@@ -1,0 +1,62 @@
+---
+import { illustrations } from "../data/illustrations.js";
+---
+
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>イラスト一覧</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+
+  <body>
+    <main>
+      <p><a href="/">トップへ戻る</a></p>
+      <h1>イラスト一覧</h1>
+
+      <div class="grid">
+        {illustrations.map((illustration) => (
+          <article class="card">
+            <img src={illustration.image} alt={illustration.title} />
+            <h2>{illustration.title}</h2>
+            <p>{illustration.tags.join(", ")}</p>
+          </article>
+        ))}
+      </div>
+    </main>
+  </body>
+</html>
+
+<style>
+  body {
+    margin: 0;
+    font-family: "Yu Gothic", "Meiryo", sans-serif;
+    background: #11131a;
+    color: #f5f1e8;
+  }
+
+  main {
+    width: min(1000px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 32px 0;
+  }
+
+  .grid {
+    columns: 3 220px;
+    column-gap: 16px;
+  }
+
+  .card {
+    break-inside: avoid;
+    margin-bottom: 16px;
+    background: #1b1f2a;
+    border: 1px solid #343a4a;
+    border-radius: 8px;
+    padding: 12px;
+  }
+
+  .card img {
+    width: 100%;
+    border-radius: 6px;
+  }
+</style>

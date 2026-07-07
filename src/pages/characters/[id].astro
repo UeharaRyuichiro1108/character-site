@@ -1,0 +1,116 @@
+---
+import { characters } from "../../data/characters.js";
+import { illustrations } from "../../data/illustrations.js";
+
+export function getStaticPaths() {
+  return characters.map((character) => ({
+    params: { id: character.id },
+    props: { character },
+  }));
+}
+
+const { character } = Astro.props;
+
+const relatedIllustrations = illustrations.filter((illustration) =>
+  illustration.tags.includes(character.id)
+);
+---
+
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>{character.name}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+
+  <body>
+    <main>
+      <p><a href="/characters/">キャラクター一覧へ戻る</a></p>
+
+      <section class="profile">
+        <img src={character.image} alt={character.name} />
+
+        <div>
+          <p class="group">{character.group}</p>
+          <h1>{character.name}</h1>
+          <p>{character.catchcopy}</p>
+          <p>{character.description}</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>関連イラスト</h2>
+
+        {relatedIllustrations.length === 0 ? (
+          <p>関連イラストはまだありません。</p>
+        ) : (
+          <div class="grid">
+            {relatedIllustrations.map((illustration) => (
+              <article class="card">
+                <img src={illustration.image} alt={illustration.title} />
+                <h3>{illustration.title}</h3>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+    </main>
+  </body>
+</html>
+
+<style>
+  body {
+    margin: 0;
+    font-family: "Yu Gothic", "Meiryo", sans-serif;
+    background: #11131a;
+    color: #f5f1e8;
+  }
+
+  main {
+    width: min(1000px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 32px 0;
+  }
+
+  .profile {
+    display: grid;
+    grid-template-columns: minmax(220px, 360px) 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .profile img {
+    width: 100%;
+    border-radius: 8px;
+  }
+
+  .group {
+    color: #9cc7ff;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .card {
+    background: #1b1f2a;
+    border: 1px solid #343a4a;
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .card img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+
+  @media (max-width: 700px) {
+    .profile {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,110 @@
+---
+import { characters } from "../data/characters.js";
+---
+
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>創作キャラクターサイト</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+
+  <body>
+    <header>
+      <h1>創作キャラクターサイト</h1>
+      <nav>
+        <a href="/characters/">キャラクター</a>
+        <a href="/illustrations/">イラスト</a>
+        <a href="/world/">世界観</a>
+        <a href="/relationships/">相関図</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <h2>星と月蝕の物語</h2>
+        <p>一次創作キャラクター、世界観、イラストをまとめたサイトです。</p>
+      </section>
+
+      <section>
+        <h2>キャラクター</h2>
+        <div class="grid">
+          {characters.map((character) => (
+            <a class="card" href={`/characters/${character.id}/`}>
+              <img src={character.image} alt={character.name} />
+              <div>
+                <p class="group">{character.group}</p>
+                <h3>{character.name}</h3>
+                <p>{character.catchcopy}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
+
+<style>
+  body {
+    margin: 0;
+    font-family: "Yu Gothic", "Meiryo", sans-serif;
+    background: #11131a;
+    color: #f5f1e8;
+  }
+
+  header {
+    padding: 20px;
+    border-bottom: 1px solid #333846;
+  }
+
+  nav {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  main {
+    width: min(1000px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 32px 0;
+  }
+
+  .hero {
+    padding: 48px 0;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .card {
+    display: block;
+    text-decoration: none;
+    background: #1b1f2a;
+    border: 1px solid #343a4a;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .card img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .card div {
+    padding: 16px;
+  }
+
+  .group {
+    color: #9cc7ff;
+    font-size: 14px;
+  }
+</style>

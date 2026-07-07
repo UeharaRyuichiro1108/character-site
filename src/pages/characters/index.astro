@@ -1,0 +1,74 @@
+---
+import { characters } from "../../data/characters.js";
+
+const groups = [...new Set(characters.map((character) => character.group))];
+---
+
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>キャラクター一覧</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+
+  <body>
+    <main>
+      <p><a href="/">トップへ戻る</a></p>
+      <h1>キャラクター一覧</h1>
+
+      {groups.map((group) => (
+        <section>
+          <h2>{group}</h2>
+          <div class="grid">
+            {characters
+              .filter((character) => character.group === group)
+              .map((character) => (
+                <a class="card" href={`/characters/${character.id}/`}>
+                  <img src={character.image} alt={character.name} />
+                  <h3>{character.name}</h3>
+                  <p>{character.catchcopy}</p>
+                </a>
+              ))}
+          </div>
+        </section>
+      ))}
+    </main>
+  </body>
+</html>
+
+<style>
+  body {
+    margin: 0;
+    font-family: "Yu Gothic", "Meiryo", sans-serif;
+    background: #11131a;
+    color: #f5f1e8;
+  }
+
+  main {
+    width: min(1000px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 32px 0;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .card {
+    padding: 16px;
+    background: #1b1f2a;
+    border: 1px solid #343a4a;
+    border-radius: 8px;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .card img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+</style>
