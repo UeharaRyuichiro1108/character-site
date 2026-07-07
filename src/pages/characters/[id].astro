@@ -1,18 +1,34 @@
 ---
-import { characters } from "../../data/characters.js";
-import { illustrations } from "../../data/illustrations.js";
-
 export function getStaticPaths() {
+  const characterModules = import.meta.glob("../../content/characters/*.md", {
+    eager: true,
+  });
+
+  const characters = Object.values(characterModules).map((module) => ({
+    ...module.frontmatter,
+    Content: module.default,
+  }));
+
   return characters.map((character) => ({
     params: { id: character.id },
     props: { character },
   }));
 }
 
+const illustrationModules = import.meta.glob("../../content/illustrations/*.md", {
+  eager: true,
+});
+
+const illustrations = Object.values(illustrationModules).map((module) => ({
+  ...module.frontmatter,
+  Content: module.default,
+}));
+
 const { character } = Astro.props;
+const CharacterContent = character.Content;
 
 const relatedIllustrations = illustrations.filter((illustration) =>
-  illustration.tags.includes(character.id)
+  illustration.tags?.includes(character.id)
 );
 ---
 
@@ -34,7 +50,9 @@ const relatedIllustrations = illustrations.filter((illustration) =>
           <p class="group">{character.group}</p>
           <h1>{character.name}</h1>
           <p>{character.catchcopy}</p>
-          <p>{character.description}</p>
+          <div class="description">
+            <CharacterContent />
+          </div>
         </div>
       </section>
 
@@ -86,6 +104,10 @@ const relatedIllustrations = illustrations.filter((illustration) =>
 
   .group {
     color: #9cc7ff;
+  }
+
+  .description {
+    line-height: 1.9;
   }
 
   .grid {

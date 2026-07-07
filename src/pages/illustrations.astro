@@ -1,5 +1,12 @@
 ---
-import { illustrations } from "../data/illustrations.js";
+const illustrationModules = import.meta.glob("../content/illustrations/*.md", {
+  eager: true,
+});
+
+const illustrations = Object.values(illustrationModules).map((module) => ({
+  ...module.frontmatter,
+  Content: module.default,
+}));
 ---
 
 <html lang="ja">
@@ -19,7 +26,7 @@ import { illustrations } from "../data/illustrations.js";
           <article class="card">
             <img src={illustration.image} alt={illustration.title} />
             <h2>{illustration.title}</h2>
-            <p>{illustration.tags.join(", ")}</p>
+            <p>{illustration.tags?.join(", ")}</p>
           </article>
         ))}
       </div>

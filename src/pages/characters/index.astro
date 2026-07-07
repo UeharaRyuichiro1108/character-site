@@ -1,5 +1,12 @@
 ---
-import { characters } from "../../data/characters.js";
+const characterModules = import.meta.glob("../../content/characters/*.md", {
+  eager: true,
+});
+
+const characters = Object.values(characterModules).map((module) => ({
+  ...module.frontmatter,
+  Content: module.default,
+}));
 
 const groups = [...new Set(characters.map((character) => character.group))];
 ---

@@ -1,0 +1,43 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: "characters"
+    label: "キャラクター"
+    folder: "src/content/characters"
+    create: true
+    slug: "{{fields.id}}"
+    fields:
+      - { label: "ID", name: "id", widget: "string" }
+      - { label: "名前", name: "name", widget: "string" }
+      - { label: "所属", name: "group", widget: "string" }
+      - { label: "画像", name: "image", widget: "image" }
+      - { label: "キャッチコピー", name: "catchcopy", widget: "string", required: false }
+      - { label: "タグ", name: "tags", widget: "list", required: false }
+      - { label: "説明", name: "body", widget: "markdown" }
+
+  - name: "illustrations"
+    label: "イラスト"
+    folder: "src/content/illustrations"
+    create: true
+    slug: "{{fields.id}}"
+    fields:
+      - { label: "ID", name: "id", widget: "string" }
+      - { label: "タイトル", name: "title", widget: "string" }
+      - { label: "画像", name: "image", widget: "image" }
+      - { label: "関連タグ", name: "tags", widget: "list", required: false }
+      - { label: "説明", name: "body", widget: "markdown", required: false }
+
+  - name: "pages"
+    label: "固定ページ"
+    files:
+      - name: "world"
+        label: "世界観"
+        file: "src/content/pages/world.md"
+        fields:
+          - { label: "タイトル", name: "title", widget: "string" }
+          - { label: "本文", name: "body", widget: "markdown" }
