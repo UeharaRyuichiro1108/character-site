@@ -1,69 +1,60 @@
----
-const illustrationModules = import.meta.glob("../content/illustrations/*.md", {
-  eager: true,
-});
+﻿---
+import BaseLayout from "../components/BaseLayout.astro";
 
+const illustrationModules = import.meta.glob("../content/illustrations/*.md", { eager: true });
 const illustrations = Object.values(illustrationModules).map((module) => ({
   ...module.frontmatter,
   Content: module.default,
 }));
 ---
 
-<html lang="ja">
-  <head>
-    <meta charset="utf-8" />
-    <title>イラスト一覧</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-  </head>
+<BaseLayout title="イラスト一覧">
+  <main class="page-shell">
+    <h1 class="page-title">イラスト</h1>
+    <p class="lead">キャラクターに紐づく記録画を一覧できます。</p>
 
-  <body>
-    <main>
-      <p><a href="/">トップへ戻る</a></p>
-      <h1>イラスト一覧</h1>
-
-      <div class="grid">
-        {illustrations.map((illustration) => (
-          <article class="card">
-            <img src={illustration.image} alt={illustration.title} />
+    <div class="illustration-grid">
+      {illustrations.map((illustration) => (
+        <article class="illustration-card panel">
+          <img src={illustration.image} alt={illustration.title} />
+          <div>
             <h2>{illustration.title}</h2>
-            <p>{illustration.tags?.join(", ")}</p>
-          </article>
-        ))}
-      </div>
-    </main>
-  </body>
-</html>
+            <p>{illustration.tags?.join(" / ")}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </main>
+</BaseLayout>
 
 <style>
-  body {
-    margin: 0;
-    font-family: "Yu Gothic", "Meiryo", sans-serif;
-    background: #11131a;
-    color: #f5f1e8;
+  .illustration-grid {
+    columns: 3 240px;
+    column-gap: 22px;
+    margin-top: 36px;
   }
 
-  main {
-    width: min(1000px, calc(100% - 32px));
-    margin: 0 auto;
-    padding: 32px 0;
-  }
-
-  .grid {
-    columns: 3 220px;
-    column-gap: 16px;
-  }
-
-  .card {
+  .illustration-card {
     break-inside: avoid;
-    margin-bottom: 16px;
-    background: #1b1f2a;
-    border: 1px solid #343a4a;
-    border-radius: 8px;
-    padding: 12px;
+    margin-bottom: 22px;
+    overflow: hidden;
   }
 
-  .card img {
+  .illustration-card img {
     width: 100%;
-    border-radius: 6px;
+  }
+
+  .illustration-card div {
+    padding: 18px;
+  }
+
+  .illustration-card h2 {
+    margin: 0 0 8px;
+    font-size: 20px;
+  }
+
+  .illustration-card p {
+    margin: 0;
+    color: var(--muted);
   }
 </style>

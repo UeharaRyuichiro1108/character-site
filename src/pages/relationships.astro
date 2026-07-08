@@ -1,36 +1,23 @@
-<html lang="ja">
-  <head>
-    <meta charset="utf-8" />
-    <title>相関図</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-  </head>
+﻿---
+import BaseLayout from "../components/BaseLayout.astro";
+---
 
-  <body>
-    <main>
-      <p><a href="/">トップへ戻る</a></p>
-      <h1>相関図</h1>
-
+<BaseLayout title="相関図">
+  <main class="page-shell">
+    <h1 class="page-title">相関図</h1>
+    <div class="relationship panel">
       <img src="/images/relationship.png" alt="キャラクター相関図" />
-    </main>
-  </body>
-</html>
+    </div>
+  </main>
+</BaseLayout>
 
 <style>
-  body {
-    margin: 0;
-    font-family: "Yu Gothic", "Meiryo", sans-serif;
-    background: #11131a;
-    color: #f5f1e8;
+  .relationship {
+    padding: 14px;
   }
 
-  main {
-    width: min(1000px, calc(100% - 32px));
-    margin: 0 auto;
-    padding: 32px 0;
-  }
-
-  img {
+  .relationship img {
     width: 100%;
-    border-radius: 8px;
+    border-radius: 6px;
   }
 </style>

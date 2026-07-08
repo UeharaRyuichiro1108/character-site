@@ -1,9 +1,8 @@
 ---
-export function getStaticPaths() {
-  const characterModules = import.meta.glob("../../content/characters/*.md", {
-    eager: true,
-  });
+import BaseLayout from "../../components/BaseLayout.astro";
 
+export function getStaticPaths() {
+  const characterModules = import.meta.glob("../../content/characters/*.md", { eager: true });
   const characters = Object.values(characterModules).map((module) => ({
     ...module.frontmatter,
     Content: module.default,
@@ -15,210 +14,252 @@ export function getStaticPaths() {
   }));
 }
 
-const illustrationModules = import.meta.glob("../../content/illustrations/*.md", {
-  eager: true,
-});
+const characterModules = import.meta.glob("../../content/characters/*.md", { eager: true });
+const illustrationModules = import.meta.glob("../../content/illustrations/*.md", { eager: true });
+const museumModules = import.meta.glob("../../content/museums/*.md", { eager: true });
+
+const allCharacters = Object.values(characterModules).map((module) => ({
+  ...module.frontmatter,
+  Content: module.default,
+}));
 
 const illustrations = Object.values(illustrationModules).map((module) => ({
   ...module.frontmatter,
   Content: module.default,
 }));
 
+const museums = Object.values(museumModules).map((module) => ({
+  ...module.frontmatter,
+  Content: module.default,
+}));
+
 const { character } = Astro.props;
 const CharacterContent = character.Content;
-
-const relatedIllustrations = illustrations.filter((illustration) =>
-  illustration.tags?.includes(character.id)
-);
+const museum = museums.find((item) => item.id === character.museumId);
+const relatedCharacters = allCharacters.filter((item) => character.relatedCharacterIds?.includes(item.id));
+const relatedIllustrations = illustrations.filter((illustration) => illustration.tags?.includes(character.id));
 ---
 
-<html lang="ja">
-  <head>
-    <meta charset="utf-8" />
-    <title>{character.name}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-  </head>
+<BaseLayout title={character.name}>
+  <main class="page-shell">
+    <p class="tag"><a href="/characters/">キャラクター一覧へ戻る</a></p>
 
-  <body>
-    <main>
-      <p><a href="/characters/">キャラクター一覧へ戻る</a></p>
-
-      <section class="profile">
+    <section class="profile-hero">
+      <div class="portrait panel">
         <img src={character.image} alt={character.name} />
+      </div>
 
-        <div>
-          <p class="group">{character.group}</p>
-          <h1>{character.name}</h1>
-          <p>{character.catchcopy}</p>
+      <div class="profile-main">
+        <p class="museum-link">
+          {museum ? <a href={`/museums/${museum.id}/`}>{character.group}</a> : character.group}
+        </p>
+        <h1 class="page-title">{character.name}</h1>
+        <p class="catchcopy">{character.catchcopy}</p>
 
-          <dl class="profile-list">
-            <div>
-              <dt>性別</dt>
-              <dd>{character.gender}</dd>
-            </div>
-            <div>
-              <dt>身長</dt>
-              <dd>{character.height}</dd>
-            </div>
-            <div>
-              <dt>年齢</dt>
-              <dd>{character.age}</dd>
-            </div>
-            <div>
-              <dt>役職</dt>
-              <dd>{character.role}</dd>
-            </div>
-            <div>
-              <dt>性格</dt>
-              <dd>{character.personality}</dd>
-            </div>
-            <div>
-              <dt>特技</dt>
-              <dd>{character.skill}</dd>
-            </div>
-            <div>
-              <dt>能力</dt>
-              <dd>{character.ability}</dd>
-            </div>
-            <div>
-              <dt>生い立ち</dt>
-              <dd>{character.background}</dd>
-            </div>
-            <div>
-              <dt>その他</dt>
-              <dd>{character.other}</dd>
-            </div>
-          </dl>
+        <dl class="profile-list panel">
+          <div><dt>性別</dt><dd>{character.gender || "未設定"}</dd></div>
+          <div><dt>身長</dt><dd>{character.height || "未設定"}</dd></div>
+          <div><dt>年齢</dt><dd>{character.age || "未設定"}</dd></div>
+          <div><dt>役職</dt><dd>{character.role || "未設定"}</dd></div>
+          <div><dt>性格</dt><dd>{character.personality || "未設定"}</dd></div>
+          <div><dt>特技</dt><dd>{character.skill || "未設定"}</dd></div>
+          <div><dt>能力</dt><dd>{character.ability || "未設定"}</dd></div>
+          <div><dt>生い立ち</dt><dd>{character.background || "未設定"}</dd></div>
+          <div><dt>その他</dt><dd>{character.other || "未設定"}</dd></div>
+        </dl>
+      </div>
+    </section>
 
-          {character.designImage && (
-            <section class="design">
-              <h2>デザイン画</h2>
-              <img src={character.designImage} alt={`${character.name}のデザイン画`} />
-            </section>
-          )}
-
-          <div class="description">
-            <CharacterContent />
-          </div>
+    {character.designImage && (
+      <section class="design-section">
+        <h2 class="section-title">デザイン画</h2>
+        <div class="design-image panel">
+          <img src={character.designImage} alt={`${character.name}のデザイン画`} />
         </div>
       </section>
+    )}
 
-      <section>
-        <h2>関連イラスト</h2>
+    <section class="description-section panel">
+      <CharacterContent />
+    </section>
 
-        {relatedIllustrations.length === 0 ? (
-          <p>関連イラストはまだありません。</p>
-        ) : (
-          <div class="grid">
-            {relatedIllustrations.map((illustration) => (
-              <article class="card">
-                <img src={illustration.image} alt={illustration.title} />
-                <h3>{illustration.title}</h3>
-              </article>
-            ))}
-          </div>
-        )}
-      </section>
-    </main>
-  </body>
-</html>
+    <section class="related-section">
+      <h2 class="section-title">関係のあるキャラクター</h2>
+      {relatedCharacters.length === 0 ? (
+        <p class="lead">関係キャラクターはまだ登録されていません。</p>
+      ) : (
+        <div class="related-grid">
+          {relatedCharacters.map((item) => (
+            <a class="related-character" href={`/characters/${item.id}/`}>
+              <img src={item.image} alt={item.name} />
+              <span>{item.name}</span>
+            </a>
+          ))}
+        </div>
+      )}
+    </section>
+
+    <section class="related-section">
+      <h2 class="section-title">関連イラスト</h2>
+      {relatedIllustrations.length === 0 ? (
+        <p class="lead">関連イラストはまだありません。</p>
+      ) : (
+        <div class="illustration-grid">
+          {relatedIllustrations.map((illustration) => (
+            <article class="illustration-card panel">
+              <img src={illustration.image} alt={illustration.title} />
+              <h3>{illustration.title}</h3>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  </main>
+</BaseLayout>
 
 <style>
-  body {
-    margin: 0;
-    font-family: "Yu Gothic", "Meiryo", sans-serif;
-    background: #11131a;
-    color: #f5f1e8;
+  .tag a,
+  .museum-link a {
+    color: var(--blue-deep);
+    text-decoration: none;
   }
 
-  main {
-    width: min(1000px, calc(100% - 32px));
-    margin: 0 auto;
-    padding: 32px 0;
-  }
-
-  .profile {
+  .profile-hero {
     display: grid;
-    grid-template-columns: minmax(220px, 360px) 1fr;
-    gap: 24px;
+    grid-template-columns: minmax(220px, 380px) minmax(0, 1fr);
+    gap: clamp(24px, 5vw, 54px);
     align-items: start;
   }
 
-  .profile img {
+  .portrait {
+    overflow: hidden;
+    padding: 10px;
+  }
+
+  .portrait img {
     width: 100%;
-    border-radius: 8px;
-  }
-
-  .group {
-    color: #9cc7ff;
-  }
-
-  .description {
-    line-height: 1.9;
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 16px;
-  }
-
-  .card {
-    background: #1b1f2a;
-    border: 1px solid #343a4a;
-    border-radius: 8px;
-    padding: 16px;
-  }
-
-  .card img {
-    width: 100%;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 4 / 5;
     object-fit: cover;
     border-radius: 6px;
   }
 
-  @media (max-width: 700px) {
-    .profile {
-      grid-template-columns: 1fr;
-    }
+  .museum-link {
+    margin: 0 0 10px;
+    color: var(--blue-deep);
+    font-weight: 700;
   }
 
-    .profile-list {
+  .catchcopy {
+    margin: -12px 0 24px;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1.8;
+  }
+
+  .profile-list {
     display: grid;
-    gap: 12px;
-    margin: 24px 0;
+    margin: 0;
+    padding: 18px clamp(18px, 3vw, 28px);
   }
 
   .profile-list div {
     display: grid;
-    grid-template-columns: 90px 1fr;
-    gap: 12px;
-    padding: 12px 0;
-    border-bottom: 1px solid #343a4a;
+    grid-template-columns: 92px minmax(0, 1fr);
+    gap: 16px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .profile-list div:last-child {
+    border-bottom: 0;
   }
 
   .profile-list dt {
-    color: #9cc7ff;
-    font-weight: bold;
+    color: var(--blue-deep);
+    font-weight: 700;
   }
 
   .profile-list dd {
     margin: 0;
+    color: var(--ink);
     line-height: 1.8;
   }
 
-  .design {
-    margin: 32px 0;
+  .design-section,
+  .related-section {
+    margin-top: 56px;
   }
 
-  .design img {
+  .design-image {
+    padding: 12px;
+  }
+
+  .design-image img {
     width: 100%;
-    max-width: 720px;
-    border-radius: 8px;
-    border: 1px solid #343a4a;
+    max-height: 780px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: var(--pale);
   }
 
-  @media (max-width: 700px) {
+  .description-section {
+    margin-top: 56px;
+    padding: clamp(24px, 5vw, 42px);
+    color: var(--muted);
+    line-height: 2;
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 20px;
+  }
+
+  .related-character {
+    display: grid;
+    gap: 10px;
+    justify-items: center;
+    color: var(--ink);
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .related-character img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--soft-shadow);
+  }
+
+  .illustration-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 22px;
+  }
+
+  .illustration-card {
+    overflow: hidden;
+  }
+
+  .illustration-card img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .illustration-card h3 {
+    margin: 0;
+    padding: 16px;
+  }
+
+  @media (max-width: 780px) {
+    .profile-hero {
+      grid-template-columns: 1fr;
+    }
+
     .profile-list div {
       grid-template-columns: 1fr;
       gap: 4px;

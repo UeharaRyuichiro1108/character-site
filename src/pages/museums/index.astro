@@ -1,0 +1,115 @@
+---
+import BaseLayout from "../../components/BaseLayout.astro";
+
+const museumModules = import.meta.glob("../../content/museums/*.md", { eager: true });
+const characterModules = import.meta.glob("../../content/characters/*.md", { eager: true });
+
+const museums = Object.values(museumModules).map((module) => ({
+  ...module.frontmatter,
+  Content: module.default,
+}));
+
+const characters = Object.values(characterModules).map((module) => ({
+  ...module.frontmatter,
+  Content: module.default,
+}));
+---
+
+<BaseLayout title="博物館一覧">
+  <main class="page-shell">
+    <h1 class="page-title">博物館一覧</h1>
+    <p class="lead">キャラクターが所属する博物館・資料館の説明と、所属人物を確認できます。</p>
+
+    <div class="museum-list">
+      {museums.map((museum) => {
+        const members = characters.filter((character) => character.museumId === museum.id);
+        const MuseumContent = museum.Content;
+        return (
+          <section class="museum-card panel">
+            <div class="museum-text">
+              <a class="museum-title" href={`/museums/${museum.id}/`}>{museum.name}</a>
+              <p class="summary">{museum.summary}</p>
+              <div class="body"><MuseumContent /></div>
+            </div>
+            <div class="member-list" aria-label={`${museum.name}の所属キャラクター`}>
+              {members.map((character) => (
+                <a class="member" href={`/characters/${character.id}/`}>
+                  <img src={character.image} alt={character.name} />
+                  <span>{character.name}</span>
+                </a>
+              ))}
+            </div>
+          </section>
+        );
+      })}
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .museum-list {
+    display: grid;
+    gap: 26px;
+    margin-top: 36px;
+  }
+
+  .museum-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
+    gap: 28px;
+    padding: clamp(22px, 4vw, 36px);
+  }
+
+  .museum-title {
+    color: var(--ink);
+    font-size: clamp(24px, 4vw, 34px);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .museum-title:hover {
+    color: var(--blue-deep);
+  }
+
+  .summary {
+    color: var(--blue-deep);
+    font-weight: 700;
+  }
+
+  .body {
+    color: var(--muted);
+    line-height: 2;
+  }
+
+  .member-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+    gap: 14px;
+    align-content: start;
+  }
+
+  .member {
+    display: grid;
+    gap: 8px;
+    justify-items: center;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .member img {
+    width: 76px;
+    height: 76px;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+  }
+
+  @media (max-width: 760px) {
+    .museum-card {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

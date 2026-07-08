@@ -1,8 +1,7 @@
----
-const characterModules = import.meta.glob("../../content/characters/*.md", {
-  eager: true,
-});
+﻿---
+import BaseLayout from "../../components/BaseLayout.astro";
 
+const characterModules = import.meta.glob("../../content/characters/*.md", { eager: true });
 const characters = Object.values(characterModules).map((module) => ({
   ...module.frontmatter,
   Content: module.default,
@@ -11,71 +10,63 @@ const characters = Object.values(characterModules).map((module) => ({
 const groups = [...new Set(characters.map((character) => character.group))];
 ---
 
-<html lang="ja">
-  <head>
-    <meta charset="utf-8" />
-    <title>キャラクター一覧</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-  </head>
+<BaseLayout title="キャラクター一覧">
+  <main class="page-shell">
+    <h1 class="page-title">キャラクター</h1>
+    <p class="lead">所属する博物館ごとに、展示人物を一覧できます。</p>
 
-  <body>
-    <main>
-      <p><a href="/">トップへ戻る</a></p>
-      <h1>キャラクター一覧</h1>
-
-      {groups.map((group) => (
-        <section>
-          <h2>{group}</h2>
-          <div class="grid">
-            {characters
-              .filter((character) => character.group === group)
-              .map((character) => (
-                <a class="card" href={`/characters/${character.id}/`}>
-                  <img src={character.image} alt={character.name} />
-                  <h3>{character.name}</h3>
-                  <p>{character.catchcopy}</p>
-                </a>
-              ))}
-          </div>
-        </section>
-      ))}
-    </main>
-  </body>
-</html>
+    {groups.map((group) => (
+      <section class="group-section">
+        <h2 class="section-title">{group}</h2>
+        <div class="character-grid">
+          {characters
+            .filter((character) => character.group === group)
+            .map((character) => (
+              <a class="character-tile" href={`/characters/${character.id}/`}>
+                <img src={character.image} alt={character.name} />
+                <span>{character.name}</span>
+              </a>
+            ))}
+        </div>
+      </section>
+    ))}
+  </main>
+</BaseLayout>
 
 <style>
-  body {
-    margin: 0;
-    font-family: "Yu Gothic", "Meiryo", sans-serif;
-    background: #11131a;
-    color: #f5f1e8;
+  .group-section {
+    margin-top: 48px;
   }
 
-  main {
-    width: min(1000px, calc(100% - 32px));
-    margin: 0 auto;
-    padding: 32px 0;
-  }
-
-  .grid {
+  .character-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+    gap: clamp(18px, 3vw, 28px);
   }
 
-  .card {
-    padding: 16px;
-    background: #1b1f2a;
-    border: 1px solid #343a4a;
-    border-radius: 8px;
-    color: inherit;
+  .character-tile {
+    display: grid;
+    gap: 12px;
+    justify-items: center;
+    color: var(--ink);
+    font-weight: 700;
+    text-align: center;
     text-decoration: none;
   }
 
-  .card img {
+  .character-tile img {
     width: 100%;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 1;
     object-fit: cover;
-    border-radius: 6px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--paper);
+    box-shadow: var(--soft-shadow);
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+  }
+
+  .character-tile:hover img {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 52px rgba(93, 125, 148, 0.22);
   }
 </style>

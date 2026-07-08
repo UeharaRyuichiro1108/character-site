@@ -1,42 +1,29 @@
----
+﻿---
+import BaseLayout from "../components/BaseLayout.astro";
 import WorldContent, { frontmatter } from "../content/pages/world.md";
 ---
 
-<html lang="ja">
-  <head>
-    <meta charset="utf-8" />
-    <title>{frontmatter.title}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-  </head>
-
-  <body>
-    <main>
-      <p><a href="/">トップへ戻る</a></p>
-      <h1>{frontmatter.title}</h1>
-
-      <div class="content">
-        <WorldContent />
-      </div>
-    </main>
-  </body>
-</html>
+<BaseLayout title={frontmatter.title}>
+  <main class="page-shell narrow">
+    <h1 class="page-title">{frontmatter.title}</h1>
+    <div class="world-body panel">
+      <WorldContent />
+    </div>
+  </main>
+</BaseLayout>
 
 <style>
-  body {
-    margin: 0;
-    font-family: "Yu Gothic", "Meiryo", sans-serif;
-    background: #11131a;
-    color: #f5f1e8;
+  .narrow {
+    width: min(820px, calc(100% - 32px));
   }
 
-  main {
-    width: min(760px, calc(100% - 32px));
-    margin: 0 auto;
-    padding: 32px 0;
-    line-height: 1.9;
+  .world-body {
+    padding: clamp(24px, 5vw, 48px);
+    line-height: 2;
   }
 
-  .content {
-    line-height: 1.9;
+  .world-body :global(h2) {
+    margin-top: 34px;
+    color: var(--blue-deep);
   }
 </style>

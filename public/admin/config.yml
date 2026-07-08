@@ -14,11 +14,34 @@ collections:
     fields:
       - { label: "ID", name: "id", widget: "string" }
       - { label: "名前", name: "name", widget: "string" }
-      - { label: "所属", name: "group", widget: "string" }
-      - { label: "画像", name: "image", widget: "image" }
+      - { label: "性別", name: "gender", widget: "string", required: false }
+      - { label: "身長", name: "height", widget: "string", required: false }
+      - { label: "年齢", name: "age", widget: "string", required: false }
+      - { label: "役職", name: "role", widget: "string", required: false }
+      - { label: "性格", name: "personality", widget: "text", required: false }
+      - { label: "特技", name: "skill", widget: "text", required: false }
+      - { label: "能力", name: "ability", widget: "text", required: false }
+      - { label: "生い立ち", name: "background", widget: "text", required: false }
+      - { label: "その他", name: "other", widget: "text", required: false }
+      - { label: "所属博物館名", name: "group", widget: "string" }
+      - { label: "所属博物館ID", name: "museumId", widget: "string", required: false }
+      - { label: "トップ画像", name: "image", widget: "image" }
+      - { label: "デザイン画", name: "designImage", widget: "image", required: false }
       - { label: "キャッチコピー", name: "catchcopy", widget: "string", required: false }
+      - { label: "関係キャラクターID", name: "relatedCharacterIds", widget: "list", required: false }
       - { label: "タグ", name: "tags", widget: "list", required: false }
-      - { label: "説明", name: "body", widget: "markdown" }
+      - { label: "自由説明", name: "body", widget: "markdown", required: false }
+
+  - name: "museums"
+    label: "博物館"
+    folder: "src/content/museums"
+    create: true
+    slug: "{{fields.id}}"
+    fields:
+      - { label: "ID", name: "id", widget: "string" }
+      - { label: "名前", name: "name", widget: "string" }
+      - { label: "短い説明", name: "summary", widget: "string" }
+      - { label: "本文", name: "body", widget: "markdown" }
 
   - name: "illustrations"
     label: "イラスト"

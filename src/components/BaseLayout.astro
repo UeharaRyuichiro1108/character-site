@@ -1,0 +1,177 @@
+---
+const { title = "創作博物館", description = "一次創作キャラクター資料館" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/">創作博物館</a>
+      <nav class="nav" aria-label="主要ナビゲーション">
+        <a href="/">TOP</a>
+        <a href="/characters/">キャラクター</a>
+        <a href="/museums/">博物館一覧</a>
+        <a href="/illustrations/">イラスト</a>
+        <a href="/relationships/">相関図</a>
+      </nav>
+    </header>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --ink: #283745;
+    --muted: #6f8292;
+    --pale: #edf6fb;
+    --pale-2: #dcecf4;
+    --blue: #9eb9cf;
+    --blue-deep: #6f8fa9;
+    --line: #d8e5ed;
+    --paper: #ffffff;
+    --soft-shadow: 0 18px 48px rgba(93, 125, 148, 0.16);
+  }
+
+  @font-face {
+  font-family: "MySiteFont";
+    src: url("/fonts/UtsukushiFONT.otf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    font-family: "MySiteFont", "Yu Gothic", "Meiryo", sans-serif;
+    color: var(--ink);
+    background: linear-gradient(180deg, #f8fcff 0%, #eef7fb 44%, #ffffff 100%);
+    letter-spacing: 0;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px clamp(16px, 4vw, 48px);
+    background: rgba(255, 255, 255, 0.86);
+    border-bottom: 1px solid rgba(158, 185, 207, 0.38);
+    backdrop-filter: blur(14px);
+  }
+
+  .brand {
+    flex: 0 0 auto;
+      font-weight: 700;
+    text-decoration: none;
+    color: var(--blue-deep);
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: clamp(10px, 2vw, 22px);
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+
+  .nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    color: var(--ink);
+    font-size: 14px;
+      font-weight: 700;
+    text-decoration: none;
+  }
+
+  .nav a:hover {
+    color: var(--blue-deep);
+  }
+
+  main {
+    width: min(1120px, calc(100% - 32px));
+    margin: 0 auto;
+  }
+
+  .page-shell {
+    padding: 48px 0 72px;
+  }
+
+  .page-title {
+    margin: 0 0 28px;
+    font-size: clamp(32px, 6vw, 64px);
+    color: var(--ink);
+  }
+
+  .section-title {
+    margin: 0 0 22px;
+    color: var(--ink);
+    font-size: clamp(24px, 4vw, 38px);
+  }
+
+  .lead {
+    color: var(--muted);
+    line-height: 2;
+  }
+
+  .panel {
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--soft-shadow);
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    color: var(--blue-deep);
+    font-size: 13px;
+      font-weight: 700;
+  }
+
+  @media (max-width: 720px) {
+    .site-header {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav {
+      width: 100%;
+      justify-content: flex-start;
+    }
+  }
+</style>

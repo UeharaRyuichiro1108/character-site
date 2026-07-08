@@ -1,4 +1,4 @@
----
+﻿---
 id: "observatory"
 title: "夜明けの観測室"
 image: "/images/illustrations/observatory.png"
