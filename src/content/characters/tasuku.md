@@ -1,24 +1,38 @@
-﻿---
+---
 id: "tasuku"
-name: "匡"
+name: "丞（たすく）"
 gender: "男性"
-height: "171cm"
-age: "20歳"
-role: "想影市立自然資料館 学芸員"
-personality: "穏やかで人当たりがよいが、資料の扱いには厳しい。"
-skill: "自然標本の整理、展示解説"
-ability: "標本に残った土地の記憶を読み取る"
-background: "想影市立自然資料館の学芸員。江渡からは「匡さん」と呼ばれている。"
-other: "閉館後の静かな展示室が好き。"
-group: "想影市立自然資料館"
-museumId: "natural-history"
+height: "185cm"
+age: "28歳"
+animal: "エゾオオカミ"
+role: "愛館市立郷土資料館　自然棟　剥製標本担当"
+personality: "冷静。汐音には少し甘いところがある。"
+skill: "足が速い"
+ability: "「繕」
+
+  何本もの糸を使い敵の動きを止めたり、物を修復したりする。
+
+  今までに修繕してきた剥製の意思が宿っている。
+  
+  修繕した剥製の数だけ糸がある。"
+background: "元は昭和に生きていた長谷川誠という男であった。
+  
+  誠は大日本帝国陸軍大尉で、長谷川美代子（後の汐音）と婚姻関係にあった。
+
+  美代子死亡後に出征先で死亡、愛館市立郷土資料館の学芸員として雇用される。"
+other: "剥製の修復が上手い"
+group: "愛館市立郷土資料館"
+museumId: "aidate"
 image: "/images/uploads/tasuku.png"
-designImage: ""
-catchcopy: "自然標本を守る学芸員"
+designImage: "/images/uploads/tasuku_design.png"
+catchcopy: "愛館市立郷土資料館　自然棟　剥製標本担当"
 relatedCharacterIds:
-  - ao
+  - sion
+  - gunso
+  - azusa
 tags:
   - tasuku
 ---
 
-想影市立自然資料館の学芸員。土地に残る記憶と標本をつなぎ、失われやすいものを展示として残そうとしている。
+愛館市立郷土資料館の学芸員。
+汐音と行動することが多い。

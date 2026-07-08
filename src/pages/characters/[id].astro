@@ -23,10 +23,16 @@ const allCharacters = Object.values(characterModules).map((module) => ({
   Content: module.default,
 }));
 
-const illustrations = Object.values(illustrationModules).map((module) => ({
-  ...module.frontmatter,
-  Content: module.default,
-}));
+const illustrations = Object.values(illustrationModules).map((module) => {
+  const data = module.frontmatter;
+  const imageList = (data.images?.length ? data.images : [data.image]).filter(Boolean).slice(0, 10);
+  return {
+    ...data,
+    images: imageList,
+    coverImage: imageList[0],
+    Content: module.default,
+  };
+});
 
 const museums = Object.values(museumModules).map((module) => ({
   ...module.frontmatter,
@@ -61,6 +67,7 @@ const relatedIllustrations = illustrations.filter((illustration) => illustration
           <div><dt>身長</dt><dd>{character.height || "未設定"}</dd></div>
           <div><dt>年齢</dt><dd>{character.age || "未設定"}</dd></div>
           <div><dt>役職</dt><dd>{character.role || "未設定"}</dd></div>
+          <div><dt>動物</dt><dd>{character.animal || "未設定"}</dd></div>
           <div><dt>性格</dt><dd>{character.personality || "未設定"}</dd></div>
           <div><dt>特技</dt><dd>{character.skill || "未設定"}</dd></div>
           <div><dt>能力</dt><dd>{character.ability || "未設定"}</dd></div>
@@ -106,10 +113,10 @@ const relatedIllustrations = illustrations.filter((illustration) => illustration
       ) : (
         <div class="illustration-grid">
           {relatedIllustrations.map((illustration) => (
-            <article class="illustration-card panel">
-              <img src={illustration.image} alt={illustration.title} />
+            <a class="illustration-card panel" href={`/illustrations/${illustration.id}/`}>
+              <img src={illustration.coverImage} alt={illustration.title} />
               <h3>{illustration.title}</h3>
-            </article>
+            </a>
           ))}
         </div>
       )}
@@ -183,6 +190,7 @@ const relatedIllustrations = illustrations.filter((illustration) => illustration
     margin: 0;
     color: var(--ink);
     line-height: 1.8;
+    white-space: pre-line;
   }
 
   .design-section,
@@ -207,6 +215,7 @@ const relatedIllustrations = illustrations.filter((illustration) => illustration
     padding: clamp(24px, 5vw, 42px);
     color: var(--muted);
     line-height: 2;
+    white-space: pre-line;
   }
 
   .related-grid {
@@ -242,6 +251,8 @@ const relatedIllustrations = illustrations.filter((illustration) => illustration
 
   .illustration-card {
     overflow: hidden;
+    color: var(--ink);
+    text-decoration: none;
   }
 
   .illustration-card img {

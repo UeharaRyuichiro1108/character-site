@@ -1,60 +1,74 @@
-﻿---
+---
 import BaseLayout from "../components/BaseLayout.astro";
 
 const illustrationModules = import.meta.glob("../content/illustrations/*.md", { eager: true });
-const illustrations = Object.values(illustrationModules).map((module) => ({
-  ...module.frontmatter,
-  Content: module.default,
-}));
+const illustrations = Object.values(illustrationModules).map((module) => {
+  const data = module.frontmatter;
+  const imageList = (data.images?.length ? data.images : [data.image]).filter(Boolean).slice(0, 10);
+  return {
+    ...data,
+    images: imageList,
+    coverImage: imageList[0],
+    Content: module.default,
+  };
+});
 ---
 
 <BaseLayout title="イラスト一覧">
   <main class="page-shell">
-    <h1 class="page-title">イラスト</h1>
-    <p class="lead">キャラクターに紐づく記録画を一覧できます。</p>
+    <h1 class="gallery-title">GALLERY</h1>
 
-    <div class="illustration-grid">
+    <div class="illustration-grid" aria-label="イラスト一覧">
       {illustrations.map((illustration) => (
-        <article class="illustration-card panel">
-          <img src={illustration.image} alt={illustration.title} />
-          <div>
-            <h2>{illustration.title}</h2>
-            <p>{illustration.tags?.join(" / ")}</p>
-          </div>
-        </article>
+        <a class="illustration-tile" href={`/illustrations/${illustration.id}/`} aria-label={illustration.title}>
+          <img src={illustration.coverImage} alt={illustration.title} />
+        </a>
       ))}
     </div>
   </main>
 </BaseLayout>
 
 <style>
+  .gallery-title {
+    margin: 0 0 28px;
+    color: var(--blue-deep);
+    font-size: clamp(28px, 5vw, 52px);
+    text-align: center;
+    letter-spacing: 0;
+  }
+
   .illustration-grid {
-    columns: 3 240px;
-    column-gap: 22px;
-    margin-top: 36px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(8px, 1.5vw, 16px);
+    max-width: 920px;
+    margin: 0 auto;
   }
 
-  .illustration-card {
-    break-inside: avoid;
-    margin-bottom: 22px;
+  .illustration-tile {
+    display: block;
+    aspect-ratio: 1;
     overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--pale);
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
   }
 
-  .illustration-card img {
+  .illustration-tile:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--soft-shadow);
+  }
+
+  .illustration-tile img {
     width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
-  .illustration-card div {
-    padding: 18px;
-  }
-
-  .illustration-card h2 {
-    margin: 0 0 8px;
-    font-size: 20px;
-  }
-
-  .illustration-card p {
-    margin: 0;
-    color: var(--muted);
+  @media (max-width: 520px) {
+    .illustration-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 </style>

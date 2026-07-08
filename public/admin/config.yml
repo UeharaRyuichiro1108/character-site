@@ -18,6 +18,7 @@ collections:
       - { label: "身長", name: "height", widget: "string", required: false }
       - { label: "年齢", name: "age", widget: "string", required: false }
       - { label: "役職", name: "role", widget: "string", required: false }
+      - { label: "動物", name: "animal", widget: "string", required: false }
       - { label: "性格", name: "personality", widget: "text", required: false }
       - { label: "特技", name: "skill", widget: "text", required: false }
       - { label: "能力", name: "ability", widget: "text", required: false }
@@ -51,7 +52,8 @@ collections:
     fields:
       - { label: "ID", name: "id", widget: "string" }
       - { label: "タイトル", name: "title", widget: "string" }
-      - { label: "画像", name: "image", widget: "image" }
+      - { label: "一覧用画像", name: "image", widget: "image" }
+      - { label: "画像セット", name: "images", widget: "list", required: false, max: 10, field: { label: "画像", name: "image", widget: "image" } }
       - { label: "関連タグ", name: "tags", widget: "list", required: false }
       - { label: "説明", name: "body", widget: "markdown", required: false }
 

@@ -1,0 +1,165 @@
+---
+import BaseLayout from "../../components/BaseLayout.astro";
+
+export function getStaticPaths() {
+  const illustrationModules = import.meta.glob("../../content/illustrations/*.md", { eager: true });
+  const illustrations = Object.values(illustrationModules).map((module) => {
+    const data = module.frontmatter;
+    const imageList = (data.images?.length ? data.images : [data.image]).filter(Boolean).slice(0, 10);
+    return {
+      ...data,
+      images: imageList,
+      Content: module.default,
+    };
+  });
+
+  return illustrations.map((illustration) => ({
+    params: { id: illustration.id },
+    props: { illustration },
+  }));
+}
+
+const characterModules = import.meta.glob("../../content/characters/*.md", { eager: true });
+const characters = Object.values(characterModules).map((module) => ({
+  ...module.frontmatter,
+  Content: module.default,
+}));
+
+const { illustration } = Astro.props;
+const IllustrationContent = illustration.Content;
+const relatedCharacters = characters.filter((character) => illustration.tags?.includes(character.id));
+---
+
+<BaseLayout title={illustration.title}>
+  <main class="page-shell artwork-page">
+    <p class="tag"><a href="/illustrations/">イラスト一覧へ戻る</a></p>
+
+    <section class="image-sequence" aria-label={`${illustration.title}の画像一覧`}>
+      {illustration.images.map((image, index) => (
+        <figure class="sequence-item" id={`image-${index + 1}`}>
+          {illustration.images.length > 1 && <span>{index + 1} / {illustration.images.length}</span>}
+          <img src={image} alt={`${illustration.title} ${index + 1}枚目`} />
+        </figure>
+      ))}
+    </section>
+
+    <section class="artwork-info">
+      <h1>{illustration.title}</h1>
+
+      <div class="artist-comment">
+        <IllustrationContent />
+      </div>
+
+      <section class="related-characters">
+        <h2>関連キャラクター</h2>
+        {relatedCharacters.length === 0 ? (
+          <p class="lead">関連キャラクターはまだ登録されていません。</p>
+        ) : (
+          <div class="character-links">
+            {relatedCharacters.map((character) => (
+              <a class="character-link" href={`/characters/${character.id}/`}>
+                <img src={character.image} alt={character.name} />
+                <span>{character.name}</span>
+              </a>
+            ))}
+          </div>
+        )}
+      </section>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .artwork-page {
+    width: min(980px, calc(100% - 32px));
+  }
+
+  .tag {
+    margin-bottom: 22px;
+  }
+
+  .tag a {
+    color: var(--blue-deep);
+    text-decoration: none;
+  }
+
+  .image-sequence {
+    display: grid;
+    gap: 26px;
+  }
+
+  .sequence-item {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+  }
+
+  .sequence-item span {
+    justify-self: end;
+    color: var(--blue-deep);
+    font-weight: 700;
+  }
+
+  .sequence-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    background: var(--pale);
+    box-shadow: var(--soft-shadow);
+  }
+
+  .artwork-info {
+    display: grid;
+    gap: 28px;
+    margin-top: 30px;
+  }
+
+  .artwork-info h1 {
+    margin: 0;
+    color: var(--ink);
+    font-size: clamp(22px, 3vw, 34px);
+    line-height: 1.5;
+  }
+
+  .artist-comment {
+    margin-top: -18px;
+    color: var(--muted);
+    line-height: 2;
+    white-space: pre-line;
+  }
+
+  .artist-comment :global(p) {
+    margin: 0;
+  }
+
+  .related-characters h2 {
+    margin: 0 0 14px;
+    color: var(--blue-deep);
+    font-size: clamp(17px, 2.4vw, 23px);
+  }
+
+  .character-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+    gap: 18px;
+  }
+
+  .character-link {
+    display: grid;
+    gap: 10px;
+    justify-items: center;
+    color: var(--ink);
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .character-link img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--soft-shadow);
+  }
+</style>

@@ -1,5 +1,5 @@
 ---
-const { title = "創作博物館", description = "一次創作キャラクター資料館" } = Astro.props;
+const { title = "愛館市立郷土資料館", description = "一次創作キャラクター資料館" } = Astro.props;
 ---
 
 <!doctype html>
@@ -13,7 +13,7 @@ const { title = "創作博物館", description = "一次創作キャラクター
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="/">創作博物館</a>
+      <a class="brand" href="/" aria-label="TOPへ戻る"><img src="/images/uploads/logo.png" alt="愛館市立郷土資料館" /></a>
       <nav class="nav" aria-label="主要ナビゲーション">
         <a href="/">TOP</a>
         <a href="/characters/">キャラクター</a>
@@ -41,7 +41,7 @@ const { title = "創作博物館", description = "一次創作キャラクター
 
   @font-face {
   font-family: "MySiteFont";
-    src: url("/fonts/UtsukushiFONT.otf") format("truetype");
+    src: url("/fonts/UtsukushiFONT.otf") format("opentype");
     font-weight: 400;
     font-style: normal;
     font-display: swap;
@@ -81,16 +81,25 @@ const { title = "創作博物館", description = "一次創作キャラクター
     justify-content: space-between;
     gap: 16px;
     padding: 14px clamp(16px, 4vw, 48px);
-    background: rgba(255, 255, 255, 0.86);
+    background: #ffffff;
     border-bottom: 1px solid rgba(158, 185, 207, 0.38);
-    backdrop-filter: blur(14px);
+    box-shadow: 0 8px 24px rgba(93, 125, 148, 0.08);
   }
 
   .brand {
     flex: 0 0 auto;
-      font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    width: 216px;
+    height: 72px;
+    overflow: hidden;
     text-decoration: none;
-    color: var(--blue-deep);
+  }
+
+  .brand img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
 
   .nav {
