@@ -50,6 +50,53 @@ const relatedIllustrations = illustrations.filter((illustration) =>
           <p class="group">{character.group}</p>
           <h1>{character.name}</h1>
           <p>{character.catchcopy}</p>
+
+          <dl class="profile-list">
+            <div>
+              <dt>性別</dt>
+              <dd>{character.gender}</dd>
+            </div>
+            <div>
+              <dt>身長</dt>
+              <dd>{character.height}</dd>
+            </div>
+            <div>
+              <dt>年齢</dt>
+              <dd>{character.age}</dd>
+            </div>
+            <div>
+              <dt>役職</dt>
+              <dd>{character.role}</dd>
+            </div>
+            <div>
+              <dt>性格</dt>
+              <dd>{character.personality}</dd>
+            </div>
+            <div>
+              <dt>特技</dt>
+              <dd>{character.skill}</dd>
+            </div>
+            <div>
+              <dt>能力</dt>
+              <dd>{character.ability}</dd>
+            </div>
+            <div>
+              <dt>生い立ち</dt>
+              <dd>{character.background}</dd>
+            </div>
+            <div>
+              <dt>その他</dt>
+              <dd>{character.other}</dd>
+            </div>
+          </dl>
+
+          {character.designImage && (
+            <section class="design">
+              <h2>デザイン画</h2>
+              <img src={character.designImage} alt={`${character.name}のデザイン画`} />
+            </section>
+          )}
+
           <div class="description">
             <CharacterContent />
           </div>
@@ -133,6 +180,48 @@ const relatedIllustrations = illustrations.filter((illustration) =>
   @media (max-width: 700px) {
     .profile {
       grid-template-columns: 1fr;
+    }
+  }
+
+    .profile-list {
+    display: grid;
+    gap: 12px;
+    margin: 24px 0;
+  }
+
+  .profile-list div {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #343a4a;
+  }
+
+  .profile-list dt {
+    color: #9cc7ff;
+    font-weight: bold;
+  }
+
+  .profile-list dd {
+    margin: 0;
+    line-height: 1.8;
+  }
+
+  .design {
+    margin: 32px 0;
+  }
+
+  .design img {
+    width: 100%;
+    max-width: 720px;
+    border-radius: 8px;
+    border: 1px solid #343a4a;
+  }
+
+  @media (max-width: 700px) {
+    .profile-list div {
+      grid-template-columns: 1fr;
+      gap: 4px;
     }
   }
 </style>
