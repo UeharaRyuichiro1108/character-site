@@ -1,6 +1,6 @@
 ---
-id: "aidate"
-title: "ミニ愛館市立郷土資料館"
+id: "origin"
+title: "2022年ごろの絵"
 image: "/images/uploads/origin.png"
 images:
   - "/images/uploads/origin.png"
