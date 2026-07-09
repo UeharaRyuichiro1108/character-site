@@ -1,0 +1,127 @@
+---
+import BaseLayout from "../../components/BaseLayout.astro";
+
+const itemModules = import.meta.glob("../../content/gifted-illustrations/*.md", { eager: true });
+const getIdFromPath = (path) => path.split("/").pop().replace(".md", "");
+
+const items = Object.entries(itemModules)
+  .map(([path, module]) => ({
+    id: module.frontmatter.id || getIdFromPath(path),
+    creatorName: module.frontmatter.creatorName || "作者名未設定",
+    url: module.frontmatter.url || "#",
+    thumbnailUrl: module.frontmatter.thumbnailUrl || "",
+  }))
+  .sort((a, b) => a.creatorName.localeCompare(b.creatorName, "ja"));
+---
+
+<BaseLayout title="描いていただいたイラスト | 愛館市立郷土資料館" description="描いていただいたイラストへのリンク集です。">
+  <main class="page-shell gifted-page">
+    <header class="gifted-head">
+      <h1 class="page-title">描いていただいたイラスト</h1>
+      <p class="lead">描いていただいた作品へのリンクを並べています。</p>
+    </header>
+
+    {items.length ? (
+      <section class="gifted-grid" aria-label="描いていただいたイラスト一覧">
+        {items.map((item) => (
+          <a class="gifted-card" href={item.url} target="_blank" rel="noopener noreferrer">
+            <div class="thumb" aria-hidden="true">
+              {item.thumbnailUrl ? <img src={item.thumbnailUrl} alt="" loading="lazy" /> : <span>URL</span>}
+            </div>
+            <div class="card-body">
+              <p>{item.creatorName} 様</p>
+              <span class="open-label">Xで見る</span>
+            </div>
+          </a>
+        ))}
+      </section>
+    ) : (
+      <p class="empty-message">まだ登録されていません。</p>
+    )}
+  </main>
+</BaseLayout>
+
+<style>
+  .gifted-page {
+    display: grid;
+    gap: 28px;
+  }
+
+  .gifted-head {
+    padding-top: 12px;
+  }
+
+  .gifted-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+  }
+
+  .gifted-card {
+    display: grid;
+    overflow: hidden;
+    color: var(--ink);
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--soft-shadow);
+    transition: transform 180ms ease, border-color 180ms ease;
+  }
+
+  .gifted-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--blue);
+  }
+
+  .thumb {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1.91 / 1;
+    background: linear-gradient(135deg, var(--pale), #fff);
+    color: var(--blue-deep);
+    font-weight: 700;
+    overflow: hidden;
+  }
+
+  .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .card-body {
+    display: grid;
+    gap: 8px;
+    padding: 16px 18px 18px;
+  }
+
+  .card-body p {
+    margin: 0;
+    color: var(--ink);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.7;
+  }
+
+  .open-label {
+    width: fit-content;
+    margin-top: 4px;
+    padding: 7px 14px;
+    color: #fff;
+    background: var(--blue-deep);
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .empty-message {
+    margin: 0;
+    padding: 26px;
+    color: var(--muted);
+    text-align: center;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+  }
+</style>

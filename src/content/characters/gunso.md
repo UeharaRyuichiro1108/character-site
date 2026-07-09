@@ -1,4 +1,4 @@
----
+﻿---
 id: "gunso"
 name: "軍曹"
 gender: "見た目は10代前半の少女だが、中身は30代男性"
@@ -35,6 +35,13 @@ relatedCharacterIds:
   - tasuku
   - sion
   - azusa
+relationships:
+  - targetId: "tasuku"
+    text: "頼りにしている"
+  - targetId: "sion"
+    text: "丞に甘い"
+  - targetId: "azusa"
+    text: "可愛いって言うな"
 tags:
   - gunso
   - main

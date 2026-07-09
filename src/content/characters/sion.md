@@ -43,6 +43,13 @@ relatedCharacterIds:
   - tasuku
   - gunso
   - azusa
+relationships:
+  - targetId: "tasuku"
+    text: "一番大事な人"
+  - targetId: "gunso"
+    text: "強くて頼りになる"
+  - targetId: "azusa"
+    text: "妹のような感じ"
 tags:
   - sion
   - main

@@ -1,0 +1,183 @@
+---
+import BaseLayout from "../../components/BaseLayout.astro";
+
+const novelModules = import.meta.glob("../../content/novels/*.md", { eager: true });
+const characterModules = import.meta.glob("../../content/characters/*.md", { eager: true });
+const museumModules = import.meta.glob("../../content/museums/*.md", { eager: true });
+
+const getIdFromPath = (path) => path.split("/").pop().replace(".md", "");
+
+const characters = Object.entries(characterModules)
+  .map(([path, module]) => ({ id: module.frontmatter.id || getIdFromPath(path), ...module.frontmatter }))
+  .sort((a, b) => a.name.localeCompare(b.name, "ja"));
+const museums = Object.entries(museumModules)
+  .map(([path, module]) => ({ id: module.frontmatter.id || getIdFromPath(path), ...module.frontmatter }))
+  .sort((a, b) => a.name.localeCompare(b.name, "ja"));
+
+const characterMap = new Map(characters.map((character) => [character.id, character]));
+const museumMap = new Map(museums.map((museum) => [museum.id, museum]));
+const getNames = (ids = [], map) => ids.map((id) => map.get(id)?.name || id).filter(Boolean);
+
+const novels = Object.entries(novelModules)
+  .map(([path, module]) => {
+    const id = module.frontmatter.id || getIdFromPath(path);
+    const characterIds = module.frontmatter.characterIds || [];
+    const museumIds = module.frontmatter.museumIds || [];
+    return {
+      id,
+      title: module.frontmatter.title || "無題の小説",
+      characterIds,
+      museumIds,
+      characterNames: getNames(characterIds, characterMap),
+      museumNames: getNames(museumIds, museumMap),
+    };
+  })
+  .sort((a, b) => a.title.localeCompare(b.title, "ja"));
+---
+
+<BaseLayout title="小説 | 愛館市立郷土資料館" description="愛館市立郷土資料館の小説一覧です。">
+  <main class="page-shell novels-page">
+    <section class="novels-head">
+      <h1 class="page-title">小説</h1>
+      <p class="lead">登場キャラクターや関連博物館から、小説を探せます。</p>
+    </section>
+
+    <form class="filter-panel" id="novel-filter">
+      <label>
+        <span>キャラクター</span>
+        <select name="character">
+          <option value="">すべて</option>
+          {characters.map((character) => <option value={character.id}>{character.name}</option>)}
+        </select>
+      </label>
+      <label>
+        <span>博物館</span>
+        <select name="museum">
+          <option value="">すべて</option>
+          {museums.map((museum) => <option value={museum.id}>{museum.name}</option>)}
+        </select>
+      </label>
+      <button type="submit">決定</button>
+      <button type="button" class="reset-button" id="novel-filter-reset">解除</button>
+    </form>
+
+    <section class="novel-list" id="novel-list" aria-live="polite">
+      {novels.map((novel) => (
+        <a
+          class="novel-card"
+          href={`/novels/${novel.id}/`}
+          data-character-ids={novel.characterIds.join(",")}
+          data-museum-ids={novel.museumIds.join(",")}
+        >
+          <h2>{novel.title}</h2>
+          <dl>
+            <div>
+              <dt>登場キャラクター</dt>
+              <dd>{novel.characterNames.length ? novel.characterNames.join("、") : "未設定"}</dd>
+            </div>
+            <div>
+              <dt>関連博物館</dt>
+              <dd>{novel.museumNames.length ? novel.museumNames.join("、") : "未設定"}</dd>
+            </div>
+          </dl>
+        </a>
+      ))}
+    </section>
+    <p class="empty-message" id="novel-empty" hidden>条件に合う小説がありません。</p>
+  </main>
+
+  <script>
+    const form = document.querySelector("#novel-filter");
+    const resetButton = document.querySelector("#novel-filter-reset");
+    const cards = Array.from(document.querySelectorAll(".novel-card"));
+    const emptyMessage = document.querySelector("#novel-empty");
+
+    const applyFilter = () => {
+      const data = new FormData(form);
+      const character = data.get("character");
+      const museum = data.get("museum");
+      let visibleCount = 0;
+
+      cards.forEach((card) => {
+        const characterIds = (card.dataset.characterIds || "").split(",").filter(Boolean);
+        const museumIds = (card.dataset.museumIds || "").split(",").filter(Boolean);
+        const matchesCharacter = !character || characterIds.includes(character);
+        const matchesMuseum = !museum || museumIds.includes(museum);
+        const isVisible = matchesCharacter && matchesMuseum;
+        card.hidden = !isVisible;
+        if (isVisible) visibleCount += 1;
+      });
+
+      emptyMessage.hidden = visibleCount !== 0;
+    };
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      applyFilter();
+    });
+
+    resetButton?.addEventListener("click", () => {
+      form.reset();
+      applyFilter();
+    });
+  </script>
+</BaseLayout>
+
+<style>
+  .novels-page { display: grid; gap: 26px; }
+  .novels-head { padding-top: 12px; }
+  .filter-panel {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(180px, 1fr)) auto auto;
+    gap: 12px;
+    align-items: end;
+    padding: 18px;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--soft-shadow);
+  }
+  .filter-panel label { display: grid; gap: 8px; color: var(--muted); font-size: 13px; font-weight: 700; }
+  .filter-panel select, .filter-panel button {
+    min-height: 42px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+  }
+  .filter-panel select { padding: 0 14px; }
+  .filter-panel button { padding: 0 20px; cursor: pointer; font-weight: 700; }
+  .filter-panel button[type="submit"] { background: var(--blue-deep); color: #fff; border-color: var(--blue-deep); }
+  .reset-button { color: var(--muted); }
+  .novel-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .novel-card {
+    display: grid;
+    gap: 14px;
+    min-height: 184px;
+    padding: 22px;
+    color: var(--ink);
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    box-shadow: var(--soft-shadow);
+    transition: transform 180ms ease, border-color 180ms ease;
+  }
+  .novel-card:hover { transform: translateY(-3px); border-color: var(--blue); }
+  .novel-card[hidden] { display: none; }
+  .novel-card h2 { margin: 0; font-size: clamp(22px, 4vw, 32px); }
+  .novel-card dl, .novel-card div { display: grid; gap: 6px; margin: 0; }
+  .novel-card dt { color: var(--blue-deep); font-size: 12px; font-weight: 700; }
+  .novel-card dd { margin: 0; color: var(--muted); line-height: 1.8; }
+  .empty-message {
+    margin: 0;
+    padding: 22px;
+    color: var(--muted);
+    text-align: center;
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+  }
+  @media (max-width: 720px) { .filter-panel { grid-template-columns: 1fr; } }
+</style>

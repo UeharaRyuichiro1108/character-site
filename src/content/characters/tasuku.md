@@ -1,4 +1,4 @@
----
+﻿---
 id: "tasuku"
 name: "丞（たすく）"
 gender: "男性"
@@ -32,6 +32,13 @@ relatedCharacterIds:
   - azusa
 tags:
   - tasuku
+relationships:
+  - targetId: "sion"
+    text: "とても大切に思っている"
+  - targetId: "gunso"
+    text: "信頼できる"
+  - targetId: "azusa"
+    text: "危なっかしい"
 ---
 
 愛館市立郷土資料館の学芸員。

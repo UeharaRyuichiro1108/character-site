@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from "../components/BaseLayout.astro";
 import FlowGallery from "../components/FlowGallery.astro";
 import WorldContent from "../content/pages/world.md";
@@ -9,12 +9,12 @@ const illustrationModules = import.meta.glob("../content/illustrations/*.md", { 
 const characters = Object.values(characterModules).map((module) => ({
   ...module.frontmatter,
   Content: module.default,
-}));
+})).filter((character) => character.id);
 
 const illustrations = Object.values(illustrationModules).map((module) => ({
   ...module.frontmatter,
   Content: module.default,
-}));
+})).filter((illustration) => illustration.id);
 
 const characterItems = [...characters]
   .sort(() => Math.random() - 0.5)
@@ -26,14 +26,11 @@ const characterItems = [...characters]
 
 const illustrationItems = [...illustrations]
   .sort(() => Math.random() - 0.5)
-  .map((illustration) => {
-    const imageList = (illustration.images?.length ? illustration.images : [illustration.image]).filter(Boolean).slice(0, 10);
-    return {
-      title: illustration.title,
-      image: imageList[0],
-      href: `/illustrations/${illustration.id}/`,
-    };
-  });
+  .map((illustration) => ({
+    title: illustration.title,
+    image: illustration.image,
+    href: `/illustrations/${illustration.id}/`,
+  }));
 ---
 
 <BaseLayout title="愛館市立郷土資料館">

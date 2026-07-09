@@ -1,17 +1,17 @@
----
+﻿---
 import BaseLayout from "../../components/BaseLayout.astro";
 
 export function getStaticPaths() {
   const illustrationModules = import.meta.glob("../../content/illustrations/*.md", { eager: true });
   const illustrations = Object.values(illustrationModules).map((module) => {
     const data = module.frontmatter;
-    const imageList = (data.images?.length ? data.images : [data.image]).filter(Boolean).slice(0, 10);
+    const imageList = (data.images ?? []).filter(Boolean).slice(0, 10);
     return {
       ...data,
       images: imageList,
       Content: module.default,
     };
-  });
+  }).filter((illustration) => illustration.id);
 
   return illustrations.map((illustration) => ({
     params: { id: illustration.id },
@@ -23,11 +23,12 @@ const characterModules = import.meta.glob("../../content/characters/*.md", { eag
 const characters = Object.values(characterModules).map((module) => ({
   ...module.frontmatter,
   Content: module.default,
-}));
+})).filter((character) => character.id);
 
 const { illustration } = Astro.props;
 const IllustrationContent = illustration.Content;
 const relatedCharacters = characters.filter((character) => illustration.tags?.includes(character.id));
+const isVideo = (src) => /\.(mp4|webm|mov)$/i.test(src);
 ---
 
 <BaseLayout title={illustration.title}>
@@ -35,10 +36,17 @@ const relatedCharacters = characters.filter((character) => illustration.tags?.in
     <p class="tag"><a href="/illustrations/">イラスト一覧へ戻る</a></p>
 
     <section class="image-sequence" aria-label={`${illustration.title}の画像一覧`}>
+      {illustration.images.length === 0 && (
+        <p class="empty-media">表示する画像・動画がまだ登録されていません。</p>
+      )}
       {illustration.images.map((image, index) => (
         <figure class="sequence-item" id={`image-${index + 1}`}>
           {illustration.images.length > 1 && <span>{index + 1} / {illustration.images.length}</span>}
-          <img src={image} alt={`${illustration.title} ${index + 1}枚目`} />
+          {isVideo(image) ? (
+            <video src={image} autoplay loop muted playsinline aria-label={`${illustration.title} ${index + 1}本目`}></video>
+          ) : (
+            <img src={image} alt={`${illustration.title} ${index + 1}枚目`} />
+          )}
         </figure>
       ))}
     </section>
@@ -88,6 +96,12 @@ const relatedCharacters = characters.filter((character) => illustration.tags?.in
     gap: 26px;
   }
 
+  .empty-media {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.9;
+  }
+
   .sequence-item {
     display: grid;
     gap: 10px;
@@ -100,7 +114,8 @@ const relatedCharacters = characters.filter((character) => illustration.tags?.in
     font-weight: 700;
   }
 
-  .sequence-item img {
+  .sequence-item img,
+  .sequence-item video {
     width: 100%;
     height: auto;
     border-radius: 8px;

@@ -1,7 +1,7 @@
----
+﻿---
 id: "azusa"
 name: "梓（あずさ）"
-gender: "18歳"
+gender: "女性"
 height: "168cm"
 age: "18歳"
 animal: "エゾシカ"
@@ -27,6 +27,14 @@ relatedCharacterIds:
   - tasuku
   - sion
   - gunso
+relationships:
+  - targetId: "tasuku"
+    text: "一見怖そうだけど優しい"
+  - targetId: "sion"
+    text: "一緒にいると落ち着く"
+  - targetId: "gunso"
+    text: "かわいくてだいすき"
+
 tags:
   - azusa
   - main

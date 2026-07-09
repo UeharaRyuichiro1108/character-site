@@ -1,17 +1,15 @@
----
+﻿---
 import BaseLayout from "../components/BaseLayout.astro";
 
 const illustrationModules = import.meta.glob("../content/illustrations/*.md", { eager: true });
 const illustrations = Object.values(illustrationModules).map((module) => {
   const data = module.frontmatter;
-  const imageList = (data.images?.length ? data.images : [data.image]).filter(Boolean).slice(0, 10);
   return {
     ...data,
-    images: imageList,
-    coverImage: imageList[0],
+    coverImage: data.image,
     Content: module.default,
   };
-});
+}).filter((illustration) => illustration.id);
 ---
 
 <BaseLayout title="イラスト一覧">

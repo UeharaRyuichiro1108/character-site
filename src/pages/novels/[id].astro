@@ -1,0 +1,91 @@
+---
+import BaseLayout from "../../components/BaseLayout.astro";
+
+const characterModules = import.meta.glob("../../content/characters/*.md", { eager: true });
+const museumModules = import.meta.glob("../../content/museums/*.md", { eager: true });
+
+const getIdFromPath = (path) => path.split("/").pop().replace(".md", "");
+
+export async function getStaticPaths() {
+  const novelModules = import.meta.glob("../../content/novels/*.md");
+  const entries = await Promise.all(
+    Object.entries(novelModules).map(async ([path, loader]) => {
+      const module = await loader();
+      const id = module.frontmatter.id || getIdFromPath(path);
+      return { params: { id }, props: { novel: { id, ...module.frontmatter }, Content: module.default } };
+    })
+  );
+  return entries;
+}
+
+const { novel, Content } = Astro.props;
+const characters = Object.entries(characterModules).map(([path, module]) => ({ id: module.frontmatter.id || getIdFromPath(path), ...module.frontmatter }));
+const museums = Object.entries(museumModules).map(([path, module]) => ({ id: module.frontmatter.id || getIdFromPath(path), ...module.frontmatter }));
+const characterMap = new Map(characters.map((character) => [character.id, character]));
+const museumMap = new Map(museums.map((museum) => [museum.id, museum]));
+const getNames = (ids = [], map) => ids.map((id) => map.get(id)?.name || id).filter(Boolean);
+const characterNames = getNames(novel.characterIds || [], characterMap);
+const museumNames = getNames(novel.museumIds || [], museumMap);
+---
+
+<BaseLayout title={`${novel.title} | 愛館市立郷土資料館`} description={`${novel.title}の本文です。`}>
+  <main class="page-shell novel-detail">
+    <a class="back-link" href="/novels/">小説一覧へ</a>
+    <header class="novel-header">
+      <h1 class="page-title">{novel.title}</h1>
+      <dl class="novel-meta">
+        <div>
+          <dt>登場キャラクター</dt>
+          <dd>{characterNames.length ? characterNames.join("、") : "未設定"}</dd>
+        </div>
+        <div>
+          <dt>関連博物館</dt>
+          <dd>{museumNames.length ? museumNames.join("、") : "未設定"}</dd>
+        </div>
+      </dl>
+    </header>
+
+    <article class="novel-body" aria-label="小説本文">
+      <Content />
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  .novel-detail { display: grid; gap: 24px; }
+  .back-link { width: fit-content; color: var(--blue-deep); font-weight: 700; text-decoration: none; }
+  .novel-header { display: grid; gap: 16px; }
+  .novel-meta { display: flex; flex-wrap: wrap; gap: 12px; margin: 0; }
+  .novel-meta div {
+    display: grid;
+    gap: 4px;
+    min-width: min(100%, 240px);
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+  }
+  .novel-meta dt { color: var(--blue-deep); font-size: 12px; font-weight: 700; }
+  .novel-meta dd { margin: 0; color: var(--muted); line-height: 1.8; }
+  .novel-body {
+    min-height: 72vh;
+    max-height: 78vh;
+    padding: clamp(20px, 4vw, 34px);
+    overflow-x: auto;
+    overflow-y: hidden;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    line-height: 2.2;
+    letter-spacing: 0;
+    color: var(--ink);
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    box-shadow: var(--soft-shadow);
+  }
+  .novel-body :global(p) { margin: 0 0 0 1.8em; }
+  .novel-body :global(ruby) { ruby-position: over; }
+  .novel-body :global(rt) { font-size: 0.52em; }
+  .novel-body :global(.emphasis) { text-emphasis: filled dot; -webkit-text-emphasis: filled dot; }
+  @media (max-width: 720px) { .novel-body { min-height: 68vh; max-height: 72vh; font-size: 15px; } }
+</style>

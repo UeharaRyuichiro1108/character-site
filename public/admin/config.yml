@@ -30,6 +30,13 @@ collections:
       - { label: "デザイン画", name: "designImage", widget: "image", required: false }
       - { label: "キャッチコピー", name: "catchcopy", widget: "string", required: false }
       - { label: "関係キャラクターID", name: "relatedCharacterIds", widget: "list", required: false }
+      - label: "相関図の関係文言"
+        name: "relationships"
+        widget: "list"
+        required: false
+        fields:
+          - { label: "相手キャラクターID", name: "targetId", widget: "string" }
+          - { label: "このキャラから相手への文言", name: "text", widget: "string", required: false }
       - { label: "タグ", name: "tags", widget: "list", required: false }
       - { label: "自由説明", name: "body", widget: "markdown", required: false }
 
@@ -42,6 +49,14 @@ collections:
       - { label: "ID", name: "id", widget: "string" }
       - { label: "名前", name: "name", widget: "string" }
       - { label: "短い説明", name: "summary", widget: "string" }
+      - { label: "関係博物館ID", name: "relatedMuseumIds", widget: "list", required: false }
+      - label: "相関図の関係文言"
+        name: "museumRelationships"
+        widget: "list"
+        required: false
+        fields:
+          - { label: "相手博物館ID", name: "targetId", widget: "string" }
+          - { label: "この博物館から相手への文言", name: "text", widget: "string", required: false }
       - { label: "本文", name: "body", widget: "markdown" }
 
   - name: "illustrations"
@@ -52,11 +67,32 @@ collections:
     fields:
       - { label: "ID", name: "id", widget: "string" }
       - { label: "タイトル", name: "title", widget: "string" }
-      - { label: "一覧用画像", name: "image", widget: "image" }
-      - { label: "画像セット", name: "images", widget: "list", required: false, max: 10, field: { label: "画像", name: "image", widget: "image" } }
+      - { label: "一覧用静止画", name: "image", widget: "image" }
+      - { label: "画像・動画セット", name: "images", widget: "list", required: false, max: 10, field: { label: "画像/GIF/MP4", name: "image", widget: "image" } }
       - { label: "関連タグ", name: "tags", widget: "list", required: false }
       - { label: "説明", name: "body", widget: "markdown", required: false }
 
+  - name: "gifted-illustrations"
+    label: "描いていただいたイラスト"
+    folder: "src/content/gifted-illustrations"
+    create: true
+    slug: "{{fields.id}}"
+    fields:
+      - { label: "ID", name: "id", widget: "string" }
+      - { label: "製作者名", name: "creatorName", widget: "string" }
+      - { label: "Xの投稿URL", name: "url", widget: "string" }
+      - { label: "サムネイル画像URL", name: "thumbnailUrl", widget: "string", required: false }
+  - name: "novels"
+    label: "小説"
+    folder: "src/content/novels"
+    create: true
+    slug: "{{fields.id}}"
+    fields:
+      - { label: "ID", name: "id", widget: "string" }
+      - { label: "タイトル", name: "title", widget: "string" }
+      - { label: "登場キャラクターID", name: "characterIds", widget: "list", required: false }
+      - { label: "関連博物館ID", name: "museumIds", widget: "list", required: false }
+      - { label: "本文", name: "body", widget: "markdown", required: false }
   - name: "pages"
     label: "固定ページ"
     files:
