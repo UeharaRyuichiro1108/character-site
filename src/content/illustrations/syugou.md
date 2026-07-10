@@ -1,9 +1,9 @@
 ---
 id: "syugou"
 title: "愛館集合ミニ"
-image: "/images/uploads/syugou.png"
+image: "/images/uploads/syugou.webp"
 images:
-  - "/images/uploads/syugou.png"
+  - "/images/uploads/syugou.webp"
 tags:
   - tasuku
   - sion

@@ -25,8 +25,8 @@ other: "夕張炭鉱資料館のメカニック的な立ち位置。
     暗い坑道でも怖くないようにと渡した。"
 group: "夕張炭鉱資料館"
 museumId: "yubari"
-image: "/images/uploads/nobu.png"
-designImage: "/images/uploads/nobu_design.png"
+image: "/images/uploads/nobu.webp"
+designImage: "/images/uploads/nobu_design.webp"
 catchcopy: "夕張炭鉱資料館　学芸員"
 relatedCharacterIds:
   - sino

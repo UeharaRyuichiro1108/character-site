@@ -1,9 +1,9 @@
 ---
 id: "taberu"
 title: "いっぱい食べる"
-image: "/images/uploads/taberu.png"
+image: "/images/uploads/taberu.webp"
 images:
-  - "/images/uploads/taberu.png"
+  - "/images/uploads/taberu.webp"
 tags:
   - sino
   - nobu

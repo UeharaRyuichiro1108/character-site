@@ -31,8 +31,8 @@ other: "夕張炭鉱資料館に初めて雇用された学芸員。
   かわいいものが好き。"
 group: "夕張炭鉱資料館"
 museumId: "yubari"
-image: "/images/uploads/sino.png"
-designImage: "/images/uploads/sino_design.png"
+image: "/images/uploads/sino.webp"
+designImage: "/images/uploads/sino_design.webp"
 catchcopy: "夕張炭鉱資料館　学芸員"
 relatedCharacterIds:
   - nobu

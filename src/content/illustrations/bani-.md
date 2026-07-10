@@ -1,10 +1,10 @@
 ---
 id: "bani-"
 title: "バニー汐音"
-image: "/images/uploads/bani-_1.png"
+image: "/images/uploads/bani-_1.webp"
 images:
-  - "/images/uploads/bani-_1.png"
-  - "/images/uploads/bani-_2.png"
+  - "/images/uploads/bani-_1.webp"
+  - "/images/uploads/bani-_2.webp"
 tags:
   - sion
   - tasuku

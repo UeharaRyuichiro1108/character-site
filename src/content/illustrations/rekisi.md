@@ -1,9 +1,9 @@
 ---
 id: "rekisi"
 title: "records"
-image: "/images/uploads/rekisi.png"
+image: "/images/uploads/rekisi.webp"
 images:
-  - "/images/uploads/rekisi.png"
+  - "/images/uploads/rekisi.webp"
 tags:
   - gunso
 ---

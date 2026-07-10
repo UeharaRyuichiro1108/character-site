@@ -1,10 +1,10 @@
 ---
 id: "banigunso"
 title: "バニ軍曹"
-image: "/images/uploads/banigunso_1.png"
+image: "/images/uploads/banigunsou_1.webp"
 images:
-  - "/images/uploads/banigunso_1.png"
-  - "/images/uploads/banigunso_2.png"
+  - "/images/uploads/banigunsou_1.webp"
+  - "/images/uploads/banigunsou_2.webp"
 tags:
   - gunso
   - azusa

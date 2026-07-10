@@ -1,9 +1,9 @@
 ---
 id: "kao"
 title: "初めて顔を見られたシノ"
-image: "/images/uploads/kao.png"
+image: "/images/uploads/kao.webp"
 images:
-  - "/images/uploads/kao.png"
+  - "/images/uploads/kao.webp"
 tags:
   - sino
   - nobu

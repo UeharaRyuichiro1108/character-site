@@ -1,11 +1,11 @@
 ---
 id: "toraware"
 title: "囚われの軍曹"
-image: "/images/uploads/toraware_1.png"
+image: "/images/uploads/toraware_1.webp"
 images:
-  - "/images/uploads/toraware_1.png"
-  - "/images/uploads/toraware_2.png"
-  - "/images/uploads/toraware_3.png"
+  - "/images/uploads/toraware_1.webp"
+  - "/images/uploads/toraware_2.webp"
+  - "/images/uploads/toraware_3.webp"
 tags:
   - gunso
   - tasuku

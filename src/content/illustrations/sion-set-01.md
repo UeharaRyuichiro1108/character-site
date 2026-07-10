@@ -1,9 +1,9 @@
 ---
 id: "sion-set-01"
 title: "丞汐"
-image: "/images/uploads/tasusio.JPG"
+image: "/images/uploads/tasusio.webp"
 images:
-  - "/images/uploads/tasusio.JPG"
+  - "/images/uploads/tasusio.webp"
 tags:
   - sion
   - tasuku

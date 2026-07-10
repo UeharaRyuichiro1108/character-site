@@ -1,9 +1,9 @@
 ---
 id: "horumarin"
 title: "formalin"
-image: "/images/uploads/horumarin.png"
+image: "/images/uploads/horumarin.webp"
 images:
-  - "/images/uploads/horumarin.png"
+  - "/images/uploads/horumarin.webp"
 tags:
   - sion
 ---

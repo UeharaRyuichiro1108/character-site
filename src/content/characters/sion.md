@@ -36,8 +36,8 @@ background: "元々は昭和に生きていた。
 other: "動物は魚。"
 group: "愛館市立郷土資料館"
 museumId: "aidate"
-image: "/images/uploads/sion.png"
-designImage: "/images/uploads/sion-design.png"
+image: "/images/uploads/sion.webp"
+designImage: "/images/uploads/sion-design.webp"
 catchcopy: "愛館市立郷土資料館　自然棟　液浸標本担当"
 relatedCharacterIds:
   - tasuku

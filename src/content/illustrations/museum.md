@@ -1,9 +1,9 @@
 ---
 id: "museum"
 title: "博物館一覧（を作ろうとした際の残骸）"
-image: "/images/uploads/museum.png"
+image: "/images/uploads/museum.webp"
 images:
-  - "/images/uploads/museum.png"
+  - "/images/uploads/museum.webp"
 tags:
   - tasuku
   - sion

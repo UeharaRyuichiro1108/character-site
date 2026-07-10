@@ -1,9 +1,9 @@
 ---
 id: "jiorama"
 title: "diorama"
-image: "/images/uploads/jiorama.png"
+image: "/images/uploads/jiorama.webp"
 images:
-  - "/images/uploads/jiorama.png"
+  - "/images/uploads/jiorama.webp"
 tags:
   - tasuku
 ---

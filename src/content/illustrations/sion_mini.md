@@ -1,9 +1,9 @@
 ---
 id: "sion_mini"
 title: "ミニ汐音"
-image: "/images/uploads/sion_mini.png"
+image: "/images/uploads/sion_mini.webp"
 images:
-  - "/images/uploads/sion_mini.png"
+  - "/images/uploads/sion_mini.webp"
 tags:
   - sion
 ---

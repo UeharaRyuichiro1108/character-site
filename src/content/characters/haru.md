@@ -28,8 +28,8 @@ other: "他の二人からは「ハル」と呼ばれている。
     "
 group: "夕張炭鉱資料館"
 museumId: "yubari"
-image: "/images/uploads/haru.png"
-designImage: "/images/uploads/haru_design.png"
+image: "/images/uploads/haru.webp"
+designImage: "/images/uploads/haru_design.webp"
 catchcopy: "夕張炭鉱資料館　学芸員"
 relatedCharacterIds:
   - sino

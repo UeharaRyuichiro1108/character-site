@@ -1,9 +1,9 @@
 ---
 id: "yubari_rakugaki"
 title: "夕張組のらくがき"
-image: "/images/uploads/yubari_rakugaki.png"
+image: "/images/uploads/yubari_rakugaki.webp"
 images:
-  - "/images/uploads/yubari_rakugaki.png"
+  - "/images/uploads/yubari_rakugaki.webp"
 tags:
   - sino
   - nobu

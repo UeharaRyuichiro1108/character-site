@@ -1,9 +1,9 @@
 ---
 id: "ticket"
 title: "チケット風"
-image: "/images/uploads/ticket.png"
+image: "/images/uploads/ticket.webp"
 images:
-  - "/images/uploads/ticket.png"
+  - "/images/uploads/ticket.webp"
 tags:
   - sion
 ---

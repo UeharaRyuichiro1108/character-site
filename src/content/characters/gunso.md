@@ -28,8 +28,8 @@ other: "外見が生前の軍曹の娘によく似ている。
   生前の記憶があまりなく、名前も覚えていないため「軍曹」と呼ばれている。"
 group: "愛館市立郷土資料館"
 museumId: "aidate"
-image: "/images/uploads/gunso.png"
-designImage: "/images/uploads/gunso_design.png"
+image: "/images/uploads/gunso.webp"
+designImage: "/images/uploads/gunso_design.webp"
 catchcopy: "愛館市立郷土資料館　歴史棟　近代史担当"
 relatedCharacterIds:
   - tasuku

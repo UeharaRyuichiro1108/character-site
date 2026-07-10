@@ -1,9 +1,9 @@
 ---
 id: "origin"
 title: "2022年ごろの絵"
-image: "/images/uploads/origin.png"
+image: "/images/uploads/origin.webp"
 images:
-  - "/images/uploads/origin.png"
+  - "/images/uploads/origin.webp"
 tags:
   - sion
   - tasuku
