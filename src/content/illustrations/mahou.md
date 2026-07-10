@@ -9,6 +9,7 @@ images:
 tags:
   - tasuku
   - sion
+postUrl: "https://x.com/aidate_info/status/2072093155969966333?s=46&t=41ciClRacREARzzk8qEemw"
 ---
 
 自家発電の二次創作です

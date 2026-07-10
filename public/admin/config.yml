@@ -69,6 +69,7 @@ collections:
       - { label: "タイトル", name: "title", widget: "string" }
       - { label: "一覧用静止画", name: "image", widget: "image" }
       - { label: "画像・動画セット", name: "images", widget: "list", required: false, max: 10, field: { label: "画像/GIF/MP4", name: "image", widget: "image" } }
+      - { label: "XのポストURL", name: "postUrl", widget: "string", required: false }
       - { label: "関連タグ", name: "tags", widget: "list", required: false }
       - { label: "説明", name: "body", widget: "markdown", required: false }
 

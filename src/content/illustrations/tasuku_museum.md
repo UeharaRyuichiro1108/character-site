@@ -6,6 +6,7 @@ images:
   - "/images/uploads/tasuku_museum.webp"
 tags:
   - tasuku
+postUrl: "https://x.com/aidate_info/status/2073947573296239000?s=46&t=41ciClRacREARzzk8qEemw"
 ---
 
     これはシリーズで描きたいと思っています

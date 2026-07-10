@@ -7,6 +7,7 @@ images:
 tags:
   - sion
   - tasuku
+postUrl: "https://x.com/aidate_info/status/2071840843015819327?s=46&t=41ciClRacREARzzk8qEemw"
 ---
 
 お気に入りです

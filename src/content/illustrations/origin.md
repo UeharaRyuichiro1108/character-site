@@ -7,6 +7,7 @@ images:
 tags:
   - sion
   - tasuku
+postUrl: "https://x.com/aidate_info/status/2072549420030447892?s=46&t=41ciClRacREARzzk8qEemw"
 ---
 
 2022年ごろの丞と汐音です。

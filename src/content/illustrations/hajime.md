@@ -8,5 +8,6 @@ images:
   - "/images/uploads/hajime_3.webp"
 tags:
   - gunso
+postUrl: "https://x.com/aidate_info/status/2071841442071539884?s=46&t=41ciClRacREARzzk8qEemw"
 ---
 

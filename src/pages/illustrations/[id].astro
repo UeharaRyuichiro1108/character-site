@@ -54,6 +54,12 @@ const isVideo = (src) => /\.(mp4|webm|mov)$/i.test(src);
     <section class="artwork-info">
       <h1>{illustration.title}</h1>
 
+      {illustration.postUrl && (
+        <a class="post-link" href={illustration.postUrl} target="_blank" rel="noopener noreferrer">
+          ポストを開く
+        </a>
+      )}
+
       <div class="artist-comment">
         <IllustrationContent />
       </div>
@@ -134,6 +140,27 @@ const isVideo = (src) => /\.(mp4|webm|mov)$/i.test(src);
     color: var(--ink);
     font-size: clamp(22px, 3vw, 34px);
     line-height: 1.5;
+  }
+
+  .post-link {
+    justify-self: start;
+    min-width: 180px;
+    padding: 12px 22px;
+    border: 1px solid var(--blue);
+    border-radius: 8px;
+    background: var(--paper);
+    color: var(--blue-deep);
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    box-shadow: 0 10px 28px rgba(93, 125, 148, 0.14);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+
+  .post-link:hover {
+    transform: translateY(-2px);
+    background: var(--pale);
+    box-shadow: var(--soft-shadow);
   }
 
   .artist-comment {
