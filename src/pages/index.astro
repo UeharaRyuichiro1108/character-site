@@ -1,10 +1,11 @@
-﻿---
+---
 import BaseLayout from "../components/BaseLayout.astro";
 import FlowGallery from "../components/FlowGallery.astro";
 import WorldContent from "../content/pages/world.md";
 
 const characterModules = import.meta.glob("../content/characters/*.md", { eager: true });
 const illustrationModules = import.meta.glob("../content/illustrations/*.md", { eager: true });
+const museumModules = import.meta.glob("../content/museums/*.md", { eager: true });
 
 const characters = Object.values(characterModules).map((module) => ({
   ...module.frontmatter,
@@ -23,6 +24,10 @@ const characterItems = [...characters]
     image: character.image,
     href: `/characters/${character.id}/`,
   }));
+const museums = Object.values(museumModules).map((module) => ({
+  ...module.frontmatter,
+  Content: module.default,
+})).filter((museum) => museum.id);
 
 const illustrationItems = [...illustrations]
   .sort(() => Math.random() - 0.5)
@@ -31,6 +36,207 @@ const illustrationItems = [...illustrations]
     image: illustration.image,
     href: `/illustrations/${illustration.id}/`,
   }));
+const diagnosisQuestions = [
+  { text: "休日はどう過ごしたい？", answers: [
+    { label: "一人で何かを作っていたい", points: { tasuku: 2, sino: 1 } },
+    { label: "自然や博物館をゆっくり見て回る", points: { sion: 2, nobu: 1 } },
+    { label: "仲間と遊びに出掛ける", points: { haru: 2, azusa: 1 } },
+    { label: "家でゆっくり身体を休める", points: { nobu: 2, gunso: 1 } },
+  ] },
+  { text: "誰かが困っていたら？", answers: [
+    { label: "黙って手伝う", points: { sino: 2, tasuku: 1 } },
+    { label: "原因を一緒に考える", points: { sion: 2, gunso: 1 } },
+    { label: "「大丈夫！」と励ます", points: { azusa: 2, haru: 1 } },
+    { label: "自分が代わりに引き受ける", points: { gunso: 2, sino: 1 } },
+  ] },
+  { text: "一番好きな言葉は？", answers: [
+    { label: "継続", points: { tasuku: 2, gunso: 1 } },
+    { label: "理解", points: { sion: 2, nobu: 1 } },
+    { label: "成長", points: { azusa: 2, haru: 1 } },
+    { label: "家族", points: { sino: 2, nobu: 1 } },
+  ] },
+  { text: "友達からよく言われるのは？", answers: [
+    { label: "真面目だね", points: { tasuku: 2, gunso: 1 } },
+    { label: "優しいね", points: { sion: 2, sino: 1 } },
+    { label: "元気だね", points: { haru: 2, azusa: 1 } },
+    { label: "落ち着くね", points: { nobu: 2, sion: 1 } },
+  ] },
+  { text: "一番得意なのは？", answers: [
+    { label: "手先を使うこと", points: { tasuku: 2, azusa: 1 } },
+    { label: "観察すること", points: { sion: 2, nobu: 1 } },
+    { label: "人を笑わせること", points: { haru: 2, azusa: 1 } },
+    { label: "誰かを支えること", points: { sino: 2, gunso: 1 } },
+  ] },
+  { text: "博物館で一番見たい展示は？", answers: [
+    { label: "修復室", points: { tasuku: 2, sino: 1 } },
+    { label: "標本・自然展示", points: { sion: 2, azusa: 1 } },
+    { label: "昔の暮らし", points: { haru: 2, nobu: 1 } },
+    { label: "軍事・歴史資料", points: { gunso: 2, tasuku: 1 } },
+  ] },
+  { text: "落ち込んだ時は？", answers: [
+    { label: "仕事や趣味に没頭する", points: { tasuku: 2, sino: 1 } },
+    { label: "一人で考える", points: { sion: 2, nobu: 1 } },
+    { label: "誰かに話す", points: { haru: 2, azusa: 1 } },
+    { label: "とにかく動く", points: { gunso: 2, azusa: 1 } },
+  ] },
+  { text: "あなたにとって一番大切なのは？", answers: [
+    { label: "技術", points: { tasuku: 2, sion: 1 } },
+    { label: "知識", points: { sion: 2, gunso: 1 } },
+    { label: "仲間", points: { sino: 2, haru: 1 } },
+    { label: "希望", points: { azusa: 2, haru: 1 } },
+  ] },
+  { text: "何かを教えるなら？", answers: [
+    { label: "手本を見せる", points: { tasuku: 2, gunso: 1 } },
+    { label: "理由から説明する", points: { sion: 2, nobu: 1 } },
+    { label: "一緒にやってみる", points: { azusa: 2, haru: 1 } },
+    { label: "相手のペースに合わせる", points: { sino: 2, nobu: 1 } },
+  ] },
+  { text: "一番好きな季節は？", answers: [
+    { label: "秋", points: { tasuku: 2, sino: 1 } },
+    { label: "夏", points: { sion: 2, haru: 1 } },
+    { label: "春", points: { azusa: 2, nobu: 1 } },
+    { label: "冬", points: { gunso: 2, sino: 1 } },
+  ] },
+  { text: "理想のチームは？", answers: [
+    { label: "黙って信頼し合える", points: { tasuku: 2, nobu: 1 } },
+    { label: "助け合える", points: { sino: 2, gunso: 1 } },
+    { label: "いつも笑っている", points: { haru: 2, azusa: 1 } },
+    { label: "お互い高め合える", points: { sion: 2, azusa: 1 } },
+  ] },
+  { text: "戦うならどんな役？", answers: [
+    { label: "後方支援", points: { tasuku: 2, sino: 1 } },
+    { label: "状況分析", points: { sion: 2, nobu: 1 } },
+    { label: "仲間の強化", points: { azusa: 2, haru: 1 } },
+    { label: "最前線", points: { gunso: 2, sino: 1 } },
+  ] },
+  { text: "誰かから褒められたいのは？", answers: [
+    { label: "「器用だね」", points: { tasuku: 2, azusa: 1 } },
+    { label: "「優しいね」", points: { sion: 2, nobu: 1 } },
+    { label: "「一緒にいて楽しい」", points: { haru: 2, azusa: 1 } },
+    { label: "「頼りになる」", points: { gunso: 2, sino: 1 } },
+  ] },
+  { text: "あなたが未来へ残したいものは？", answers: [
+    { label: "思い出", points: { tasuku: 2, nobu: 1 } },
+    { label: "真実", points: { sion: 2, gunso: 1 } },
+    { label: "笑顔", points: { haru: 2, azusa: 1 } },
+    { label: "絆", points: { sino: 2, gunso: 1 } },
+  ] },
+];
+
+const diagnosisCharacters = Object.fromEntries(
+  characters.map((character) => [character.id, {
+    id: character.id,
+    name: character.name,
+    image: character.image,
+    summary: character.catchcopy || character.role || character.group || "",
+    href: `/characters/${character.id}/`,
+  }])
+);
+
+const diagnosisConfig = {
+  questions: diagnosisQuestions,
+  characters: diagnosisCharacters,
+};
+const museumDiagnosisQuestions = [
+  { text: "あなたが博物館を作るなら？", answers: [
+    { label: "地域の歴史を後世へ残したい", points: { aidate: 2, hokudai: 1 } },
+    { label: "地域のみんなが集まる場所にしたい", points: { yubari: 2, otaru: 1 } },
+    { label: "最先端の研究成果を展示したい", points: { hokudai: 2, aidate: 1 } },
+    { label: "展示そのものを楽しんでもらいたい", points: { otaru: 2, yubari: 1 } },
+  ] },
+  { text: "一番好きな言葉は？", answers: [
+    { label: "伝統", points: { aidate: 2, otaru: 1 } },
+    { label: "一山一家", points: { yubari: 2, otaru: 1 } },
+    { label: "真理", points: { hokudai: 2, aidate: 1 } },
+    { label: "思い出", points: { otaru: 2, yubari: 1 } },
+  ] },
+  { text: "仲間と仕事をするときは？", answers: [
+    { label: "自分の担当を最後までやる", points: { aidate: 2, hokudai: 1 } },
+    { label: "助け合うことを優先", points: { yubari: 2, otaru: 1 } },
+    { label: "新しい方法を考える", points: { hokudai: 2, aidate: 1 } },
+    { label: "みんなが楽しめる工夫をする", points: { otaru: 2, yubari: 1 } },
+  ] },
+  { text: "あなたが一番わくわくする展示は？", answers: [
+    { label: "修復された展示物", points: { aidate: 2, hokudai: 1 } },
+    { label: "当時の暮らしを再現した展示", points: { otaru: 2, yubari: 1 } },
+    { label: "標本や研究資料", points: { hokudai: 2, aidate: 1 } },
+    { label: "実際に体験できる展示", points: { otaru: 2, yubari: 1 } },
+  ] },
+  { text: "新人が入ってきました", answers: [
+    { label: "まず仕事を教える", points: { aidate: 2, hokudai: 1 } },
+    { label: "まず仲良くなる", points: { yubari: 2, otaru: 1 } },
+    { label: "一緒に研究する", points: { hokudai: 2, aidate: 1 } },
+    { label: "館内を案内する", points: { otaru: 2, yubari: 1 } },
+  ] },
+  { text: "一番好きな時間", answers: [
+    { label: "展示を直している時間", points: { aidate: 2, otaru: 1 } },
+    { label: "仲間とご飯を食べる時間", points: { yubari: 2, otaru: 1 } },
+    { label: "新しい発見をした瞬間", points: { hokudai: 2, aidate: 1 } },
+    { label: "来館者が笑っている瞬間", points: { otaru: 2, yubari: 1 } },
+  ] },
+  { text: "あなたが残したいものは？", answers: [
+    { label: "歴史", points: { aidate: 2, hokudai: 1 } },
+    { label: "絆", points: { yubari: 2, otaru: 1 } },
+    { label: "知識", points: { hokudai: 2, aidate: 1 } },
+    { label: "思い出", points: { otaru: 2, yubari: 1 } },
+  ] },
+  { text: "あなたはどちらかというと？", answers: [
+    { label: "職人気質", points: { aidate: 2, hokudai: 1 } },
+    { label: "家族思い", points: { yubari: 2, otaru: 1 } },
+    { label: "研究者", points: { hokudai: 2, aidate: 1 } },
+    { label: "案内役", points: { otaru: 2, yubari: 1 } },
+  ] },
+  { text: "トラブル発生！", answers: [
+    { label: "落ち着いて対処する", points: { aidate: 2, hokudai: 1 } },
+    { label: "仲間を集める", points: { yubari: 2, otaru: 1 } },
+    { label: "原因を分析する", points: { hokudai: 2, aidate: 1 } },
+    { label: "来館者を避難させる", points: { otaru: 2, yubari: 1 } },
+  ] },
+  { text: "一番好きな場所", answers: [
+    { label: "修復室", points: { aidate: 2, hokudai: 1 } },
+    { label: "炭鉱跡", points: { yubari: 2, otaru: 1 } },
+    { label: "研究室", points: { hokudai: 2, aidate: 1 } },
+    { label: "展示室", points: { otaru: 2, yubari: 1 } },
+  ] },
+  { text: "あなたが一番嬉しいのは？", answers: [
+    { label: "展示がきれいになった", points: { aidate: 2, otaru: 1 } },
+    { label: "仲間が笑っている", points: { yubari: 2, otaru: 1 } },
+    { label: "新発見をした", points: { hokudai: 2, aidate: 1 } },
+    { label: "来館者が楽しそうだった", points: { otaru: 2, yubari: 1 } },
+  ] },
+  { text: "あなたに向いている仕事は？", answers: [
+    { label: "修復", points: { aidate: 2, hokudai: 1 } },
+    { label: "接客", points: { otaru: 2, yubari: 1 } },
+    { label: "調査・研究", points: { hokudai: 2, aidate: 1 } },
+    { label: "チームをまとめる", points: { yubari: 2, otaru: 1 } },
+  ] },
+  { text: "一番大切にしたいものは？", answers: [
+    { label: "展示物", points: { aidate: 2, hokudai: 1 } },
+    { label: "仲間", points: { yubari: 2, otaru: 1 } },
+    { label: "真実", points: { hokudai: 2, aidate: 1 } },
+    { label: "来館者", points: { otaru: 2, yubari: 1 } },
+  ] },
+  { text: "最後の質問です。あなたはどんな博物館に勤めたい？", answers: [
+    { label: "歴史を未来へ残す博物館", points: { aidate: 2, hokudai: 1 } },
+    { label: "家族のような仲間と働く博物館", points: { yubari: 2, otaru: 1 } },
+    { label: "世界中の謎を研究する博物館", points: { hokudai: 2, aidate: 1 } },
+    { label: "「また来たい」と思われる博物館", points: { otaru: 2, yubari: 1 } },
+  ] },
+];
+
+const museumDiagnosisMuseums = Object.fromEntries(
+  museums.map((museum) => [museum.id, {
+    id: museum.id,
+    name: museum.name,
+    summary: museum.summary || "",
+    href: `/museums/${museum.id}/`,
+  }])
+);
+
+const museumDiagnosisConfig = {
+  questions: museumDiagnosisQuestions,
+  museums: museumDiagnosisMuseums,
+};
 ---
 
 <BaseLayout title="愛館市立郷土資料館">
@@ -63,6 +269,279 @@ const illustrationItems = [...illustrations]
       <h2 class="section-title">イラスト</h2>
       <FlowGallery items={illustrationItems} type="illustration" />
     </section>
+    <section class="diagnosis-section" id="character-diagnosis">
+      <p class="tag">DIAGNOSIS</p>
+      <h2 class="section-title">キャラクター診断</h2>
+      <p class="lead diagnosis-lead">質問に答えると、あなたに似ているキャラクターを表示します。</p>
+
+      <form class="diagnosis-panel" id="diagnosis-form">
+        <p class="diagnosis-progress" id="diagnosis-progress"></p>
+        <div class="diagnosis-questions">
+          {diagnosisQuestions.map((question, questionIndex) => (
+            <fieldset class="diagnosis-question" data-question-index={questionIndex}>
+              <legend>{`Q${questionIndex + 1} ${question.text}`}</legend>
+              <div class="answer-grid">
+                {question.answers.map((answer, answerIndex) => (
+                  <label>
+                    <input type="radio" name={`question-${questionIndex}`} value={answerIndex} />
+                    <span>{answer.label}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ))}
+        </div>
+        <div class="diagnosis-actions">
+          <button type="button" id="diagnosis-prev">前の質問へ</button>
+          <button type="submit" id="diagnosis-submit">結果を見る</button>
+          <button type="button" id="diagnosis-reset">やり直す</button>
+        </div>
+      </form>
+
+      <article class="diagnosis-result" id="diagnosis-result" hidden aria-live="polite"></article>
+      <script id="diagnosis-data" type="application/json" set:html={JSON.stringify(diagnosisConfig)}></script>
+    </section>
+
+    <script>
+      const diagnosisForm = document.querySelector("#diagnosis-form");
+      const diagnosisPrev = document.querySelector("#diagnosis-prev");
+      const diagnosisReset = document.querySelector("#diagnosis-reset");
+      const diagnosisSubmit = document.querySelector("#diagnosis-submit");
+      const diagnosisProgress = document.querySelector("#diagnosis-progress");
+      const diagnosisResult = document.querySelector("#diagnosis-result");
+      const diagnosisQuestionEls = Array.from(diagnosisForm?.querySelectorAll(".diagnosis-question") || []);
+      const diagnosisData = JSON.parse(document.querySelector("#diagnosis-data")?.textContent || "{}");
+      let currentDiagnosisQuestion = 0;
+      const buildShareUrl = (message) => {
+        const url = new URL("https://twitter.com/intent/tweet");
+        url.searchParams.set("text", message);
+        url.searchParams.set("url", window.location.origin + window.location.pathname);
+        return url.toString();
+      };
+
+      const updateDiagnosisView = () => {
+        const lastIndex = diagnosisQuestionEls.length - 1;
+        diagnosisQuestionEls.forEach((question, index) => {
+          question.hidden = index !== currentDiagnosisQuestion;
+        });
+        diagnosisProgress.textContent = `${currentDiagnosisQuestion + 1} / ${diagnosisQuestionEls.length}`;
+        diagnosisPrev.disabled = currentDiagnosisQuestion === 0;
+        diagnosisSubmit.hidden = currentDiagnosisQuestion !== lastIndex;
+      };
+
+      const goToDiagnosisQuestion = (index) => {
+        currentDiagnosisQuestion = Math.max(0, Math.min(index, diagnosisQuestionEls.length - 1));
+        updateDiagnosisView();
+        diagnosisResult.hidden = true;
+        diagnosisResult.innerHTML = "";
+        diagnosisForm.scrollIntoView({ behavior: "smooth", block: "center" });
+      };
+
+      const renderResult = (character) => {
+        diagnosisResult.hidden = false;
+        diagnosisResult.innerHTML = `
+          <div class="result-copy">
+            <p class="result-label">診断結果</p>
+            <h3>${character.name}</h3>
+            ${character.summary ? `<p>${character.summary}</p>` : ""}
+            <a href="${character.href}">紹介を見る</a>
+            <a class="share-link" href="${buildShareUrl(`キャラクター診断の結果は「${character.name}」でした。`)}" target="_blank" rel="noopener noreferrer">診断結果をポストする</a>
+          </div>
+          <a class="result-image" href="${character.href}" aria-label="${character.name}の紹介を見る">
+            <img src="${character.image}" alt="${character.name}" />
+          </a>
+        `;
+        diagnosisResult.scrollIntoView({ behavior: "smooth", block: "center" });
+      };
+
+      diagnosisQuestionEls.forEach((question, questionIndex) => {
+        question.querySelectorAll("input[type='radio']").forEach((input) => {
+          input.addEventListener("change", () => {
+            diagnosisResult.hidden = true;
+            diagnosisResult.innerHTML = "";
+            if (questionIndex < diagnosisQuestionEls.length - 1) {
+              window.setTimeout(() => goToDiagnosisQuestion(questionIndex + 1), 220);
+            } else {
+              updateDiagnosisView();
+            }
+          });
+        });
+      });
+
+      diagnosisPrev?.addEventListener("click", () => {
+        goToDiagnosisQuestion(currentDiagnosisQuestion - 1);
+      });
+
+      diagnosisForm?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const scores = Object.fromEntries(Object.keys(diagnosisData.characters || {}).map((id) => [id, 0]));
+
+        for (let questionIndex = 0; questionIndex < diagnosisData.questions.length; questionIndex += 1) {
+          const selected = diagnosisForm.querySelector(`input[name="question-${questionIndex}"]:checked`);
+          if (!selected) {
+            goToDiagnosisQuestion(questionIndex);
+            diagnosisResult.hidden = false;
+            diagnosisResult.innerHTML = `<p class="diagnosis-warning">まだ答えていない質問があります。</p>`;
+            return;
+          }
+
+          const answer = diagnosisData.questions[questionIndex].answers[Number(selected.value)];
+          Object.entries(answer.points).forEach(([id, point]) => {
+            scores[id] = (scores[id] || 0) + point;
+          });
+        }
+
+        const winnerId = Object.entries(scores).sort((a, b) => b[1] - a[1])[0]?.[0];
+        const winner = diagnosisData.characters[winnerId];
+        if (winner) renderResult(winner);
+      });
+
+      diagnosisReset?.addEventListener("click", () => {
+        diagnosisForm.reset();
+        currentDiagnosisQuestion = 0;
+        updateDiagnosisView();
+        diagnosisResult.hidden = true;
+        diagnosisResult.innerHTML = "";
+        diagnosisForm.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+
+      updateDiagnosisView();
+    </script>
+    <section class="diagnosis-section museum-diagnosis-section" id="museum-diagnosis">
+      <p class="tag">MUSEUM DIAGNOSIS</p>
+      <h2 class="section-title">あなたが所属する博物館診断</h2>
+      <p class="lead diagnosis-lead">質問に答えると、あなたに合いそうな博物館を表示します。</p>
+
+      <form class="diagnosis-panel" id="museum-diagnosis-form">
+        <p class="diagnosis-progress" id="museum-diagnosis-progress"></p>
+        <div class="diagnosis-questions">
+          {museumDiagnosisQuestions.map((question, questionIndex) => (
+            <fieldset class="diagnosis-question" data-question-index={questionIndex}>
+              <legend>{`Q${questionIndex + 1} ${question.text}`}</legend>
+              <div class="answer-grid">
+                {question.answers.map((answer, answerIndex) => (
+                  <label>
+                    <input type="radio" name={`museum-question-${questionIndex}`} value={answerIndex} />
+                    <span>{answer.label}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ))}
+        </div>
+        <div class="diagnosis-actions">
+          <button type="button" id="museum-diagnosis-prev">前の質問へ</button>
+          <button type="submit" id="museum-diagnosis-submit">結果を見る</button>
+          <button type="button" id="museum-diagnosis-reset">やり直す</button>
+        </div>
+      </form>
+
+      <article class="diagnosis-result museum-result" id="museum-diagnosis-result" hidden aria-live="polite"></article>
+      <script id="museum-diagnosis-data" type="application/json" set:html={JSON.stringify(museumDiagnosisConfig)}></script>
+    </section>
+
+    <script>
+      const museumDiagnosisForm = document.querySelector("#museum-diagnosis-form");
+      const museumDiagnosisPrev = document.querySelector("#museum-diagnosis-prev");
+      const museumDiagnosisReset = document.querySelector("#museum-diagnosis-reset");
+      const museumDiagnosisSubmit = document.querySelector("#museum-diagnosis-submit");
+      const museumDiagnosisProgress = document.querySelector("#museum-diagnosis-progress");
+      const museumDiagnosisResult = document.querySelector("#museum-diagnosis-result");
+      const museumDiagnosisQuestionEls = Array.from(museumDiagnosisForm?.querySelectorAll(".diagnosis-question") || []);
+      const museumDiagnosisData = JSON.parse(document.querySelector("#museum-diagnosis-data")?.textContent || "{}");
+      let currentMuseumDiagnosisQuestion = 0;
+      const buildMuseumShareUrl = (message) => {
+        const url = new URL("https://twitter.com/intent/tweet");
+        url.searchParams.set("text", message);
+        url.searchParams.set("url", window.location.origin + window.location.pathname);
+        return url.toString();
+      };
+
+      const updateMuseumDiagnosisView = () => {
+        const lastIndex = museumDiagnosisQuestionEls.length - 1;
+        museumDiagnosisQuestionEls.forEach((question, index) => {
+          question.hidden = index !== currentMuseumDiagnosisQuestion;
+        });
+        museumDiagnosisProgress.textContent = `${currentMuseumDiagnosisQuestion + 1} / ${museumDiagnosisQuestionEls.length}`;
+        museumDiagnosisPrev.disabled = currentMuseumDiagnosisQuestion === 0;
+        museumDiagnosisSubmit.hidden = currentMuseumDiagnosisQuestion !== lastIndex;
+      };
+
+      const goToMuseumDiagnosisQuestion = (index) => {
+        currentMuseumDiagnosisQuestion = Math.max(0, Math.min(index, museumDiagnosisQuestionEls.length - 1));
+        updateMuseumDiagnosisView();
+        museumDiagnosisResult.hidden = true;
+        museumDiagnosisResult.innerHTML = "";
+        museumDiagnosisForm.scrollIntoView({ behavior: "smooth", block: "center" });
+      };
+
+      const renderMuseumResult = (museum) => {
+        museumDiagnosisResult.hidden = false;
+        museumDiagnosisResult.innerHTML = `
+          <div class="result-copy">
+            <p class="result-label">診断結果</p>
+            <h3>${museum.name}</h3>
+            ${museum.summary ? `<p>${museum.summary}</p>` : ""}
+            <a href="${museum.href}">博物館を見る</a>
+            <a class="share-link" href="${buildMuseumShareUrl(`博物館診断の結果は「${museum.name}」でした。`)}" target="_blank" rel="noopener noreferrer">診断結果をポストする</a>
+          </div>
+        `;
+        museumDiagnosisResult.scrollIntoView({ behavior: "smooth", block: "center" });
+      };
+
+      museumDiagnosisQuestionEls.forEach((question, questionIndex) => {
+        question.querySelectorAll("input[type='radio']").forEach((input) => {
+          input.addEventListener("change", () => {
+            museumDiagnosisResult.hidden = true;
+            museumDiagnosisResult.innerHTML = "";
+            if (questionIndex < museumDiagnosisQuestionEls.length - 1) {
+              window.setTimeout(() => goToMuseumDiagnosisQuestion(questionIndex + 1), 220);
+            } else {
+              updateMuseumDiagnosisView();
+            }
+          });
+        });
+      });
+
+      museumDiagnosisPrev?.addEventListener("click", () => {
+        goToMuseumDiagnosisQuestion(currentMuseumDiagnosisQuestion - 1);
+      });
+
+      museumDiagnosisForm?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const scores = Object.fromEntries(Object.keys(museumDiagnosisData.museums || {}).map((id) => [id, 0]));
+
+        for (let questionIndex = 0; questionIndex < museumDiagnosisData.questions.length; questionIndex += 1) {
+          const selected = museumDiagnosisForm.querySelector(`input[name="museum-question-${questionIndex}"]:checked`);
+          if (!selected) {
+            goToMuseumDiagnosisQuestion(questionIndex);
+            museumDiagnosisResult.hidden = false;
+            museumDiagnosisResult.innerHTML = `<p class="diagnosis-warning">まだ答えていない質問があります。</p>`;
+            return;
+          }
+
+          const answer = museumDiagnosisData.questions[questionIndex].answers[Number(selected.value)];
+          Object.entries(answer.points).forEach(([id, point]) => {
+            scores[id] = (scores[id] || 0) + point;
+          });
+        }
+
+        const winnerId = Object.entries(scores).sort((a, b) => b[1] - a[1])[0]?.[0];
+        const winner = museumDiagnosisData.museums[winnerId];
+        if (winner) renderMuseumResult(winner);
+      });
+
+      museumDiagnosisReset?.addEventListener("click", () => {
+        museumDiagnosisForm.reset();
+        currentMuseumDiagnosisQuestion = 0;
+        updateMuseumDiagnosisView();
+        museumDiagnosisResult.hidden = true;
+        museumDiagnosisResult.innerHTML = "";
+        museumDiagnosisForm.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+
+      updateMuseumDiagnosisView();
+    </script>
   </main>
 </BaseLayout>
 
@@ -109,5 +588,215 @@ const illustrationItems = [...illustrations]
 
   .showcase-section {
     padding: 56px 0;
+  }
+  .diagnosis-section {
+    padding: 64px 0 88px;
+  }
+
+  .diagnosis-lead {
+    margin: -10px 0 24px;
+  }
+
+  .diagnosis-panel {
+    display: grid;
+    gap: 22px;
+    padding: clamp(18px, 4vw, 34px);
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    box-shadow: var(--soft-shadow);
+  }
+
+  .diagnosis-progress {
+    justify-self: end;
+    margin: 0;
+    color: var(--blue-deep);
+    font-weight: 700;
+  }
+
+  .diagnosis-question[hidden] {
+    display: none;
+  }
+
+  .diagnosis-actions button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .diagnosis-actions button[hidden] {
+    display: none;
+  }
+  .diagnosis-questions {
+    display: grid;
+    gap: 18px;
+  }
+
+  .diagnosis-question {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+    padding: 0 0 18px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .diagnosis-question:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .diagnosis-question legend {
+    margin-bottom: 12px;
+    color: var(--ink);
+    font-size: clamp(17px, 3vw, 22px);
+    font-weight: 700;
+  }
+
+  .answer-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .answer-grid label {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    align-items: center;
+    min-height: 52px;
+    padding: 12px 14px;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    cursor: pointer;
+  }
+
+  .answer-grid label:has(input:checked) {
+    border-color: var(--blue-deep);
+    background: var(--pale);
+  }
+
+  .answer-grid input {
+    accent-color: var(--blue-deep);
+  }
+
+  .diagnosis-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .diagnosis-actions button,
+  .result-copy a {
+    display: inline-flex;
+    width: min(100%, 280px);
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 22px;
+    border-radius: 999px;
+    border: 1px solid var(--blue-deep);
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .diagnosis-actions button[type="submit"],
+  .result-copy a {
+    color: #fff;
+    background: var(--blue-deep);
+  }
+
+  .diagnosis-actions button[type="button"] {
+    color: var(--blue-deep);
+    background: #fff;
+  }
+
+  .diagnosis-result {
+    display: grid;
+    grid-template-columns: 1fr minmax(180px, 280px);
+    gap: clamp(18px, 4vw, 34px);
+    align-items: center;
+    margin-top: 24px;
+    padding: clamp(20px, 5vw, 38px);
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    box-shadow: var(--soft-shadow);
+  }
+
+  .diagnosis-result[hidden] {
+    display: none;
+  }
+
+  .result-copy {
+    display: grid;
+    justify-items: start;
+    gap: 12px;
+  }
+
+  .result-label {
+    margin: 0;
+    color: var(--blue-deep);
+    font-weight: 700;
+  }
+
+  .result-copy h3 {
+    margin: 0;
+    font-size: clamp(30px, 6vw, 52px);
+  }
+
+  .result-copy p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  .result-copy a.share-link {
+    color: var(--blue-deep);
+    background: #fff;
+  }
+  .result-image {
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
+    border-radius: 22px;
+    background: var(--pale);
+  }
+
+  .result-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .diagnosis-warning {
+    margin: 0;
+    color: var(--blue-deep);
+    font-weight: 700;
+  }
+
+  .museum-diagnosis-section {
+    padding-top: 32px;
+  }
+
+  .museum-result {
+    grid-template-columns: 1fr;
+  }
+  @media (max-width: 720px) {
+    .answer-grid,
+    .diagnosis-result {
+      grid-template-columns: 1fr;
+    }
+
+    .diagnosis-result {
+      text-align: center;
+    }
+
+    .result-copy a {
+      width: 100%;
+    }
   }
 </style>
