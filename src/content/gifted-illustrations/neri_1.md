@@ -1,6 +1,6 @@
 ---
 id: "neri_1"
-creatorName: "ねりねり様"
+creatorName: "ねりねり"
 url: "https://x.com/neri_neri_da/status/1993952265212973356"
 thumbnailUrl: "/images/uploads/IMG_3130.webp"
 ---

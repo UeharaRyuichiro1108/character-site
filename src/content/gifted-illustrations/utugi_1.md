@@ -1,6 +1,6 @@
 ---
 id: "utugi_1"
-creatorName: "うつぎ様"
+creatorName: "うつぎ"
 url: "https://x.com/u2gi_sawawa/status/2058927324482224292"
 thumbnailUrl: "/images/uploads/IMG_3135.webp"
 ---
