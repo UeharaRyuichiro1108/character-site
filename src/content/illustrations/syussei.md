@@ -1,10 +1,10 @@
 ---
 id: "syussei"
 title: "離別"
-image: "/images/uploads/syussei_1.png"
+image: "/images/uploads/syussei_1.webp"
 images:
-  - "/images/uploads/syussei_1.png"
-  - "/images/uploads/syussei_2.png"
+  - "/images/uploads/syussei_1.webp"
+  - "/images/uploads/syussei_2.webp"
 tags:
   - sion
   - tasuku

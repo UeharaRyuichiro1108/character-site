@@ -1,9 +1,9 @@
 ---
 id: "kawaii"
 title: "かわいい"
-image: "/images/uploads/kawaii.png"
+image: "/images/uploads/kawaii.webp"
 images:
-  - "/images/uploads/kawaii.png"
+  - "/images/uploads/kawaii.webp"
 tags:
   - gunso
   - azusa
