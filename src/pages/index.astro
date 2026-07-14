@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from "../components/BaseLayout.astro";
 import FlowGallery from "../components/FlowGallery.astro";
 import WorldContent from "../content/pages/world.md";
@@ -269,6 +269,243 @@ const museumDiagnosisConfig = {
       <h2 class="section-title">イラスト</h2>
       <FlowGallery items={illustrationItems} type="illustration" />
     </section>
+
+
+    <section class="member-card-section" id="history-society-card">
+      <p class="tag">MEMBERSHIP</p>
+      <h2 class="section-title">愛館市歴史研究学会 会員証</h2>
+
+      <div class="member-card-panel panel">
+        <form class="member-card-form" id="member-card-form">
+          <label>
+            <span>プロフィール写真</span>
+            <input type="file" id="member-photo" accept="image/*" required />
+          </label>
+          <label>
+            <span>名前</span>
+            <input type="text" id="member-name" maxlength="24" required />
+          </label>
+          <button type="submit">会員証を生成</button>
+        </form>
+
+        <div class="member-card-preview" id="member-card-preview" hidden>
+          <img id="member-card-image" alt="生成された会員証" />
+          <div class="member-card-actions">
+            <a id="member-card-download" class="member-card-download" download="aidate-history-society-card.png">PNGを保存</a>
+            <button type="button" id="member-card-post" class="member-card-post" disabled>ポストする</button>
+          </div>
+        </div>
+      </div>
+
+      <canvas id="member-card-canvas" width="1200" height="760" hidden></canvas>
+    </section>
+
+    <script>
+      const memberCardForm = document.querySelector("#member-card-form");
+      const memberPhotoInput = document.querySelector("#member-photo");
+      const memberNameInput = document.querySelector("#member-name");
+      const memberCardCanvas = document.querySelector("#member-card-canvas");
+      const memberCardPreview = document.querySelector("#member-card-preview");
+      const memberCardImage = document.querySelector("#member-card-image");
+      const memberCardDownload = document.querySelector("#member-card-download");
+      const memberCardPost = document.querySelector("#member-card-post");
+      let latestMemberCardFile = null;
+      const memberPostText = "\u611b\u9928\u5e02\u6b74\u53f2\u7814\u7a76\u5b66\u4f1a\u306e\u4f1a\u54e1\u767b\u9332\u3092\u3057\u307e\u3057\u305f\u3002\n#\u611b\u9928\u5e02\u6b74\u53f2\u7814\u7a76\u5b66\u4f1a";
+
+      const loadImageFromUrl = (src) => new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = reject;
+        image.src = src;
+      });
+
+      const loadImageFromFile = (file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const image = new Image();
+          image.onload = () => resolve(image);
+          image.onerror = reject;
+          image.src = reader.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const loadOptionalImage = async (src) => {
+        try {
+          return await loadImageFromUrl(src);
+        } catch {
+          return null;
+        }
+      };
+
+      const formatRegistrationDate = () => {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return year + "." + month + "." + day;
+      };
+
+      const drawCoverImage = (ctx, image, x, y, width, height) => {
+        const sourceRatio = image.width / image.height;
+        const targetRatio = width / height;
+        let sourceWidth = image.width;
+        let sourceHeight = image.height;
+        let sourceX = 0;
+        let sourceY = 0;
+
+        if (sourceRatio > targetRatio) {
+          sourceWidth = image.height * targetRatio;
+          sourceX = (image.width - sourceWidth) / 2;
+        } else {
+          sourceHeight = image.width / targetRatio;
+          sourceY = (image.height - sourceHeight) / 2;
+        }
+
+        ctx.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, x, y, width, height);
+      };
+
+      const createMemberNumber = () => {
+        const values = new Uint32Array(1);
+        crypto.getRandomValues(values);
+        return String((values[0] % 9999) + 1).padStart(4, "0");
+      };
+
+      memberCardPost?.addEventListener("click", async () => {
+        if (!latestMemberCardFile) return;
+        const shareData = {
+          title: "\u611b\u9928\u5e02\u6b74\u53f2\u7814\u7a76\u5b66\u4f1a",
+          text: memberPostText,
+          files: [latestMemberCardFile],
+        };
+
+        if (navigator.canShare?.(shareData)) {
+          await navigator.share(shareData);
+          return;
+        }
+
+        const tweetUrl = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(memberPostText);
+        window.open(tweetUrl, "_blank", "noopener,noreferrer");
+      });
+      memberCardForm?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const file = memberPhotoInput.files?.[0];
+        const memberName = memberNameInput.value.trim();
+        if (!file || !memberName || !memberCardCanvas) return;
+
+        const ctx = memberCardCanvas.getContext("2d");
+        const [logoImage, photoImage, qrImage, stampImage] = await Promise.all([
+          loadImageFromUrl("/images/uploads/logo.webp"),
+          loadImageFromFile(file),
+          loadOptionalImage("/images/uploads/QR_015961.png"),
+          loadOptionalImage("/images/uploads/mystamp.png"),
+        ]);
+        const memberNumber = createMemberNumber();
+        const registrationDate = formatRegistrationDate();
+
+        const cardSerif = "'Yu Mincho', 'Hiragino Mincho ProN', 'YuMincho', 'Times New Roman', serif";
+        ctx.clearRect(0, 0, memberCardCanvas.width, memberCardCanvas.height);
+        ctx.fillStyle = "#f7fbfe";
+        ctx.fillRect(0, 0, 1200, 760);
+
+        const gradient = ctx.createLinearGradient(0, 0, 1200, 760);
+        gradient.addColorStop(0, "#ffffff");
+        gradient.addColorStop(1, "#dcecf4");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(38, 38, 1124, 684);
+
+        ctx.strokeStyle = "#9eb9cf";
+        ctx.lineWidth = 4;
+        ctx.strokeRect(38, 38, 1124, 684);
+
+        ctx.save();
+        ctx.globalAlpha = 0.065;
+        ctx.drawImage(logoImage, 54, 264, 930, 318);
+        ctx.restore();
+
+        ctx.fillStyle = "rgba(158, 185, 207, 0.16)";
+        ctx.fillRect(760, 38, 402, 684);
+
+        ctx.drawImage(logoImage, 78, 74, 250, 86);
+
+        ctx.fillStyle = "#283745";
+        ctx.font = "700 52px " + cardSerif;
+        ctx.fillText("愛館市歴史研究学会", 78, 245);
+
+        ctx.fillStyle = "#6f8fa9";
+        ctx.font = "700 26px " + cardSerif;
+        ctx.fillText("MEMBERSHIP CARD", 82, 292);
+
+        ctx.strokeStyle = "#d8e5ed";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(82, 328);
+        ctx.lineTo(686, 328);
+        ctx.stroke();
+
+        ctx.fillStyle = "#6f8292";
+        ctx.font = "700 24px " + cardSerif;
+        ctx.fillText("会員番号", 82, 402);
+        ctx.fillText("会員名", 82, 514);
+
+        ctx.fillStyle = "#283745";
+        ctx.font = "700 58px " + cardSerif;
+        ctx.fillText(memberNumber, 82, 465);
+
+        ctx.font = "700 48px " + cardSerif;
+        ctx.fillText(memberName, 82, 578);
+
+        ctx.fillStyle = "#6f8292";
+        ctx.font = "22px " + cardSerif;
+        ctx.fillText("Aidate City Historical Research Society", 82, 652);
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.roundRect(814, 152, 280, 360, 26);
+        ctx.clip();
+        drawCoverImage(ctx, photoImage, 814, 152, 280, 360);
+        ctx.restore();
+
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 8;
+        ctx.strokeRect(814, 152, 280, 360);
+
+        ctx.fillStyle = "#6f8292";
+        ctx.font = "700 20px " + cardSerif;
+        ctx.fillText("\u767b\u9332\u5e74\u6708\u65e5", 814, 548);
+        ctx.fillStyle = "#283745";
+        ctx.font = "700 27px " + cardSerif;
+        ctx.fillText(registrationDate, 814, 586);
+
+        ctx.fillStyle = "#6f8fa9";
+        ctx.font = "700 22px " + cardSerif;
+        ctx.fillText("\u611b\u9928\u5e02\u6b74\u53f2\u6587\u5316\u8ca1\u56e3", 814, 642);
+
+        if (stampImage) {
+          ctx.save();
+          ctx.globalAlpha = 0.88;
+          ctx.drawImage(stampImage, 990, 614, 58, 58);
+          ctx.restore();
+        }
+
+        if (qrImage) {
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(620, 582, 104, 104);
+          ctx.drawImage(qrImage, 628, 590, 88, 88);
+        }
+
+        const dataUrl = memberCardCanvas.toDataURL("image/png");
+        const memberCardBlob = await (await fetch(dataUrl)).blob();
+        latestMemberCardFile = new File([memberCardBlob], "aidate-history-society-card-" + memberNumber + ".png", { type: "image/png" });
+        memberCardImage.src = dataUrl;
+        memberCardDownload.href = dataUrl;
+        memberCardDownload.download = latestMemberCardFile.name;
+        memberCardPost.disabled = false;
+        memberCardPreview.hidden = false;
+        memberCardPreview.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    </script>
     <section class="diagnosis-section" id="character-diagnosis">
       <p class="tag">DIAGNOSIS</p>
       <h2 class="section-title">キャラクター診断</h2>
@@ -589,6 +826,89 @@ const museumDiagnosisConfig = {
   .showcase-section {
     padding: 56px 0;
   }
+
+  .member-card-section {
+    padding: 64px 0 36px;
+  }
+
+  .member-card-panel {
+    font-family: "Yu Mincho", "Hiragino Mincho ProN", "YuMincho", serif;
+    display: grid;
+    grid-template-columns: minmax(0, 360px) 1fr;
+    gap: clamp(18px, 4vw, 34px);
+    align-items: start;
+    padding: clamp(20px, 4vw, 34px);
+  }
+
+  .member-card-form {
+    display: grid;
+    gap: 16px;
+  }
+
+  .member-card-form label {
+    display: grid;
+    gap: 8px;
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .member-card-form input[type="text"],
+  .member-card-form input[type="file"] {
+    width: 100%;
+    min-height: 46px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fffdf9;
+    color: var(--ink);
+    font: inherit;
+  }
+
+  .member-card-form button,
+  .member-card-download {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0 22px;
+    border: 1px solid var(--blue-deep);
+    border-radius: 999px;
+    background: var(--blue-deep);
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .member-card-preview {
+    display: grid;
+    gap: 14px;
+    justify-items: start;
+  }
+
+
+  .member-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .member-card-post:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+  .member-card-preview[hidden] {
+    display: none;
+  }
+
+  .member-card-preview img {
+    width: min(100%, 680px);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--soft-shadow);
+  }
+
   .diagnosis-section {
     padding: 64px 0 88px;
   }
@@ -786,6 +1106,12 @@ const museumDiagnosisConfig = {
     grid-template-columns: 1fr;
   }
   @media (max-width: 720px) {
+
+    .member-card-panel {
+      grid-template-columns: 1fr;
+    }
+
+
     .answer-grid,
     .diagnosis-result {
       grid-template-columns: 1fr;
