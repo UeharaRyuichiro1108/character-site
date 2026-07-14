@@ -79,6 +79,14 @@ const characters = Object.values(characterModules).map((module) => ({
   .body {
     color: var(--muted);
     line-height: 2;
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+
+  .body :global(*) {
+    margin: 0;
   }
 
   .member-list {
