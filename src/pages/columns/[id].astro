@@ -1,0 +1,118 @@
+﻿---
+import BaseLayout from "../../components/BaseLayout.astro";
+
+const characterModules = import.meta.glob("../../content/characters/*.md", { eager: true });
+const museumModules = import.meta.glob("../../content/museums/*.md", { eager: true });
+
+const getIdFromPath = (path) => path.split("/").pop().replace(".md", "");
+const formatDate = (value) => {
+  if (!value) return "未設定";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" });
+};
+
+export async function getStaticPaths() {
+  const columnModules = import.meta.glob("../../content/columns/*.md");
+  const entries = await Promise.all(
+    Object.entries(columnModules).map(async ([path, loader]) => {
+      const module = await loader();
+      const id = module.frontmatter.id || getIdFromPath(path);
+      return { params: { id }, props: { column: { id, ...module.frontmatter }, Content: module.default } };
+    })
+  );
+  return entries;
+}
+
+const { column, Content } = Astro.props;
+const characters = Object.entries(characterModules).map(([path, module]) => ({ id: module.frontmatter.id || getIdFromPath(path), ...module.frontmatter }));
+const museums = Object.entries(museumModules).map(([path, module]) => ({ id: module.frontmatter.id || getIdFromPath(path), ...module.frontmatter }));
+const characterMap = new Map(characters.map((character) => [character.id, character]));
+const museumMap = new Map(museums.map((museum) => [museum.id, museum]));
+const getNames = (ids = [], map) => ids.map((id) => map.get(id)?.name || id).filter(Boolean);
+const characterNames = getNames(column.characterIds || [], characterMap);
+const museumNames = getNames(column.museumIds || [], museumMap);
+---
+
+<BaseLayout title={`${column.title} | 愛館市立郷土資料館`} description={column.summary || `${column.title}のコラムです。`}>
+  <main class="page-shell column-detail">
+    <a class="back-link" href="/columns/">コラム一覧へ</a>
+    <header class="column-header">
+      <p class="column-date">作成日 {formatDate(column.createdAt)} / 編集日 {formatDate(column.updatedAt)}</p>
+      <h1 class="page-title">{column.title}</h1>
+      {column.summary && <p class="lead column-summary">{column.summary}</p>}
+      <dl class="column-meta">
+        <div>
+          <dt>関連キャラクター</dt>
+          <dd>{characterNames.length ? characterNames.join("、") : "未設定"}</dd>
+        </div>
+        <div>
+          <dt>関連博物館</dt>
+          <dd>{museumNames.length ? museumNames.join("、") : "未設定"}</dd>
+        </div>
+      </dl>
+    </header>
+
+    <article class="column-body" aria-label="コラム本文">
+      <Content />
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  .column-detail { display: grid; gap: 24px; }
+  .back-link { width: fit-content; color: var(--blue-deep); font-weight: 700; text-decoration: none; }
+  .column-header { display: grid; gap: 14px; }
+  .column-date { margin: 0; color: var(--blue-deep); font-size: 13px; font-weight: 700; }
+  .column-summary { margin: 0; max-width: 760px; }
+  .column-meta { display: flex; flex-wrap: wrap; gap: 12px; margin: 0; }
+  .column-meta div {
+    display: grid;
+    gap: 4px;
+    min-width: min(100%, 240px);
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+  }
+  .column-meta dt { color: var(--blue-deep); font-size: 12px; font-weight: 700; }
+  .column-meta dd { margin: 0; color: var(--muted); line-height: 1.8; }
+  .column-body {
+    display: grid;
+    gap: 18px;
+    padding: clamp(20px, 4vw, 36px);
+    color: var(--ink);
+    line-height: 2;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    box-shadow: var(--soft-shadow);
+  }
+  .column-body :global(p) { margin: 0; }
+  .column-body :global(h1),
+  .column-body :global(h2),
+  .column-body :global(h3),
+  .column-body :global(h4),
+  .column-body :global(h5),
+  .column-body :global(h6) {
+    margin: 22px 0 0;
+    color: var(--ink);
+    line-height: 1.5;
+    letter-spacing: 0;
+  }
+  .column-body :global(h1) { font-size: clamp(30px, 5vw, 44px); }
+  .column-body :global(h2) { font-size: clamp(26px, 4vw, 36px); }
+  .column-body :global(h3) { font-size: clamp(22px, 3vw, 30px); }
+  .column-body :global(h4) { font-size: 20px; color: var(--blue-deep); }
+  .column-body :global(h5) { font-size: 18px; color: var(--blue-deep); }
+  .column-body :global(h6) { font-size: 16px; color: var(--muted); }
+  .column-body :global(img) {
+    width: min(100%, 760px);
+    height: auto;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    box-shadow: 0 14px 34px rgba(93, 125, 148, 0.12);
+  }
+  .column-body :global(figure) { margin: 0; }
+  .column-body :global(a) { color: var(--blue-deep); font-weight: 700; }
+</style>

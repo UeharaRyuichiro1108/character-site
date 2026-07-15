@@ -1,0 +1,201 @@
+﻿---
+import BaseLayout from "../../components/BaseLayout.astro";
+
+const columnModules = import.meta.glob("../../content/columns/*.md", { eager: true });
+const characterModules = import.meta.glob("../../content/characters/*.md", { eager: true });
+const museumModules = import.meta.glob("../../content/museums/*.md", { eager: true });
+
+const getIdFromPath = (path) => path.split("/").pop().replace(".md", "");
+const formatDate = (value) => {
+  if (!value) return "未設定";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" });
+};
+
+const characters = Object.entries(characterModules)
+  .map(([path, module]) => ({ id: module.frontmatter.id || getIdFromPath(path), ...module.frontmatter }))
+  .sort((a, b) => a.name.localeCompare(b.name, "ja"));
+const museums = Object.entries(museumModules)
+  .map(([path, module]) => ({ id: module.frontmatter.id || getIdFromPath(path), ...module.frontmatter }))
+  .sort((a, b) => a.name.localeCompare(b.name, "ja"));
+
+const characterMap = new Map(characters.map((character) => [character.id, character]));
+const museumMap = new Map(museums.map((museum) => [museum.id, museum]));
+const getNames = (ids = [], map) => ids.map((id) => map.get(id)?.name || id).filter(Boolean);
+
+const columns = Object.entries(columnModules)
+  .map(([path, module]) => {
+    const id = module.frontmatter.id || getIdFromPath(path);
+    const characterIds = module.frontmatter.characterIds || [];
+    const museumIds = module.frontmatter.museumIds || [];
+    return {
+      id,
+      title: module.frontmatter.title || "無題のコラム",
+      summary: module.frontmatter.summary || "概要はまだありません。",
+      createdAt: module.frontmatter.createdAt || "",
+      updatedAt: module.frontmatter.updatedAt || "",
+      characterIds,
+      museumIds,
+      characterNames: getNames(characterIds, characterMap),
+      museumNames: getNames(museumIds, museumMap),
+    };
+  })
+  .sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || ""), "ja"));
+---
+
+<BaseLayout title="コラム | 愛館市立郷土資料館" description="創作のメモや思想をまとめたコラム一覧です。">
+  <main class="page-shell columns-page">
+    <section class="columns-head">
+      <h1 class="page-title">コラム</h1>
+      <p class="lead">創作のメモ、考察、思想などをまとめています。関連キャラクターや博物館から絞り込めます。</p>
+    </section>
+
+    <form class="filter-panel" id="column-filter">
+      <label>
+        <span>キャラクター</span>
+        <select name="character">
+          <option value="">すべて</option>
+          {characters.map((character) => <option value={character.id}>{character.name}</option>)}
+        </select>
+      </label>
+      <label>
+        <span>博物館</span>
+        <select name="museum">
+          <option value="">すべて</option>
+          {museums.map((museum) => <option value={museum.id}>{museum.name}</option>)}
+        </select>
+      </label>
+      <button type="submit">決定</button>
+      <button type="button" class="reset-button" id="column-filter-reset">解除</button>
+    </form>
+
+    <section class="column-list" id="column-list" aria-live="polite">
+      {columns.map((column) => (
+        <a
+          class="column-card"
+          href={`/columns/${column.id}/`}
+          data-character-ids={column.characterIds.join(",")}
+          data-museum-ids={column.museumIds.join(",")}
+        >
+          <div class="column-card-main">
+            <p class="column-date">作成日 {formatDate(column.createdAt)} / 編集日 {formatDate(column.updatedAt)}</p>
+            <h2>{column.title}</h2>
+            <p>{column.summary}</p>
+          </div>
+          <dl>
+            <div>
+              <dt>関連キャラクター</dt>
+              <dd>{column.characterNames.length ? column.characterNames.join("、") : "未設定"}</dd>
+            </div>
+            <div>
+              <dt>関連博物館</dt>
+              <dd>{column.museumNames.length ? column.museumNames.join("、") : "未設定"}</dd>
+            </div>
+          </dl>
+        </a>
+      ))}
+    </section>
+    <p class="empty-message" id="column-empty" hidden>条件に合うコラムがありません。</p>
+  </main>
+
+  <script>
+    const form = document.querySelector("#column-filter");
+    const resetButton = document.querySelector("#column-filter-reset");
+    const cards = Array.from(document.querySelectorAll(".column-card"));
+    const emptyMessage = document.querySelector("#column-empty");
+
+    const applyFilter = () => {
+      const data = new FormData(form);
+      const character = data.get("character");
+      const museum = data.get("museum");
+      let visibleCount = 0;
+
+      cards.forEach((card) => {
+        const characterIds = (card.dataset.characterIds || "").split(",").filter(Boolean);
+        const museumIds = (card.dataset.museumIds || "").split(",").filter(Boolean);
+        const matchesCharacter = !character || characterIds.includes(character);
+        const matchesMuseum = !museum || museumIds.includes(museum);
+        const isVisible = matchesCharacter && matchesMuseum;
+        card.hidden = !isVisible;
+        if (isVisible) visibleCount += 1;
+      });
+
+      emptyMessage.hidden = visibleCount !== 0;
+    };
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      applyFilter();
+    });
+
+    resetButton?.addEventListener("click", () => {
+      form.reset();
+      applyFilter();
+    });
+  </script>
+</BaseLayout>
+
+<style>
+  .columns-page { display: grid; gap: 26px; }
+  .columns-head { padding-top: 12px; }
+  .filter-panel {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(180px, 1fr)) auto auto;
+    gap: 12px;
+    align-items: end;
+    padding: 18px;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--soft-shadow);
+  }
+  .filter-panel label { display: grid; gap: 8px; color: var(--muted); font-size: 13px; font-weight: 700; }
+  .filter-panel select, .filter-panel button {
+    min-height: 42px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+  }
+  .filter-panel select { padding: 0 14px; }
+  .filter-panel button { padding: 0 20px; cursor: pointer; font-weight: 700; }
+  .filter-panel button[type="submit"] { background: var(--blue-deep); color: #fff; border-color: var(--blue-deep); }
+  .reset-button { color: var(--muted); }
+  .column-list { display: grid; gap: 16px; }
+  .column-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.42fr);
+    gap: 18px;
+    padding: 22px;
+    color: var(--ink);
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    box-shadow: var(--soft-shadow);
+    transition: transform 180ms ease, border-color 180ms ease;
+  }
+  .column-card:hover { transform: translateY(-3px); border-color: var(--blue); }
+  .column-card[hidden] { display: none; }
+  .column-card-main { display: grid; gap: 10px; }
+  .column-date { margin: 0; color: var(--blue-deep); font-size: 12px; font-weight: 700; }
+  .column-card h2 { margin: 0; font-size: clamp(22px, 4vw, 32px); }
+  .column-card p { margin: 0; color: var(--muted); line-height: 1.9; }
+  .column-card dl, .column-card div { display: grid; gap: 6px; margin: 0; }
+  .column-card dt { color: var(--blue-deep); font-size: 12px; font-weight: 700; }
+  .column-card dd { margin: 0; color: var(--muted); line-height: 1.8; }
+  .empty-message {
+    margin: 0;
+    padding: 22px;
+    color: var(--muted);
+    text-align: center;
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+  }
+  @media (max-width: 760px) {
+    .filter-panel, .column-card { grid-template-columns: 1fr; }
+  }
+</style>

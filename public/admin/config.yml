@@ -1,4 +1,4 @@
-backend:
+﻿backend:
   name: git-gateway
   branch: main
 
@@ -92,6 +92,20 @@ collections:
       - { label: "ID", name: "id", widget: "string" }
       - { label: "タイトル", name: "title", widget: "string" }
       - { label: "登場キャラクターID", name: "characterIds", widget: "list", required: false }
+      - { label: "関連博物館ID", name: "museumIds", widget: "list", required: false }
+      - { label: "本文", name: "body", widget: "markdown", required: false }
+  - name: "columns"
+    label: "コラム"
+    folder: "src/content/columns"
+    create: true
+    slug: "{{fields.id}}"
+    fields:
+      - { label: "ID", name: "id", widget: "string" }
+      - { label: "タイトル", name: "title", widget: "string" }
+      - { label: "概要", name: "summary", widget: "text", required: false }
+      - { label: "作成日", name: "createdAt", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "編集日", name: "updatedAt", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "関連キャラクターID", name: "characterIds", widget: "list", required: false }
       - { label: "関連博物館ID", name: "museumIds", widget: "list", required: false }
       - { label: "本文", name: "body", widget: "markdown", required: false }
   - name: "pages"
