@@ -23,6 +23,12 @@ const museums = Object.entries(museumModules)
 const characterMap = new Map(characters.map((character) => [character.id, character]));
 const museumMap = new Map(museums.map((museum) => [museum.id, museum]));
 const getNames = (ids = [], map) => ids.map((id) => map.get(id)?.name || id).filter(Boolean);
+const fallbackThumbnail = "/images/uploads/logo.webp";
+const getFirstImageFromColumn = (module) => {
+  const body = typeof module.rawContent === "function" ? module.rawContent() : "";
+  const markdownImage = body.match(/!\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/);
+  return markdownImage?.[1] || fallbackThumbnail;
+};
 
 const columns = Object.entries(columnModules)
   .map(([path, module]) => {
@@ -35,6 +41,7 @@ const columns = Object.entries(columnModules)
       summary: module.frontmatter.summary || "概要はまだありません。",
       createdAt: module.frontmatter.createdAt || "",
       updatedAt: module.frontmatter.updatedAt || "",
+      thumbnail: getFirstImageFromColumn(module),
       characterIds,
       museumIds,
       characterNames: getNames(characterIds, characterMap),
@@ -78,6 +85,7 @@ const columns = Object.entries(columnModules)
           data-character-ids={column.characterIds.join(",")}
           data-museum-ids={column.museumIds.join(",")}
         >
+          <img class="column-thumbnail" src={column.thumbnail} alt={`${column.title}のサムネイル`} loading="lazy" />
           <div class="column-card-main">
             <p class="column-date">作成日 {formatDate(column.createdAt)} / 編集日 {formatDate(column.updatedAt)}</p>
             <h2>{column.title}</h2>
@@ -166,7 +174,7 @@ const columns = Object.entries(columnModules)
   .column-list { display: grid; gap: 16px; }
   .column-card {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.42fr);
+    grid-template-columns: 168px minmax(0, 1fr) minmax(220px, 0.36fr);
     gap: 18px;
     padding: 22px;
     color: var(--ink);
@@ -179,6 +187,15 @@ const columns = Object.entries(columnModules)
   }
   .column-card:hover { transform: translateY(-3px); border-color: var(--blue); }
   .column-card[hidden] { display: none; }
+  .column-thumbnail {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    align-self: start;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(237, 246, 251, 0.75);
+  }
   .column-card-main { display: grid; gap: 10px; }
   .column-date { margin: 0; color: var(--blue-deep); font-size: 12px; font-weight: 700; }
   .column-card h2 { margin: 0; font-size: clamp(22px, 4vw, 32px); }
