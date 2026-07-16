@@ -1,6 +1,6 @@
 ---
 id: "itterassyai"
-title: "ありがとう"
+title: "あの日の後悔"
 characterIds:
   - gunso
   - azusa
