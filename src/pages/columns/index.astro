@@ -37,7 +37,7 @@ const columns = Object.entries(columnModules)
     const museumIds = module.frontmatter.museumIds || [];
     return {
       id,
-      title: module.frontmatter.title || "無題のコラム",
+      title: module.frontmatter.title || "無題の博物館館報",
       summary: module.frontmatter.summary || "概要はまだありません。",
       createdAt: module.frontmatter.createdAt || "",
       updatedAt: module.frontmatter.updatedAt || "",
@@ -51,10 +51,10 @@ const columns = Object.entries(columnModules)
   .sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || ""), "ja"));
 ---
 
-<BaseLayout title="コラム | 愛館市立郷土資料館" description="創作のメモや思想をまとめたコラム一覧です。">
+<BaseLayout title="博物館館報 | 愛館市立郷土資料館" description="創作のメモや思想をまとめた博物館館報一覧です。">
   <main class="page-shell columns-page">
     <section class="columns-head">
-      <h1 class="page-title">コラム</h1>
+      <h1 class="page-title">博物館館報</h1>
       <p class="lead">創作のメモ、考察、思想などをまとめています。関連キャラクターや博物館から絞り込めます。</p>
     </section>
 
@@ -104,7 +104,7 @@ const columns = Object.entries(columnModules)
         </a>
       ))}
     </section>
-    <p class="empty-message" id="column-empty" hidden>条件に合うコラムがありません。</p>
+    <p class="empty-message" id="column-empty" hidden>条件に合う博物館館報がありません。</p>
   </main>
 
   <script>

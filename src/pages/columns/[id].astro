@@ -34,9 +34,9 @@ const characterNames = getNames(column.characterIds || [], characterMap);
 const museumNames = getNames(column.museumIds || [], museumMap);
 ---
 
-<BaseLayout title={`${column.title} | 愛館市立郷土資料館`} description={column.summary || `${column.title}のコラムです。`}>
+<BaseLayout title={`${column.title} | 愛館市立郷土資料館`} description={column.summary || `${column.title}の博物館館報です。`}>
   <main class="page-shell column-detail">
-    <a class="back-link" href="/columns/">コラム一覧へ</a>
+    <a class="back-link" href="/columns/">博物館館報一覧へ</a>
     <header class="column-header">
       <p class="column-date">作成日 {formatDate(column.createdAt)} / 編集日 {formatDate(column.updatedAt)}</p>
       <h1 class="page-title">{column.title}</h1>
@@ -53,7 +53,7 @@ const museumNames = getNames(column.museumIds || [], museumMap);
       </dl>
     </header>
 
-    <article class="column-body" aria-label="コラム本文">
+    <article class="column-body" aria-label="博物館館報本文">
       <Content />
     </article>
   </main>

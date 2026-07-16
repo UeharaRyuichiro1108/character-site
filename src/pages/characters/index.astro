@@ -7,7 +7,12 @@ const characters = Object.values(characterModules).map((module) => ({
   Content: module.default,
 }));
 
-const groups = [...new Set(characters.map((character) => character.group))];
+const priorityGroup = "愛館市立郷土資料館";
+const groups = [...new Set(characters.map((character) => character.group))].sort((a, b) => {
+  if (a === priorityGroup) return -1;
+  if (b === priorityGroup) return 1;
+  return 0;
+});
 ---
 
 <BaseLayout title="キャラクター一覧">

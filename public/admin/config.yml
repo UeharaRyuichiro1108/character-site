@@ -95,7 +95,7 @@ collections:
       - { label: "関連博物館ID", name: "museumIds", widget: "list", required: false }
       - { label: "本文", name: "body", widget: "markdown", required: false }
   - name: "columns"
-    label: "コラム"
+    label: "博物館館報"
     folder: "src/content/columns"
     create: true
     slug: "{{fields.id}}"

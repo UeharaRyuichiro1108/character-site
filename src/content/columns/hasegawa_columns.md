@@ -1,4 +1,4 @@
----
+﻿---
 id: "hasegawa_columns"
 title: "長谷川夫妻のイメソン"
 summary: "長谷川夫妻（丞＆汐音）のイメソンを紹介します"
@@ -11,7 +11,7 @@ museumIds:
   - aidate
 ---
 
-ただただイメソンを載せるだけのド短いコラム？です
+ただただイメソンを載せるだけのド短い博物館館報？です
 
 ![丞＆汐音](/images/uploads/tasusio.webp)
 
