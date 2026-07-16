@@ -17,6 +17,12 @@ type GuestbookMessage = { date: string; message: string; stickerId: string };
 const guestbookMessages = [
   // ここにGoogleフォームで届いた内容を追加します。
   // 例: { date: "2026-07-16", message: "また来ます。", stickerId: "sion" },
+  { date: "2026-07-16", message: `こんにちは。
+私は上原さんの創作が可愛くて大好きな人です。可愛いキャラクターに反して設定や抱える想いが深く、楽しませて貰っています!
+軍曹さんと梓ちゃんペアが好きなので、お話読みたいです…他にも新メンバーが続々と誕生しており期待で目が離せません。漫画化アニメ化待ってます。
+最近博物館に行くようになり、いつか北海道の博物館にも足を運びたいです。
+キャラクター診断で汐音さんでしたので汐音さんのステッカーにしました。ラインスタンプで欲しいくらい全員キュートです…!
+長文失礼しました。暑さが厳しいのでお体に気をつけて過ごして下さい。`, stickerId: "sion" },
 
 ] as GuestbookMessage[];
 const pageCharacterLimit = 420;
@@ -606,6 +612,7 @@ const guestbookPages = guestbookMessages.reduce(
   nextButton?.addEventListener("click", () => showPage(activePage + 1));
   showPage(0);
 </script>
+
 
 
 
