@@ -1,0 +1,537 @@
+﻿---
+import BaseLayout from "../../components/BaseLayout.astro";
+
+const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfaz8XlEBxKa8w7hz0HOmiumHx_ifJ_-GYycXwu7RVXeWzkRA/viewform";
+const stickerOptions = [
+  { id: "tasuku", label: "丞" },
+  { id: "sion", label: "汐音" },
+  { id: "azusa", label: "梓" },
+  { id: "sino", label: "シノ" },
+  { id: "nobu", label: "ノブ" },
+  { id: "gunso", label: "軍曹" },
+  { id: "haru", label: "ハル" },
+];
+const stickerPositions = ["sticker-top-right", "sticker-middle-right", "sticker-bottom-right", "sticker-top-left"];
+const handwritingClasses = ["handwriting-1", "handwriting-2", "handwriting-3", "handwriting-4", "handwriting-5"];
+type GuestbookMessage = { date: string; message: string; stickerId: string };
+const guestbookMessages = [
+  // ここにGoogleフォームで届いた内容を追加します。
+  // 例: { date: "2026-07-16", message: "また来ます。", stickerId: "sion" },
+
+] as GuestbookMessage[];
+const pageCharacterLimit = 420;
+const guestbookPages = guestbookMessages.reduce(
+  (pages, item) => {
+    const messageSize = item.message.length + 48;
+    const currentPage = pages.at(-1);
+
+    if (!currentPage || (currentPage.characterCount + messageSize > pageCharacterLimit && currentPage.items.length > 0)) {
+      pages.push({ items: [item], characterCount: messageSize });
+      return pages;
+    }
+
+    currentPage.items.push(item);
+    currentPage.characterCount += messageSize;
+    return pages;
+  },
+  [] as { items: GuestbookMessage[]; characterCount: number }[],
+).map((page) => page.items);
+---
+
+<BaseLayout title="来館者ノート | 愛館市立郷土資料館" description="愛館市立郷土資料館へのご意見ご感想を送れる来館者ノートです。">
+  <main class="page-shell guestbook-page">
+    <section class="guestbook-head">
+      <p class="tag">GUEST BOOK</p>
+      <h1 class="page-title">来館者ノート</h1>
+      <p class="lead">ご来館ありがとうございます！ご意見ご感想など送っていただけるとうれしいです。</p>
+      <p class="reflection-note">いただいたメッセージの反映には少々お時間をいただきます。</p>
+    </section>
+
+    <section class="note-panel messages-panel" aria-label="掲載済みの来館者ノート">
+      <div class="note-paper message-paper">
+        <div class="note-meta">
+          <span>愛館市立郷土資料館</span>
+          <span>来館者ノート</span>
+        </div>
+        <div class="message-book" data-guestbook-pages>
+          {guestbookMessages.length === 0 ? (
+            <p class="empty-message">まだ掲載されたメッセージはありません。</p>
+          ) : (
+            guestbookPages.map((page, pageIndex) => (
+              <article class={`note-page ${pageIndex === 0 ? "is-active" : ""}`} data-page-index={pageIndex}>
+                {page.map((item, messageIndex) => {
+                  const sticker = stickerOptions.find((option) => option.id === item.stickerId);
+                  const displayIndex = guestbookPages.slice(0, pageIndex).reduce((total, pageItems) => total + pageItems.length, 0) + messageIndex;
+                  const stickerClass = stickerPositions[displayIndex % stickerPositions.length];
+                  const handwritingClass = handwritingClasses[displayIndex % handwritingClasses.length];
+
+                  return (
+                    <section class="guest-message">
+                      {sticker && (
+                        <img
+                          class={`message-sticker ${stickerClass}`}
+                          src={`/images/uploads/st_${sticker.id}.webp`}
+                          alt={`${sticker.label}のステッカー`}
+                          loading="lazy"
+                        />
+                      )}
+                      {item.date && <time datetime={item.date}>{item.date}</time>}
+                      <p class={handwritingClass}>{item.message}</p>
+                    </section>
+                  );
+                })}
+              </article>
+            ))
+          )}
+        </div>
+        {guestbookPages.length > 0 && (
+          <div class="page-controls" aria-label="来館者ノートのページ操作">
+            <button type="button" class="page-button" data-page-prev>前のページ</button>
+            <span class="page-count"><span data-current-page>1</span> / {guestbookPages.length}</span>
+            <button type="button" class="page-button" data-page-next>次のページ</button>
+          </div>
+        )}
+      </div>
+    </section>
+
+    <section class="note-panel writing-panel" aria-label="来館者ノート記入欄">
+      <form class="note-paper writing-paper" id="guestbook-form">
+        <div class="note-meta">
+          <span>愛館市立郷土資料館</span>
+          <span>記入欄</span>
+        </div>
+        <label class="note-field note-field-message">
+          <span>ご感想</span>
+          <textarea id="guestbook-message" placeholder="ご意見ご感想などをお書きください" maxlength="800" required></textarea>
+        </label>
+        <div class="sticker-picker" aria-label="ステッカー選択欄">
+          <p class="sticker-title">ステッカーを1枚選べます</p>
+          <div class="sticker-grid">
+            {stickerOptions.map((sticker) => (
+              <label class="sticker-option">
+                <input type="radio" name="guestbook-sticker" value={sticker.label} checked={sticker.id === "tasuku"} />
+                <span class="sticker-card">
+                  <img src={`/images/uploads/st_${sticker.id}.webp`} alt={`${sticker.label}のステッカー`} loading="lazy" />
+                  <span>{sticker.label}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+        <p class="note-help">ボタンを押すと、サイトで書いた内容が入ったGoogleフォームが開きます。フォーム画面で送信ボタンをを押してください。</p>
+        <p class="form-error" id="guestbook-error" hidden>ご感想を入力してください。</p>
+        <button class="submit-link" type="submit">Googleフォームで送信する</button>
+      </form>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  @font-face {
+    font-family: "GuestbookTegaki1";
+    src: url("/fonts/tegaki-1.ttf") format("truetype");
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "GuestbookTegaki2";
+    src: url("/fonts/tegaki-2.otf") format("opentype");
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "GuestbookTegaki3";
+    src: url("/fonts/tegaki-3.otf") format("opentype");
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "GuestbookTegaki4";
+    src: url("/fonts/tegaki-4.woff2") format("woff2");
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "GuestbookTegaki5";
+    src: url("/fonts/tegaki-5.otf") format("opentype");
+    font-display: swap;
+  }
+  .guestbook-page {
+    display: grid;
+    gap: 28px;
+  }
+
+  .guestbook-head {
+    padding-top: 12px;
+  }
+
+  .reflection-note {
+    max-width: 760px;
+    margin: 14px 0 0;
+    color: var(--muted);
+    line-height: 1.9;
+  }
+
+  .note-panel {
+    padding: clamp(16px, 4vw, 34px);
+    background: linear-gradient(135deg, rgba(237, 246, 251, 0.95), rgba(255, 255, 255, 0.96));
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--soft-shadow);
+  }
+
+  .note-paper {
+    position: relative;
+    display: grid;
+    gap: 18px;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: clamp(22px, 5vw, 42px);
+    overflow: hidden;
+    background:
+      linear-gradient(90deg, rgba(242, 164, 189, 0.16) 0 2px, transparent 2px 100%) 48px 0 / 1px 100% no-repeat,
+      repeating-linear-gradient(180deg, #fffdf8 0 38px, #dcecf4 39px 40px);
+    border: 1px solid #d8cfc3;
+    border-radius: 8px;
+    box-shadow: 0 20px 52px rgba(93, 125, 148, 0.16);
+  }
+
+  .note-paper::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 34px;
+    width: 2px;
+    background: rgba(242, 164, 189, 0.48);
+  }
+
+  .note-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+    color: var(--blue-deep);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .message-book {
+    position: relative;
+    min-height: clamp(420px, 58vw, 560px);
+  }
+
+  .note-page {
+    display: none;
+    min-height: clamp(420px, 58vw, 560px);
+    padding: 16px clamp(88px, 16vw, 132px) 28px 0;
+  }
+
+  .note-page.is-active {
+    display: grid;
+    align-content: start;
+    gap: 22px;
+  }
+
+  .guest-message {
+    position: relative;
+    display: grid;
+    gap: 8px;
+    min-height: 112px;
+    padding: 0 0 18px;
+    border-bottom: 1px dashed rgba(111, 143, 169, 0.28);
+  }
+
+  .guest-message:last-child {
+    border-bottom: 0;
+  }
+
+  .guest-message time {
+    color: var(--blue-deep);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .guest-message p,
+  .empty-message {
+    margin: 0;
+    color: var(--ink);
+    line-height: 2.05;
+    letter-spacing: 0;
+    white-space: pre-line;
+  }
+
+  .handwriting-1 {
+    font-family: "GuestbookTegaki1", "Yu Mincho", serif;
+  }
+
+  .handwriting-2 {
+    font-family: "GuestbookTegaki2", "Yu Mincho", serif;
+  }
+
+  .handwriting-3 {
+    font-family: "GuestbookTegaki3", "Yu Mincho", serif;
+  }
+
+  .handwriting-4 {
+    font-family: "GuestbookTegaki4", "Yu Mincho", serif;
+  }
+
+  .handwriting-5 {
+    font-family: "GuestbookTegaki5", "Yu Mincho", serif;
+  }
+
+  .empty-message {
+    min-height: 220px;
+    color: var(--muted);
+  }
+
+  .message-sticker {
+    position: absolute;
+    z-index: 1;
+    width: clamp(64px, 12vw, 92px);
+    aspect-ratio: 1;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 18px rgba(93, 125, 148, 0.18));
+    transform: rotate(-5deg);
+  }
+
+  .sticker-top-right {
+    top: 14px;
+    right: 8px;
+  }
+
+  .sticker-middle-right {
+    top: 40%;
+    right: 24px;
+    transform: rotate(4deg);
+  }
+
+  .sticker-bottom-right {
+    right: 4px;
+    bottom: 26px;
+    transform: rotate(-2deg);
+  }
+
+  .sticker-top-left {
+    top: 24px;
+    right: 72px;
+    transform: rotate(6deg);
+  }
+
+  .page-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding-top: 8px;
+  }
+
+  .page-button {
+    min-height: 38px;
+    padding: 0 16px;
+    color: var(--blue-deep);
+    font: inherit;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(111, 143, 169, 0.32);
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  .page-button:disabled {
+    cursor: default;
+    opacity: 0.42;
+  }
+
+  .page-count {
+    min-width: 64px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .note-field {
+    display: grid;
+    gap: 8px;
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .note-field span {
+    color: var(--blue-deep);
+    font-size: 14px;
+  }
+
+  .note-field textarea {
+    width: 100%;
+    min-height: 180px;
+    padding: 12px;
+    border: 0;
+    border-bottom: 1px solid rgba(111, 143, 169, 0.42);
+    background: rgba(255, 255, 255, 0.5);
+    color: var(--ink);
+    font: inherit;
+    resize: vertical;
+  }
+
+  .sticker-picker {
+    display: grid;
+    gap: 12px;
+  }
+
+  .sticker-title {
+    margin: 0;
+    color: var(--blue-deep);
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .sticker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+    gap: 10px;
+  }
+
+  .sticker-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .sticker-card {
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    min-height: 112px;
+    padding: 10px 8px;
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.64);
+    border: 1px solid rgba(111, 143, 169, 0.26);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .sticker-card img {
+    width: 64px;
+    aspect-ratio: 1;
+    object-fit: contain;
+  }
+
+  .sticker-option input:checked + .sticker-card {
+    border-color: #e58cab;
+    box-shadow: 0 10px 24px rgba(229, 140, 171, 0.24);
+    transform: translateY(-2px);
+  }
+
+  .note-help {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.9;
+  }
+
+  .form-error {
+    margin: 0;
+    color: #b95f78;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .submit-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    min-height: 46px;
+    padding: 0 24px;
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    background: var(--blue-deep);
+    border: 1px solid var(--blue-deep);
+    border-radius: 999px;
+    box-shadow: 0 14px 30px rgba(93, 125, 148, 0.2);
+  }
+
+  .submit-link:hover {
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 640px) {
+    .note-paper {
+      padding-left: 28px;
+    }
+
+    .note-page {
+      padding-right: 84px;
+    }
+
+    .message-sticker {
+      width: 62px;
+    }
+
+    .submit-link {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  const guestbookForm = document.querySelector("#guestbook-form");
+  const guestbookMessage = document.querySelector("#guestbook-message");
+  const guestbookError = document.querySelector("#guestbook-error");
+
+  guestbookForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const message = guestbookMessage?.value.trim() ?? "";
+    const sticker = guestbookForm.querySelector('input[name="guestbook-sticker"]:checked')?.value ?? "";
+
+    if (!message) {
+      if (guestbookError) guestbookError.hidden = false;
+      guestbookMessage?.focus();
+      return;
+    }
+
+    if (guestbookError) guestbookError.hidden = true;
+
+    const url = new URL("https://docs.google.com/forms/d/e/1FAIpQLSfaz8XlEBxKa8w7hz0HOmiumHx_ifJ_-GYycXwu7RVXeWzkRA/viewform");
+    url.searchParams.set("usp", "pp_url");
+    url.searchParams.set("entry.325254876", message);
+    url.searchParams.set("entry.1832039290", sticker);
+
+    window.open(url.toString(), "_blank", "noopener,noreferrer");
+  });
+
+  const pages = Array.from(document.querySelectorAll(".note-page"));
+  const currentPage = document.querySelector("[data-current-page]");
+  const prevButton = document.querySelector("[data-page-prev]");
+  const nextButton = document.querySelector("[data-page-next]");
+  let activePage = 0;
+
+  const showPage = (pageIndex) => {
+    if (pages.length === 0) return;
+
+    activePage = Math.min(Math.max(pageIndex, 0), pages.length - 1);
+    pages.forEach((page, index) => {
+      page.classList.toggle("is-active", index === activePage);
+    });
+
+    if (currentPage) currentPage.textContent = String(activePage + 1);
+    if (prevButton) prevButton.disabled = activePage === 0;
+    if (nextButton) nextButton.disabled = activePage === pages.length - 1;
+  };
+
+  prevButton?.addEventListener("click", () => showPage(activePage - 1));
+  nextButton?.addEventListener("click", () => showPage(activePage + 1));
+  showPage(0);
+</script>
+
+
+
+
