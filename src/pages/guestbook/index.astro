@@ -22,7 +22,14 @@ const guestbookMessages = [
 軍曹さんと梓ちゃんペアが好きなので、お話読みたいです…他にも新メンバーが続々と誕生しており期待で目が離せません。漫画化アニメ化待ってます。
 最近博物館に行くようになり、いつか北海道の博物館にも足を運びたいです。
 キャラクター診断で汐音さんでしたので汐音さんのステッカーにしました。ラインスタンプで欲しいくらい全員キュートです…!
-長文失礼しました。暑さが厳しいのでお体に気をつけて過ごして下さい。`, stickerId: "sion" },
+長文失礼しました。暑さが厳しいのでお体に気をつけて過ごして下さい。
+
+【管理者コメント】
+コメントありがとうございます！初めての来館者でウッキウキです…！！
+私も軍曹梓ペア大好きです！！小説の部分だったりが不足気味なので力を入れていきます…！
+ぜひ北海道の博物館にも行ってみてほしいです！土地が広いだけあっていっぱい面白い博物館がありますので！
+創作のモチーフになった場所だったりも紹介していけたらなと思います
+熱中症にはお気をつけてご安全にお過ごしください…！`, stickerId: "sion" },
 
 ] as GuestbookMessage[];
 const pageCharacterLimit = 420;
@@ -538,11 +545,17 @@ const guestbookPages = guestbookMessages.reduce(
       padding: 16px 0 28px 0;
     }
     .guest-message {
-      padding-right: 96px;
+      padding-right: 68px;
+    }
+
+    .guest-message p,
+    .empty-message {
+      font-size: 13px;
+      line-height: 1.85;
     }
 
     .message-sticker {
-      width: 76px;
+      width: 52px;
     }
 
     .sticker-margin-top,
@@ -612,6 +625,7 @@ const guestbookPages = guestbookMessages.reduce(
   nextButton?.addEventListener("click", () => showPage(activePage + 1));
   showPage(0);
 </script>
+
 
 
 
