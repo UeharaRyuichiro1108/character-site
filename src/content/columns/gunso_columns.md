@@ -1,7 +1,7 @@
 ---
 id: "gunso_columns"
 title: "【ネタバレ？】軍曹について"
-summary: "愛館市立郷土資料館の軍曹について、欲求を記載します。"
+summary: "愛館市立郷土資料館の軍曹について、考えていることを記載します。"
 createdAt: "2026-07-16"
 updatedAt: "2026-07-16"
 characterIds:

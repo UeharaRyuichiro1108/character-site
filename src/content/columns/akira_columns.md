@@ -3,7 +3,7 @@ id: "akira_columns"
 title: "アキラについて"
 summary: "北方大学総合博物館　医学部展示室担当のアキラについていろいろと書きます"
 createdAt: "2026-07-15"
-updatedAt: "2026-07-15"
+updatedAt: "2026-07-16"
 characterIds:
   - akira
 museumIds:
