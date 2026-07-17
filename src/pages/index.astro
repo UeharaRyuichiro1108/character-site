@@ -337,6 +337,8 @@ const museumDiagnosisConfig = {
       let currentAdIndex = 0;
       let adResetTimer;
       let adScrollSyncTimer;
+      let adTouchStartX = 0;
+      let adTouchStartY = 0;
 
       const getAdLeft = (index) => {
         const target = adSlides[index];
@@ -387,6 +389,20 @@ const museumDiagnosisConfig = {
           }
         }, 160);
       });
+
+      adTrack?.addEventListener("touchstart", (event) => {
+        const touch = event.touches[0];
+        adTouchStartX = touch.clientX;
+        adTouchStartY = touch.clientY;
+      }, { passive: true });
+
+      adTrack?.addEventListener("touchend", (event) => {
+        const touch = event.changedTouches[0];
+        const distanceX = touch.clientX - adTouchStartX;
+        const distanceY = touch.clientY - adTouchStartY;
+        if (Math.abs(distanceX) < 36 || Math.abs(distanceX) < Math.abs(distanceY)) return;
+        scrollToAd(currentAdIndex + (distanceX < 0 ? 1 : -1));
+      }, { passive: true });
 
       adPrev?.addEventListener("click", () => scrollToAd(currentAdIndex - 1));
       adNext?.addEventListener("click", () => scrollToAd(currentAdIndex + 1));
@@ -1432,13 +1448,14 @@ const museumDiagnosisConfig = {
 
     .ad-track {
       gap: 10px;
+      overflow-x: hidden;
       padding-bottom: 2px;
-      scrollbar-width: thin;
+      scrollbar-width: none;
+      touch-action: pan-y;
     }
 
     .ad-track::-webkit-scrollbar {
-      display: block;
-      height: 6px;
+      display: none;
     }
 
     .ad-slide,
@@ -1465,6 +1482,7 @@ const museumDiagnosisConfig = {
     }
   }
 </style>
+
 
 
 
