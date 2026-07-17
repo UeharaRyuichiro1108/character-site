@@ -5,6 +5,6 @@ publishedAt: 2026-07-16
 bannerImage: /images/uploads/sion_photo.webp
 ---
 
-標本瓶をイメージした爽やかなソーダ、という幻覚広告です。
+標本瓶をイメージした爽やかなソーダが新発売
 
-飲めません。存在しません。
+売店にて販売中です
