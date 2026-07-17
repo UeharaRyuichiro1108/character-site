@@ -2,6 +2,7 @@
 id: site-news-start
 title: 【サイト更新】お知らせ欄を追加しました
 publishedAt: 2026-07-17
+order: 1
 ---
 
 サイトの更新情報をまとめるため、お知らせ欄を追加しました。

@@ -3,6 +3,23 @@ import BaseLayout from "../../components/BaseLayout.astro";
 
 const newsModules = import.meta.glob("../../content/news/*.md", { eager: true });
 const getIdFromPath = (path) => path.split("/").pop().replace(".md", "");
+const getSortTime = (value) => {
+  const time = new Date(value || 0).getTime();
+  return Number.isNaN(time) ? 0 : time;
+};
+const getDateKey = (value) => {
+  if (!value) return "";
+  const text = String(value);
+  const match = text.match(/^\d{4}-\d{2}-\d{2}/);
+  if (match) return match[0];
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return text;
+  return date.toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" });
+};
+const getDisplayOrder = (value) => {
+  const order = Number(value);
+  return Number.isFinite(order) ? order : 9999;
+};
 const formatDate = (value) => {
   if (!value) return "未設定";
   const date = new Date(value);
@@ -15,8 +32,10 @@ const newsItems = Object.entries(newsModules)
     id: module.frontmatter.id || getIdFromPath(path),
     title: module.frontmatter.title || "無題のお知らせ",
     publishedAt: module.frontmatter.publishedAt || "",
+    order: getDisplayOrder(module.frontmatter.order),
+    dateKey: getDateKey(module.frontmatter.publishedAt),
   }))
-  .sort((a, b) => String(b.publishedAt || "").localeCompare(String(a.publishedAt || ""), "ja"));
+  .sort((a, b) => String(b.dateKey).localeCompare(String(a.dateKey), "ja") || b.order - a.order || getSortTime(b.publishedAt) - getSortTime(a.publishedAt) || String(b.id).localeCompare(String(a.id), "ja"));
 ---
 
 <BaseLayout title="お知らせ | 愛館市立郷土資料館" description="愛館市立郷土資料館の更新情報一覧です。">
@@ -62,3 +81,7 @@ const newsItems = Object.entries(newsModules)
     .news-card { grid-template-columns: 1fr; gap: 6px; }
   }
 </style>
+
+
+
+

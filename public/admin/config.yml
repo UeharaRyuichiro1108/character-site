@@ -128,6 +128,7 @@ collections:
       - { label: "ID", name: "id", widget: "string" }
       - { label: "タイトル", name: "title", widget: "string" }
       - { label: "掲載年月日", name: "publishedAt", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "同じ日付内の表示順", name: "order", widget: "number", required: false, value_type: "int", min: 1, hint: "同じ掲載年月日の中で、1が一番下、2がその上に表示されます。数字が大きいほど上に並びます。未入力の場合は後ろに並びます。" }
       - { label: "本文", name: "body", widget: "markdown", required: false }
   - name: "pages"
     label: "固定ページ"
@@ -138,5 +139,8 @@ collections:
         fields:
           - { label: "タイトル", name: "title", widget: "string" }
           - { label: "本文", name: "body", widget: "markdown" }
+
+
+
 
 

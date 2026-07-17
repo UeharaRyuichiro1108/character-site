@@ -2,6 +2,7 @@
 id: news_ad
 title: 【サイト更新】幻覚広告を作成しました。
 publishedAt: 2026-07-17
+order: 2
 ---
 
 TOPページに広告バナー掲載欄を作成しました。
