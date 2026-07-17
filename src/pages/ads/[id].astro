@@ -35,7 +35,6 @@ const bannerImage = ad.bannerImage || "/images/uploads/logo.webp";
       <p class="fake-note">※内容はすべて嘘です</p>
     </header>
 
-    <img class="ad-hero-image" src={bannerImage} alt={`${ad.title}のバナー`} />
     <article class="ad-body" aria-label="幻覚広告本文">
       <Content />
     </article>
@@ -69,5 +68,13 @@ const bannerImage = ad.bannerImage || "/images/uploads/logo.webp";
     box-shadow: var(--soft-shadow);
   }
   .ad-body :global(p) { margin: 0; }
+  .ad-body :global(img) {
+    width: min(100%, 760px);
+    height: auto;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: 0 14px 34px rgba(93, 125, 148, 0.12);
+  }
   .ad-body :global(a) { color: var(--blue-deep); font-weight: 700; }
 </style>
+

@@ -63,6 +63,7 @@ const latestAds = Object.entries(adModules)
   }))
   .sort((a, b) => String(b.publishedAt || "").localeCompare(String(a.publishedAt || ""), "ja"))
   .slice(0, 5);
+const loopingAds = latestAds.length > 1 ? [...latestAds, ...latestAds] : latestAds;
 const diagnosisQuestions = [
   { text: "休日はどう過ごしたい？", answers: [
     { label: "一人で何かを作っていたい", points: { tasuku: 2, sino: 1 } },
@@ -294,10 +295,10 @@ const museumDiagnosisConfig = {
         </div>
         <a class="section-link" href="/ads/">広告一覧を見る</a>
       </div>
-      <div class="ad-carousel" data-ad-carousel>
+      <div class="ad-carousel" data-ad-carousel data-ad-count={latestAds.length}>
         <button class="ad-arrow ad-arrow-prev" type="button" data-ad-prev aria-label="前の広告へ">‹</button>
         <div class="ad-track" data-ad-track tabindex="0">
-          {latestAds.map((ad) => (
+          {loopingAds.map((ad) => (
             <a class="ad-slide" href={`/ads/${ad.id}/`}>
               <img src={ad.bannerImage} alt={`${ad.title}のバナー`} loading="lazy" />
               <span>{ad.title}</span>
@@ -327,23 +328,70 @@ const museumDiagnosisConfig = {
     </section>
 
     <script>
+      const adCarousel = document.querySelector("[data-ad-carousel]");
       const adTrack = document.querySelector("[data-ad-track]");
       const adSlides = Array.from(document.querySelectorAll(".ad-slide"));
       const adPrev = document.querySelector("[data-ad-prev]");
       const adNext = document.querySelector("[data-ad-next]");
+      const originalAdCount = Number(adCarousel?.dataset.adCount || adSlides.length);
       let currentAdIndex = 0;
+      let adResetTimer;
+      let adScrollSyncTimer;
+
+      const getAdLeft = (index) => {
+        const target = adSlides[index];
+        return target ? target.offsetLeft - adTrack.offsetLeft : 0;
+      };
+
+      const jumpToAd = (index) => {
+        if (!adTrack || adSlides.length === 0) return;
+        adTrack.scrollTo({ left: getAdLeft(index), behavior: "auto" });
+      };
 
       const scrollToAd = (index) => {
-        if (!adTrack || adSlides.length === 0) return;
-        currentAdIndex = (index + adSlides.length) % adSlides.length;
-        const target = adSlides[currentAdIndex];
-        adTrack.scrollTo({ left: target.offsetLeft - adTrack.offsetLeft, behavior: "smooth" });
+        if (!adTrack || adSlides.length === 0 || originalAdCount <= 0) return;
+        window.clearTimeout(adResetTimer);
+
+        if (index < 0 && originalAdCount > 1) {
+          currentAdIndex = originalAdCount;
+          jumpToAd(currentAdIndex);
+          index = originalAdCount - 1;
+        }
+
+        currentAdIndex = index;
+        adTrack.scrollTo({ left: getAdLeft(currentAdIndex), behavior: "smooth" });
+
+        if (currentAdIndex >= originalAdCount) {
+          adResetTimer = window.setTimeout(() => {
+            currentAdIndex = 0;
+            jumpToAd(currentAdIndex);
+          }, 650);
+        }
       };
+
+      adTrack?.addEventListener("scroll", () => {
+        window.clearTimeout(adScrollSyncTimer);
+        adScrollSyncTimer = window.setTimeout(() => {
+          if (!adTrack || adSlides.length === 0 || originalAdCount <= 0) return;
+          const currentLeft = adTrack.scrollLeft;
+          const nearestIndex = adSlides.reduce((nearest, slide, index) => {
+            const distance = Math.abs(slide.offsetLeft - adTrack.offsetLeft - currentLeft);
+            const nearestDistance = Math.abs(adSlides[nearest].offsetLeft - adTrack.offsetLeft - currentLeft);
+            return distance < nearestDistance ? index : nearest;
+          }, currentAdIndex);
+
+          currentAdIndex = nearestIndex;
+          if (currentAdIndex >= originalAdCount) {
+            currentAdIndex -= originalAdCount;
+            jumpToAd(currentAdIndex);
+          }
+        }, 160);
+      });
 
       adPrev?.addEventListener("click", () => scrollToAd(currentAdIndex - 1));
       adNext?.addEventListener("click", () => scrollToAd(currentAdIndex + 1));
 
-      if (adSlides.length > 1) {
+      if (originalAdCount > 1) {
         window.setInterval(() => scrollToAd(currentAdIndex + 1), 5200);
       }
     </script>
@@ -1417,6 +1465,8 @@ const museumDiagnosisConfig = {
     }
   }
 </style>
+
+
 
 
 
