@@ -1,0 +1,64 @@
+﻿---
+import BaseLayout from "../../components/BaseLayout.astro";
+
+const newsModules = import.meta.glob("../../content/news/*.md", { eager: true });
+const getIdFromPath = (path) => path.split("/").pop().replace(".md", "");
+const formatDate = (value) => {
+  if (!value) return "未設定";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" });
+};
+
+const newsItems = Object.entries(newsModules)
+  .map(([path, module]) => ({
+    id: module.frontmatter.id || getIdFromPath(path),
+    title: module.frontmatter.title || "無題のお知らせ",
+    publishedAt: module.frontmatter.publishedAt || "",
+  }))
+  .sort((a, b) => String(b.publishedAt || "").localeCompare(String(a.publishedAt || ""), "ja"));
+---
+
+<BaseLayout title="お知らせ | 愛館市立郷土資料館" description="愛館市立郷土資料館の更新情報一覧です。">
+  <main class="page-shell news-page">
+    <section class="news-head">
+      <h1 class="page-title">お知らせ</h1>
+      <p class="lead">サイトの更新情報などを掲載しています。</p>
+    </section>
+
+    <section class="news-list" aria-label="お知らせ一覧">
+      {newsItems.map((item) => (
+        <a class="news-card" href={`/news/${item.id}/`}>
+          <time datetime={item.publishedAt}>{formatDate(item.publishedAt)}</time>
+          <h2>{item.title}</h2>
+        </a>
+      ))}
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .news-page { display: grid; gap: 26px; }
+  .news-head { padding-top: 12px; }
+  .news-list { display: grid; gap: 12px; }
+  .news-card {
+    display: grid;
+    grid-template-columns: 128px minmax(0, 1fr);
+    gap: 18px;
+    align-items: center;
+    padding: 18px 22px;
+    color: var(--ink);
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: var(--soft-shadow);
+    transition: transform 180ms ease, border-color 180ms ease;
+  }
+  .news-card:hover { transform: translateY(-2px); border-color: var(--blue); }
+  .news-card time { color: var(--blue-deep); font-size: 13px; font-weight: 700; }
+  .news-card h2 { margin: 0; font-size: clamp(18px, 3vw, 24px); line-height: 1.5; }
+  @media (max-width: 640px) {
+    .news-card { grid-template-columns: 1fr; gap: 6px; }
+  }
+</style>

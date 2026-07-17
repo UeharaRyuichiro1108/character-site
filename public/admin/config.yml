@@ -108,6 +108,27 @@ collections:
       - { label: "関連キャラクターID", name: "characterIds", widget: "list", required: false }
       - { label: "関連博物館ID", name: "museumIds", widget: "list", required: false }
       - { label: "本文", name: "body", widget: "markdown", required: false }
+  - name: "ads"
+    label: "幻覚広告"
+    folder: "src/content/ads"
+    create: true
+    slug: "{{fields.id}}"
+    fields:
+      - { label: "ID", name: "id", widget: "string" }
+      - { label: "タイトル", name: "title", widget: "string" }
+      - { label: "掲載年月日", name: "publishedAt", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "バナー画像", name: "bannerImage", widget: "image" }
+      - { label: "本文", name: "body", widget: "markdown", required: false }
+  - name: "news"
+    label: "お知らせ"
+    folder: "src/content/news"
+    create: true
+    slug: "{{fields.id}}"
+    fields:
+      - { label: "ID", name: "id", widget: "string" }
+      - { label: "タイトル", name: "title", widget: "string" }
+      - { label: "掲載年月日", name: "publishedAt", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "本文", name: "body", widget: "markdown", required: false }
   - name: "pages"
     label: "固定ページ"
     files:
@@ -117,3 +138,5 @@ collections:
         fields:
           - { label: "タイトル", name: "title", widget: "string" }
           - { label: "本文", name: "body", widget: "markdown" }
+
+

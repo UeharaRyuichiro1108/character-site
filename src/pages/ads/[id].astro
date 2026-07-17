@@ -1,0 +1,73 @@
+﻿---
+import BaseLayout from "../../components/BaseLayout.astro";
+
+const getIdFromPath = (path) => path.split("/").pop().replace(".md", "");
+const formatDate = (value) => {
+  if (!value) return "未設定";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" });
+};
+
+export async function getStaticPaths() {
+  const adModules = import.meta.glob("../../content/ads/*.md");
+  const entries = await Promise.all(
+    Object.entries(adModules).map(async ([path, loader]) => {
+      const module = await loader();
+      const id = module.frontmatter.id || getIdFromPath(path);
+      return { params: { id }, props: { ad: { id, ...module.frontmatter }, Content: module.default } };
+    })
+  );
+  return entries;
+}
+
+const { ad, Content } = Astro.props;
+const bannerImage = ad.bannerImage || "/images/uploads/logo.webp";
+---
+
+<BaseLayout title={`${ad.title} | 愛館市立郷土資料館`} description={`${ad.title}の幻覚広告です。`} image={bannerImage}>
+  <main class="page-shell ad-detail">
+    <a class="back-link" href="/ads/">幻覚広告一覧へ</a>
+    <header class="ad-header">
+      <p class="tag">FAKE ADVERTISEMENT</p>
+      <h1 class="page-title">{ad.title}</h1>
+      <time datetime={ad.publishedAt}>{formatDate(ad.publishedAt)}</time>
+      <p class="fake-note">※内容はすべて嘘です</p>
+    </header>
+
+    <img class="ad-hero-image" src={bannerImage} alt={`${ad.title}のバナー`} />
+    <article class="ad-body" aria-label="幻覚広告本文">
+      <Content />
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  .ad-detail { display: grid; gap: 24px; }
+  .back-link { width: fit-content; color: var(--blue-deep); font-weight: 700; text-decoration: none; }
+  .ad-header { display: grid; gap: 10px; }
+  .ad-header time { color: var(--blue-deep); font-size: 13px; font-weight: 700; }
+  .fake-note { margin: 0; color: var(--muted); font-size: 14px; }
+  .ad-hero-image {
+    width: 100%;
+    aspect-ratio: 16 / 6;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--soft-shadow);
+    background: var(--pale);
+  }
+  .ad-body {
+    display: grid;
+    gap: 18px;
+    padding: clamp(20px, 4vw, 36px);
+    color: var(--ink);
+    line-height: 2;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    box-shadow: var(--soft-shadow);
+  }
+  .ad-body :global(p) { margin: 0; }
+  .ad-body :global(a) { color: var(--blue-deep); font-weight: 700; }
+</style>

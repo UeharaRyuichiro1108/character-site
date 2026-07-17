@@ -6,6 +6,16 @@ import WorldContent from "../content/pages/world.md";
 const characterModules = import.meta.glob("../content/characters/*.md", { eager: true });
 const illustrationModules = import.meta.glob("../content/illustrations/*.md", { eager: true });
 const museumModules = import.meta.glob("../content/museums/*.md", { eager: true });
+const newsModules = import.meta.glob("../content/news/*.md", { eager: true });
+const adModules = import.meta.glob("../content/ads/*.md", { eager: true });
+
+const getIdFromPath = (path) => path.split("/").pop().replace(".md", "");
+const formatDate = (value) => {
+  if (!value) return "未設定";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" });
+};
 
 const characters = Object.values(characterModules).map((module) => ({
   ...module.frontmatter,
@@ -36,6 +46,23 @@ const illustrationItems = [...illustrations]
     image: illustration.image,
     href: `/illustrations/${illustration.id}/`,
   }));
+const latestNews = Object.entries(newsModules)
+  .map(([path, module]) => ({
+    id: module.frontmatter.id || getIdFromPath(path),
+    title: module.frontmatter.title || "無題のお知らせ",
+    publishedAt: module.frontmatter.publishedAt || "",
+  }))
+  .sort((a, b) => String(b.publishedAt || "").localeCompare(String(a.publishedAt || ""), "ja"))
+  .slice(0, 5);
+const latestAds = Object.entries(adModules)
+  .map(([path, module]) => ({
+    id: module.frontmatter.id || getIdFromPath(path),
+    title: module.frontmatter.title || "無題の幻覚広告",
+    publishedAt: module.frontmatter.publishedAt || "",
+    bannerImage: module.frontmatter.bannerImage || "/images/uploads/logo.webp",
+  }))
+  .sort((a, b) => String(b.publishedAt || "").localeCompare(String(a.publishedAt || ""), "ja"))
+  .slice(0, 5);
 const diagnosisQuestions = [
   { text: "休日はどう過ごしたい？", answers: [
     { label: "一人で何かを作っていたい", points: { tasuku: 2, sino: 1 } },
@@ -257,6 +284,69 @@ const museumDiagnosisConfig = {
         <WorldContent />
       </div>
     </section>
+
+    <section class="ad-section" aria-label="幻覚広告欄">
+      <div class="section-heading-row">
+        <div>
+          <p class="tag">FAKE ADVERTISEMENT</p>
+          <h2 class="section-title">幻覚広告欄</h2>
+          <p class="ad-note">※内容はすべて嘘です</p>
+        </div>
+        <a class="section-link" href="/ads/">広告一覧を見る</a>
+      </div>
+      <div class="ad-carousel" data-ad-carousel>
+        <button class="ad-arrow ad-arrow-prev" type="button" data-ad-prev aria-label="前の広告へ">‹</button>
+        <div class="ad-track" data-ad-track tabindex="0">
+          {latestAds.map((ad) => (
+            <a class="ad-slide" href={`/ads/${ad.id}/`}>
+              <img src={ad.bannerImage} alt={`${ad.title}のバナー`} loading="lazy" />
+              <span>{ad.title}</span>
+            </a>
+          ))}
+        </div>
+        <button class="ad-arrow ad-arrow-next" type="button" data-ad-next aria-label="次の広告へ">›</button>
+      </div>
+    </section>
+
+    <section class="news-section" aria-label="お知らせ">
+      <div class="section-heading-row">
+        <div>
+          <p class="tag">NEWS</p>
+          <h2 class="section-title">お知らせ</h2>
+        </div>
+        <a class="section-link" href="/news/">一覧を見る</a>
+      </div>
+      <div class="top-news-list panel">
+        {latestNews.map((item) => (
+          <a class="top-news-item" href={`/news/${item.id}/`}>
+            <time datetime={item.publishedAt}>{formatDate(item.publishedAt)}</time>
+            <span>{item.title}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <script>
+      const adTrack = document.querySelector("[data-ad-track]");
+      const adSlides = Array.from(document.querySelectorAll(".ad-slide"));
+      const adPrev = document.querySelector("[data-ad-prev]");
+      const adNext = document.querySelector("[data-ad-next]");
+      let currentAdIndex = 0;
+
+      const scrollToAd = (index) => {
+        if (!adTrack || adSlides.length === 0) return;
+        currentAdIndex = (index + adSlides.length) % adSlides.length;
+        const target = adSlides[currentAdIndex];
+        adTrack.scrollTo({ left: target.offsetLeft - adTrack.offsetLeft, behavior: "smooth" });
+      };
+
+      adPrev?.addEventListener("click", () => scrollToAd(currentAdIndex - 1));
+      adNext?.addEventListener("click", () => scrollToAd(currentAdIndex + 1));
+
+      if (adSlides.length > 1) {
+        window.setInterval(() => scrollToAd(currentAdIndex + 1), 5200);
+      }
+    </script>
 
     <section class="showcase-section">
       <p class="tag">CHARACTERS</p>
@@ -823,6 +913,177 @@ const museumDiagnosisConfig = {
     color: var(--blue-deep);
   }
 
+  .ad-section {
+    padding: 56px 0 24px;
+  }
+
+  .ad-note {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .ad-carousel {
+    position: relative;
+  }
+
+  .ad-track {
+    display: grid;
+    grid-auto-columns: 100%;
+    grid-auto-flow: column;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    border-radius: 18px;
+  }
+
+  .ad-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ad-slide {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 16 / 4;
+    min-height: 0;
+    color: #fff;
+    text-decoration: none;
+    background: var(--pale);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--soft-shadow);
+    scroll-snap-align: start;
+  }
+
+  .ad-slide img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 16 / 4;
+    min-height: 0;
+    object-fit: cover;
+  }
+
+  .ad-slide::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 48%;
+    background: linear-gradient(180deg, rgba(40, 55, 69, 0), rgba(40, 55, 69, 0.62));
+  }
+
+  .ad-slide span {
+    position: absolute;
+    left: clamp(16px, 4vw, 34px);
+    right: clamp(16px, 4vw, 34px);
+    bottom: clamp(14px, 3vw, 28px);
+    z-index: 1;
+    font-size: clamp(20px, 4vw, 34px);
+    font-weight: 700;
+    line-height: 1.4;
+    text-shadow: 0 2px 12px rgba(40, 55, 69, 0.36);
+  }
+
+  .ad-arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    color: var(--blue-deep);
+    font-size: 34px;
+    line-height: 1;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    box-shadow: 0 12px 26px rgba(93, 125, 148, 0.18);
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(-50%);
+    transition: opacity 160ms ease, transform 160ms ease;
+  }
+
+  .ad-carousel:hover .ad-arrow,
+  .ad-carousel:focus-within .ad-arrow {
+    opacity: 1;
+  }
+
+  .ad-arrow:hover {
+    transform: translateY(-50%) scale(1.05);
+  }
+
+  .ad-arrow-prev {
+    left: 12px;
+  }
+
+  .ad-arrow-next {
+    right: 12px;
+  }
+
+  .news-section {
+    padding: 56px 0 24px;
+  }
+
+  .section-heading-row {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .section-heading-row .section-title {
+    margin-bottom: 0;
+  }
+
+  .section-link {
+    color: var(--blue-deep);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .top-news-list {
+    display: grid;
+    padding: 8px clamp(14px, 3vw, 22px);
+  }
+
+  .top-news-item {
+    display: grid;
+    grid-template-columns: 128px minmax(0, 1fr);
+    gap: 18px;
+    align-items: center;
+    padding: 14px 0;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .top-news-item:last-child {
+    border-bottom: 0;
+  }
+
+  .top-news-item time {
+    color: var(--blue-deep);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .top-news-item span {
+    line-height: 1.6;
+    font-weight: 700;
+  }
+
+  .top-news-item:hover span {
+    color: var(--blue-deep);
+  }
+
   .showcase-section {
     padding: 56px 0;
   }
@@ -1112,6 +1373,36 @@ const museumDiagnosisConfig = {
     }
 
 
+    .section-heading-row {
+      align-items: start;
+      flex-direction: column;
+    }
+
+    .ad-arrow {
+      display: none;
+    }
+
+    .ad-track {
+      gap: 10px;
+      padding-bottom: 2px;
+      scrollbar-width: thin;
+    }
+
+    .ad-track::-webkit-scrollbar {
+      display: block;
+      height: 6px;
+    }
+
+    .ad-slide,
+    .ad-slide img {
+      min-height: 150px;
+    }
+
+    .top-news-item {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+
     .answer-grid,
     .diagnosis-result {
       grid-template-columns: 1fr;
@@ -1126,3 +1417,7 @@ const museumDiagnosisConfig = {
     }
   }
 </style>
+
+
+
+

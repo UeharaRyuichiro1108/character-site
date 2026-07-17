@@ -1,0 +1,77 @@
+﻿---
+import BaseLayout from "../../components/BaseLayout.astro";
+
+const adModules = import.meta.glob("../../content/ads/*.md", { eager: true });
+const getIdFromPath = (path) => path.split("/").pop().replace(".md", "");
+const formatDate = (value) => {
+  if (!value) return "未設定";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" });
+};
+
+const ads = Object.entries(adModules)
+  .map(([path, module]) => ({
+    id: module.frontmatter.id || getIdFromPath(path),
+    title: module.frontmatter.title || "無題の幻覚広告",
+    publishedAt: module.frontmatter.publishedAt || "",
+    bannerImage: module.frontmatter.bannerImage || "/images/uploads/logo.webp",
+  }))
+  .sort((a, b) => String(b.publishedAt || "").localeCompare(String(a.publishedAt || ""), "ja"));
+---
+
+<BaseLayout title="幻覚広告一覧 | 愛館市立郷土資料館" description="内容がすべて嘘の幻覚広告一覧です。">
+  <main class="page-shell ads-page">
+    <section class="ads-head">
+      <h1 class="page-title">幻覚広告一覧</h1>
+      <p class="lead">※内容はすべて嘘です</p>
+    </section>
+
+    <section class="ad-list" aria-label="幻覚広告一覧">
+      {ads.map((ad) => (
+        <a class="ad-card" href={`/ads/${ad.id}/`}>
+          <img src={ad.bannerImage} alt={`${ad.title}のバナー`} loading="lazy" />
+          <div>
+            <time datetime={ad.publishedAt}>{formatDate(ad.publishedAt)}</time>
+            <h2>{ad.title}</h2>
+          </div>
+        </a>
+      ))}
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .ads-page { display: grid; gap: 26px; }
+  .ads-head { padding-top: 12px; }
+  .ads-head .lead { margin-top: -16px; font-size: 14px; }
+  .ad-list { display: grid; gap: 16px; }
+  .ad-card {
+    display: grid;
+    grid-template-columns: minmax(180px, 360px) minmax(0, 1fr);
+    gap: 18px;
+    align-items: center;
+    padding: 18px;
+    color: var(--ink);
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--soft-shadow);
+    transition: transform 180ms ease, border-color 180ms ease;
+  }
+  .ad-card:hover { transform: translateY(-2px); border-color: var(--blue); }
+  .ad-card img {
+    width: 100%;
+    aspect-ratio: 16 / 7;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--pale);
+  }
+  .ad-card time { color: var(--blue-deep); font-size: 13px; font-weight: 700; }
+  .ad-card h2 { margin: 8px 0 0; font-size: clamp(20px, 3vw, 30px); line-height: 1.5; }
+  @media (max-width: 700px) {
+    .ad-card { grid-template-columns: 1fr; }
+  }
+</style>

@@ -1,0 +1,72 @@
+﻿---
+import BaseLayout from "../../components/BaseLayout.astro";
+
+const getIdFromPath = (path) => path.split("/").pop().replace(".md", "");
+const formatDate = (value) => {
+  if (!value) return "未設定";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" });
+};
+
+export async function getStaticPaths() {
+  const newsModules = import.meta.glob("../../content/news/*.md");
+  const entries = await Promise.all(
+    Object.entries(newsModules).map(async ([path, loader]) => {
+      const module = await loader();
+      const id = module.frontmatter.id || getIdFromPath(path);
+      return { params: { id }, props: { news: { id, ...module.frontmatter }, Content: module.default } };
+    })
+  );
+  return entries;
+}
+
+const { news, Content } = Astro.props;
+---
+
+<BaseLayout title={`${news.title} | 愛館市立郷土資料館`} description={`${news.title}のお知らせです。`}>
+  <main class="page-shell news-detail">
+    <a class="back-link" href="/news/">お知らせ一覧へ</a>
+    <header class="news-header">
+      <time datetime={news.publishedAt}>{formatDate(news.publishedAt)}</time>
+      <h1 class="page-title">{news.title}</h1>
+    </header>
+
+    <article class="news-body" aria-label="お知らせ本文">
+      <Content />
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  .news-detail { display: grid; gap: 24px; }
+  .back-link { width: fit-content; color: var(--blue-deep); font-weight: 700; text-decoration: none; }
+  .news-header { display: grid; gap: 12px; }
+  .news-header time { color: var(--blue-deep); font-size: 13px; font-weight: 700; }
+  .news-body {
+    display: grid;
+    gap: 18px;
+    padding: clamp(20px, 4vw, 36px);
+    color: var(--ink);
+    line-height: 2;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    box-shadow: var(--soft-shadow);
+  }
+  .news-body :global(p) { margin: 0; }
+  .news-body :global(h1),
+  .news-body :global(h2),
+  .news-body :global(h3),
+  .news-body :global(h4),
+  .news-body :global(h5),
+  .news-body :global(h6) {
+    margin: 22px 0 0;
+    color: var(--ink);
+    line-height: 1.5;
+    letter-spacing: 0;
+  }
+  .news-body :global(h2) { font-size: clamp(24px, 4vw, 34px); }
+  .news-body :global(h3) { font-size: clamp(20px, 3vw, 28px); }
+  .news-body :global(a) { color: var(--blue-deep); font-weight: 700; }
+</style>

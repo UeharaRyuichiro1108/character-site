@@ -1,0 +1,15 @@
+﻿---
+id: news_koramu_gunso
+title: 【館報】軍曹について を更新しました
+publishedAt: 2026-07-16
+---
+
+館報を更新しました。
+
+今回は愛館市立郷土資料館の近代史担当、軍曹についての館報です。
+
+過去やこれからの展開について書いています。
+
+見て行っていただけると嬉しいです。
+
+[【館報】軍曹について](https://character-site.netlify.app/columns/gunso_columns/)
