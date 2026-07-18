@@ -12,4 +12,5 @@ publishedAt: 2026-07-16
 
 見て行っていただけると嬉しいです。
 
-[【館報】軍曹について](https://character-site.netlify.app/columns/gunso_columns/)
+[【館報】軍曹について](/columns/gunso_columns/)
+

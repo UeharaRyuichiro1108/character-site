@@ -13,4 +13,5 @@ order: 3
 
 見て行っていただけると嬉しいです。
 
-[【館報】梓について](https://character-site.netlify.app/columns/azusa_columns/)
+[【館報】梓について](/columns/azusa_columns/)
+
