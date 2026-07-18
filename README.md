@@ -79,8 +79,8 @@ https://dash.cloudflare.com/
 - Build output directory: `dist`
 
 8. `Save and Deploy` 繧呈款縺励∪縺吶・
-9. 繝・・繝ｭ繧､縺悟ｮ御ｺ・☆繧九→縲～https://aidate-museum.pages.dev` 縺ｮ繧医≧縺ｪURL縺瑚｡ｨ遉ｺ縺輔ｌ縺ｾ縺吶・
-繧ゅ＠陦ｨ遉ｺ縺輔ｌ縺欟RL縺・`https://aidate-museum.pages.dev` 縺ｧ縺ｯ縺ｪ縺九▲縺溷ｴ蜷医・縲～src/components/BaseLayout.astro` 縺ｮ `siteUrl` 繧貞ｮ滄圀縺ｮCloudflare URL縺ｫ螟画峩縺励※縺上□縺輔＞縲・
+9. 繝・・繝ｭ繧､縺悟ｮ御ｺ・☆繧九→縲～https://aidate-museum.uehararyuichiro.workers.dev` 縺ｮ繧医≧縺ｪURL縺瑚｡ｨ遉ｺ縺輔ｌ縺ｾ縺吶・
+繧ゅ＠陦ｨ遉ｺ縺輔ｌ縺欟RL縺・`https://aidate-museum.uehararyuichiro.workers.dev` 縺ｧ縺ｯ縺ｪ縺九▲縺溷ｴ蜷医・縲～src/components/BaseLayout.astro` 縺ｮ `siteUrl` 繧貞ｮ滄圀縺ｮCloudflare URL縺ｫ螟画峩縺励※縺上□縺輔＞縲・
 10. 谺｡蝗樔ｻ･髯阪・縲∽ｻ翫∪縺ｧ騾壹ｊGit縺ｧ譖ｴ譁ｰ縺ｧ縺阪∪縺吶・
 ```powershell
 git add .
@@ -89,4 +89,5 @@ git push
 ```
 
 Cloudflare縺隈itHub縺ｸ縺ｮpush繧呈､懃衍縺励※縲∬・蜍輔〒繧ｵ繧､繝医ｒ譖ｴ譁ｰ縺励∪縺吶・
+
 
