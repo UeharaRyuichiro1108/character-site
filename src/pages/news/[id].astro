@@ -1,7 +1,12 @@
-﻿---
+---
 import BaseLayout from "../../components/BaseLayout.astro";
 
 const getIdFromPath = (path) => path.split("/").pop().replace(".md", "");
+const getFirstMarkdownImage = (module) => {
+  const body = typeof module.rawContent === "function" ? module.rawContent() : "";
+  const markdownImage = body.match(/!\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/);
+  return markdownImage?.[1] || "";
+};
 const formatDate = (value) => {
   if (!value) return "未設定";
   const date = new Date(value);
@@ -10,12 +15,18 @@ const formatDate = (value) => {
 };
 
 export async function getStaticPaths() {
+  const getFirstMarkdownImage = (module) => {
+    const body = typeof module.rawContent === "function" ? module.rawContent() : "";
+    const markdownImage = body.match(/!\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/);
+    return markdownImage?.[1] || "";
+  };
+
   const newsModules = import.meta.glob("../../content/news/*.md");
   const entries = await Promise.all(
     Object.entries(newsModules).map(async ([path, loader]) => {
       const module = await loader();
       const id = module.frontmatter.id || getIdFromPath(path);
-      return { params: { id }, props: { news: { id, ...module.frontmatter }, Content: module.default } };
+      return { params: { id }, props: { news: { id, ...module.frontmatter, shareImage: getFirstMarkdownImage(module) }, Content: module.default } };
     })
   );
   return entries;
@@ -24,7 +35,7 @@ export async function getStaticPaths() {
 const { news, Content } = Astro.props;
 ---
 
-<BaseLayout title={`${news.title} | 愛館市立郷土資料館`} description={`${news.title}のお知らせです。`}>
+<BaseLayout title={`${news.title} | 愛館市立郷土資料館`} description={`${news.title}のお知らせです。`} image={news.shareImage}>
   <main class="page-shell news-detail">
     <a class="back-link" href="/news/">お知らせ一覧へ</a>
     <header class="news-header">

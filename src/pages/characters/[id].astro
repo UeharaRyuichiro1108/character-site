@@ -1,4 +1,4 @@
-﻿---
+---
 import BaseLayout from "../../components/BaseLayout.astro";
 
 export function getStaticPaths() {
@@ -46,7 +46,7 @@ const relatedCharacters = allCharacters.filter((item) => character.relatedCharac
 const relatedIllustrations = illustrations.filter((illustration) => illustration.tags?.includes(character.id));
 ---
 
-<BaseLayout title={character.name}>
+<BaseLayout title={`${character.name} | 愛館市立郷土資料館`} description={character.catchcopy || `${character.name}のキャラクター紹介です。`} image={character.image}>
   <main class="page-shell">
     <p class="tag"><a href="/characters/">キャラクター一覧へ戻る</a></p>
 

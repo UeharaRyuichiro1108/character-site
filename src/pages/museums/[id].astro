@@ -23,9 +23,10 @@ const characters = Object.values(characterModules).map((module) => ({
 const { museum } = Astro.props;
 const MuseumContent = museum.Content;
 const members = characters.filter((character) => character.museumId === museum.id);
+const shareImage = museum.image || members[0]?.image || "/images/uploads/aidate.webp";
 ---
 
-<BaseLayout title={museum.name}>
+<BaseLayout title={`${museum.name} | 愛館市立郷土資料館`} description={museum.summary || `${museum.name}の紹介です。`} image={shareImage}>
   <main class="page-shell">
     <p class="tag"><a href="/museums/">博物館一覧へ戻る</a></p>
     <h1 class="page-title">{museum.name}</h1>

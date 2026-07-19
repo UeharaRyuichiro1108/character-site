@@ -1,4 +1,4 @@
-﻿---
+---
 const {
   title = "愛館市立郷土資料館",
   description = "一次創作キャラクター資料館",
@@ -8,7 +8,9 @@ const {
 const siteName = "愛館市立郷土資料館";
 const siteUrl = "https://aidate-museum.uehararyuichiro.workers.dev";
 const pageUrl = new URL(Astro.url.pathname, siteUrl).toString();
-const imageUrl = new URL(image, siteUrl).toString();
+const fallbackImage = "/images/uploads/aidate.webp";
+const safeImage = image || fallbackImage;
+const imageUrl = new URL(safeImage, siteUrl).toString();
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "WebSite",
@@ -38,10 +40,13 @@ const structuredData = {
     <meta property="og:description" content={description} />
     <meta property="og:url" content={pageUrl} />
     <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:secure_url" content={imageUrl} />
+    <meta property="og:image:alt" content={title} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={imageUrl} />
+    <meta name="twitter:url" content={pageUrl} />
     <title>{title}</title>
     <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
   </head>

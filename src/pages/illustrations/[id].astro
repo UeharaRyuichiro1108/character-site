@@ -1,4 +1,4 @@
-﻿---
+---
 import BaseLayout from "../../components/BaseLayout.astro";
 
 export function getStaticPaths() {
@@ -29,9 +29,10 @@ const { illustration } = Astro.props;
 const IllustrationContent = illustration.Content;
 const relatedCharacters = characters.filter((character) => illustration.tags?.includes(character.id));
 const isVideo = (src) => /\.(mp4|webm|mov)$/i.test(src);
+const shareImage = illustration.image || illustration.images.find((item) => !isVideo(item)) || "/images/uploads/aidate.webp";
 ---
 
-<BaseLayout title={illustration.title}>
+<BaseLayout title={`${illustration.title} | 愛館市立郷土資料館`} description={`${illustration.title}のイラストです。`} image={shareImage}>
   <main class="page-shell artwork-page">
     <p class="tag"><a href="/illustrations/">イラスト一覧へ戻る</a></p>
 
