@@ -1,4 +1,4 @@
-﻿---
+---
 import BaseLayout from "../components/BaseLayout.astro";
 import FlowGallery from "../components/FlowGallery.astro";
 import WorldContent from "../content/pages/world.md";
@@ -1477,9 +1477,21 @@ const museumDiagnosisConfig = {
       display: none;
     }
 
-    .ad-slide,
+    .ad-slide {
+      aspect-ratio: 16 / 6;
+      min-height: 0;
+      background: #fff;
+    }
+
     .ad-slide img {
-      min-height: 150px;
+      min-height: 0;
+      object-fit: contain;
+      background: #fff;
+    }
+
+    .ad-slide::after,
+    .ad-slide span {
+      display: none;
     }
 
     .top-news-item {
