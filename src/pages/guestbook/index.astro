@@ -1,4 +1,4 @@
-﻿---
+---
 import BaseLayout from "../../components/BaseLayout.astro";
 
 const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfaz8XlEBxKa8w7hz0HOmiumHx_ifJ_-GYycXwu7RVXeWzkRA/viewform";
@@ -12,7 +12,7 @@ const stickerOptions = [
   { id: "haru", label: "ハル" },
 ];
 const stickerPositions = ["sticker-margin-top", "sticker-margin-middle", "sticker-margin-bottom", "sticker-margin-upper", "sticker-margin-lower"];
-const handwritingClasses = ["handwriting-1", "handwriting-2", "handwriting-3", "handwriting-4", "handwriting-5", "handwriting-6", "handwriting-7", "handwriting-8", "handwriting-9", "handwriting-10"];
+const handwritingClasses = ["handwriting-4", "handwriting-5", "handwriting-6", "handwriting-7", "handwriting-9"];
 type GuestbookMessage = { date: string; message: string; stickerId: string };
 const guestbookMessages = [
   // ここにGoogleフォームで届いた内容を追加します。
@@ -150,24 +150,6 @@ const guestbookPages = guestbookMessages.reduce(
 
 <style>
   @font-face {
-    font-family: "GuestbookTegaki1";
-    src: url("/fonts/tegaki-1.ttf") format("truetype");
-    font-display: swap;
-  }
-
-  @font-face {
-    font-family: "GuestbookTegaki2";
-    src: url("/fonts/tegaki-2.otf") format("opentype");
-    font-display: swap;
-  }
-
-  @font-face {
-    font-family: "GuestbookTegaki3";
-    src: url("/fonts/tegaki-3.otf") format("opentype");
-    font-display: swap;
-  }
-
-  @font-face {
     font-family: "GuestbookTegaki4";
     src: url("/fonts/tegaki-4.woff2") format("woff2");
     font-display: swap;
@@ -192,20 +174,8 @@ const guestbookPages = guestbookMessages.reduce(
   }
 
   @font-face {
-    font-family: "GuestbookTegaki8";
-    src: url("/fonts/tegaki-8.ttf") format("truetype");
-    font-display: swap;
-  }
-
-  @font-face {
     font-family: "GuestbookTegaki9";
     src: url("/fonts/tegaki-9.otf") format("opentype");
-    font-display: swap;
-  }
-
-  @font-face {
-    font-family: "GuestbookTegaki10";
-    src: url("/fonts/tegaki-10.ttf") format("truetype");
     font-display: swap;
   }
   .guestbook-page {
@@ -319,18 +289,6 @@ const guestbookPages = guestbookMessages.reduce(
     justify-self: start;
   }
 
-  .handwriting-1 {
-    font-family: "GuestbookTegaki1", "Yu Mincho", serif;
-  }
-
-  .handwriting-2 {
-    font-family: "GuestbookTegaki2", "Yu Mincho", serif;
-  }
-
-  .handwriting-3 {
-    font-family: "GuestbookTegaki3", "Yu Mincho", serif;
-  }
-
   .handwriting-4 {
     font-family: "GuestbookTegaki4", "Yu Mincho", serif;
   }
@@ -347,16 +305,8 @@ const guestbookPages = guestbookMessages.reduce(
     font-family: "GuestbookTegaki7", "Yu Mincho", serif;
   }
 
-  .handwriting-8 {
-    font-family: "GuestbookTegaki8", "Yu Mincho", serif;
-  }
-
   .handwriting-9 {
     font-family: "GuestbookTegaki9", "Yu Mincho", serif;
-  }
-
-  .handwriting-10 {
-    font-family: "GuestbookTegaki10", "Yu Mincho", serif;
   }
   .empty-message {
     min-height: 220px;
