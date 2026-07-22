@@ -1,0 +1,662 @@
+﻿---
+import BaseLayout from "../../components/BaseLayout.astro";
+
+const postModules = import.meta.glob("../../content/musetter/*.md", { eager: true });
+const characterModules = import.meta.glob("../../content/characters/*.md", { eager: true });
+const museumModules = import.meta.glob("../../content/museums/*.md", { eager: true });
+
+const getIdFromPath = (path) => path.split("/").pop().replace(".md", "");
+const toDate = (value) => {
+  const date = new Date(value || "");
+  return Number.isNaN(date.getTime()) ? new Date(0) : date;
+};
+const formatDateTime = (value) => {
+  const date = toDate(value);
+  if (date.getTime() === 0) return "日時未設定";
+  return date.toLocaleString("ja-JP", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+const characters = Object.entries(characterModules).map(([path, module]) => ({
+  id: module.frontmatter.id || getIdFromPath(path),
+  type: "character",
+  name: module.frontmatter.name || "名前未設定",
+  handle: `@${module.frontmatter.id || getIdFromPath(path)}`,
+  avatar: module.frontmatter.musetterIcon || module.frontmatter.image || "/images/uploads/logo.webp",
+  profileUrl: `/characters/${module.frontmatter.id || getIdFromPath(path)}/`,
+}));
+
+const museums = Object.entries(museumModules).map(([path, module]) => ({
+  id: module.frontmatter.id || getIdFromPath(path),
+  type: "museum",
+  name: module.frontmatter.name || "博物館名未設定",
+  handle: `@${module.frontmatter.id || getIdFromPath(path)}_museum`,
+  avatar: module.frontmatter.musetterIcon || module.frontmatter.image || "/images/uploads/logo.webp",
+  profileUrl: `/museums/${module.frontmatter.id || getIdFromPath(path)}/`,
+}));
+
+const accountMap = new Map([...characters, ...museums].map((account) => [`${account.type}:${account.id}`, account]));
+
+const allPosts = Object.entries(postModules)
+  .map(([path, module]) => {
+    const frontmatter = module.frontmatter || {};
+    const id = frontmatter.id || getIdFromPath(path);
+    const account = accountMap.get(`${frontmatter.authorType}:${frontmatter.authorId}`) || {
+      id: frontmatter.authorId || "unknown",
+      type: frontmatter.authorType || "unknown",
+      name: frontmatter.authorId || "不明なアカウント",
+      handle: "@unknown",
+      avatar: module.frontmatter.musetterIcon || module.frontmatter.image || "/images/uploads/logo.webp",
+      profileUrl: "/musetter/",
+    };
+    return {
+      id,
+      account,
+      publishedAt: frontmatter.publishedAt || "",
+      replyTo: frontmatter.replyTo || "",
+      images: (frontmatter.images || []).slice(0, 4),
+      body: typeof module.rawContent === "function" ? module.rawContent() : "",
+      rendered: module.compiledContent ? module.compiledContent() : "",
+    };
+  })
+  .sort((a, b) => toDate(b.publishedAt).getTime() - toDate(a.publishedAt).getTime());
+
+const repliesByPostId = new Map();
+allPosts.filter((post) => post.replyTo).forEach((reply) => {
+  const replies = repliesByPostId.get(reply.replyTo) || [];
+  replies.push(reply);
+  repliesByPostId.set(reply.replyTo, replies);
+});
+
+const getReplyThread = (postId, depth = 1, visited = new Set()) => {
+  if (visited.has(postId)) return [];
+  visited.add(postId);
+  const directReplies = (repliesByPostId.get(postId) || [])
+    .sort((a, b) => toDate(a.publishedAt).getTime() - toDate(b.publishedAt).getTime());
+
+  return directReplies.flatMap((reply) => [
+    { ...reply, depth },
+    ...getReplyThread(reply.id, depth + 1, new Set(visited)),
+  ]);
+};
+
+const timelinePosts = allPosts.filter((post) => !post.replyTo);
+const allAccounts = [...museums, ...characters].sort((a, b) => a.name.localeCompare(b.name, "ja"));
+---
+
+<BaseLayout title="Musetter | 愛館市立郷土資料館" description="博物館とキャラクターの投稿が流れるSNS風タイムラインです。">
+  <main class="page-shell musetter-page">
+    <section class="musetter-hero">
+      <p class="eyebrow">Museum Timeline</p>
+      <h1>Musetter</h1>
+      <p>博物館や学芸員たちの投稿が流れてくる、創作内SNS風のタイムラインです。</p>
+    </section>
+
+    <div class="musetter-layout">
+      <section class="timeline" aria-label="Musetterタイムライン">
+        {timelinePosts.map((post) => {
+          const replies = getReplyThread(post.id);
+          return (
+            <article class="tweet-card" data-post-id={post.id}>
+              <a class="avatar-link" href={post.account.profileUrl}>
+                <img src={post.account.avatar} alt={`${post.account.name}のアイコン`} loading="lazy" />
+              </a>
+              <div class="tweet-main">
+                <header class="tweet-header">
+                  <a href={post.account.profileUrl}>{post.account.name}</a>
+                  <span>{post.account.handle}</span>
+                  <time datetime={post.publishedAt}>{formatDateTime(post.publishedAt)}</time>
+                </header>
+                <div class="tweet-body" set:html={post.rendered} />
+                {post.images.length > 0 && (
+                  <div class={`image-grid count-${post.images.length}`}>
+                    {post.images.map((image, index) => (
+                      <button class="image-thumb" type="button" data-images={post.images.join("|")} data-index={index} aria-label={`${post.account.name}の画像${index + 1}を拡大`}>
+                        <img src={image} alt="" loading="lazy" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div class="tweet-actions" aria-label="投稿の操作">
+                  <button class="reply-button" type="button" aria-label="返信を見る">返信 {replies.length}</button>
+                  <button class="retweet-button js-toggle" type="button" data-kind="retweet" aria-label="リツイート" aria-pressed="false"><svg class="action-icon retweet-icon" width="22" height="18" viewBox="0 0 24 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 5.5h11"/><path d="M14 2.5l3 3-3 3"/><path d="M18 14.5H7"/><path d="M10 11.5l-3 3 3 3"/></svg></button>
+                  <button class="like-button js-toggle" type="button" data-kind="like" aria-label="いいね" aria-pressed="false"><svg class="action-icon like-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21C9.4 18.7 7.2 16.8 5.6 15.1 3.8 13.2 3 11.4 3 9.4 3 6.8 5 5 7.5 5c1.6 0 3.2.8 4.5 2.5C13.3 5.8 14.9 5 16.5 5 19 5 21 6.8 21 9.4c0 2-.8 3.8-2.6 5.7C16.8 16.8 14.6 18.7 12 21Z"/></svg></button>
+                </div>
+                {replies.length > 0 && (
+                  <div class="reply-list">
+                    {replies.map((reply) => (
+                      <article class="reply-card" data-post-id={reply.id} style={`--reply-depth-offset: ${Math.min(Math.max((reply.depth || 1) - 1, 0), 3) * 24}px`}>
+                        <a class="reply-avatar" href={reply.account.profileUrl}>
+                          <img src={reply.account.avatar} alt={`${reply.account.name}のアイコン`} loading="lazy" />
+                        </a>
+                        <div>
+                          <header class="tweet-header reply-header">
+                            <a href={reply.account.profileUrl}>{reply.account.name}</a>
+                            <span>{reply.account.handle}</span>
+                            <time datetime={reply.publishedAt}>{formatDateTime(reply.publishedAt)}</time>
+                          </header>
+                          <div class="tweet-body" set:html={reply.rendered} />
+                          {reply.images.length > 0 && (
+                            <div class={`image-grid count-${reply.images.length}`}>
+                              {reply.images.map((image, index) => (
+                                <button class="image-thumb" type="button" data-images={reply.images.join("|")} data-index={index} aria-label={`${reply.account.name}の画像${index + 1}を拡大`}>
+                                  <img src={image} alt="" loading="lazy" />
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                          <div class="tweet-actions compact" aria-label="返信の操作">
+                            <button class="retweet-button js-toggle" type="button" data-kind="retweet" aria-label="リツイート" aria-pressed="false"><svg class="action-icon retweet-icon" width="22" height="18" viewBox="0 0 24 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 5.5h11"/><path d="M14 2.5l3 3-3 3"/><path d="M18 14.5H7"/><path d="M10 11.5l-3 3 3 3"/></svg></button>
+                            <button class="like-button js-toggle" type="button" data-kind="like" aria-label="いいね" aria-pressed="false"><svg class="action-icon like-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21C9.4 18.7 7.2 16.8 5.6 15.1 3.8 13.2 3 11.4 3 9.4 3 6.8 5 5 7.5 5c1.6 0 3.2.8 4.5 2.5C13.3 5.8 14.9 5 16.5 5 19 5 21 6.8 21 9.4c0 2-.8 3.8-2.6 5.7C16.8 16.8 14.6 18.7 12 21Z"/></svg></button>
+                          </div>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </article>
+          );
+        })}
+      </section>
+    </div>
+  </main>
+
+  <dialog class="media-dialog" id="media-dialog" aria-label="画像プレビュー">
+    <button class="dialog-close" type="button" aria-label="閉じる">×</button>
+    <button class="dialog-nav prev" type="button" aria-label="前の画像">‹</button>
+    <img class="dialog-image" alt="拡大画像" />
+    <button class="dialog-nav next" type="button" aria-label="次の画像">›</button>
+    <p class="dialog-count" aria-live="polite"></p>
+  </dialog>
+
+  <script>
+    const storagePrefix = "musetter-action:";
+    const getActionKey = (button) => {
+      const card = button.closest(".reply-card") || button.closest(".tweet-card");
+      return `${storagePrefix}${button.dataset.kind}:${card?.dataset.postId || "unknown"}`;
+    };
+    const updateActionButton = (button, active) => {
+      const kind = button.dataset.kind;
+      const icon = button.querySelector("svg");
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-pressed", String(active));
+      button.style.color = active ? (kind === "like" ? "#f0629b" : "#75b843") : "";
+      button.style.backgroundColor = active ? (kind === "like" ? "#ffe8f2" : "#edf9df") : "";
+      if (icon && kind === "like") {
+        icon.setAttribute("fill", active ? "currentColor" : "none");
+      }
+    };
+
+    document.querySelectorAll(".js-toggle").forEach((button) => {
+      const key = getActionKey(button);
+      updateActionButton(button, localStorage.getItem(key) === "1");
+      button.addEventListener("click", () => {
+        const nextActive = button.getAttribute("aria-pressed") !== "true";
+        updateActionButton(button, nextActive);
+        localStorage.setItem(key, nextActive ? "1" : "0");
+      });
+    });
+
+    const dialog = document.querySelector("#media-dialog");
+    const dialogImage = dialog?.querySelector(".dialog-image");
+    const dialogCount = dialog?.querySelector(".dialog-count");
+    const prevButton = dialog?.querySelector(".dialog-nav.prev");
+    const nextButton = dialog?.querySelector(".dialog-nav.next");
+    const closeButton = dialog?.querySelector(".dialog-close");
+    let currentImages = [];
+    let currentIndex = 0;
+    let touchStartX = 0;
+
+    const updateDialog = () => {
+      if (!dialogImage || !dialogCount) return;
+      dialogImage.src = currentImages[currentIndex] || "";
+      dialogCount.textContent = currentImages.length > 1 ? `${currentIndex + 1} / ${currentImages.length}` : "";
+      const hasMultiple = currentImages.length > 1;
+      prevButton.hidden = !hasMultiple;
+      nextButton.hidden = !hasMultiple;
+    };
+
+    const moveDialog = (direction) => {
+      if (currentImages.length <= 1) return;
+      currentIndex = (currentIndex + direction + currentImages.length) % currentImages.length;
+      updateDialog();
+    };
+
+    document.querySelectorAll(".image-thumb").forEach((button) => {
+      button.addEventListener("click", () => {
+        currentImages = (button.dataset.images || "").split("|").filter(Boolean);
+        currentIndex = Number(button.dataset.index || 0);
+        updateDialog();
+        dialog?.showModal();
+      });
+    });
+
+    closeButton?.addEventListener("click", () => dialog?.close());
+    prevButton?.addEventListener("click", () => moveDialog(-1));
+    nextButton?.addEventListener("click", () => moveDialog(1));
+    dialog?.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    dialog?.addEventListener("touchstart", (event) => {
+      touchStartX = event.touches[0]?.clientX || 0;
+    }, { passive: true });
+    dialog?.addEventListener("touchend", (event) => {
+      const touchEndX = event.changedTouches[0]?.clientX || 0;
+      const distance = touchEndX - touchStartX;
+      if (Math.abs(distance) > 48) moveDialog(distance > 0 ? -1 : 1);
+    }, { passive: true });
+    document.addEventListener("keydown", (event) => {
+      if (!dialog?.open) return;
+      if (event.key === "ArrowLeft") moveDialog(-1);
+      if (event.key === "ArrowRight") moveDialog(1);
+    });
+  </script>
+</BaseLayout>
+
+<style>
+  .musetter-page {
+    display: grid;
+    gap: 24px;
+  }
+
+  .musetter-hero {
+    padding: 26px 0 4px;
+  }
+
+  .eyebrow {
+    margin: 0 0 6px;
+    color: var(--blue-deep);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .musetter-hero h1 {
+    margin: 0;
+    font-size: clamp(42px, 8vw, 82px);
+  }
+
+  .musetter-hero p:last-child {
+    max-width: 680px;
+    margin: 8px 0 0;
+    color: var(--muted);
+    line-height: 1.9;
+  }
+
+  .musetter-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+    align-items: start;
+  }
+
+  .timeline {
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: var(--soft-shadow);
+  }
+
+  .account-mini small,
+  .tweet-header span,
+  .tweet-header time {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .timeline {
+    overflow: hidden;
+    border-radius: 22px;
+  }
+
+
+  .tweet-card {
+    display: grid;
+    grid-template-columns: 54px minmax(0, 1fr);
+    gap: 14px;
+    padding: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .tweet-card:last-child {
+    border-bottom: 0;
+  }
+
+  .avatar-link {
+    width: 54px;
+    height: 54px;
+  }
+
+  .avatar-link,
+  .reply-avatar {
+    display: block;
+    overflow: hidden;
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  .avatar-link img,
+  .reply-avatar img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+  }
+
+  .tweet-main {
+    display: grid;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .tweet-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: baseline;
+  }
+
+  .tweet-header a {
+    color: var(--ink);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .tweet-header a:hover {
+    color: var(--blue-deep);
+  }
+
+  .tweet-body :global(p) {
+    margin: 0;
+    line-height: 1.9;
+    white-space: pre-wrap;
+  }
+
+  .image-grid {
+    display: grid;
+    gap: 6px;
+    overflow: hidden;
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    background: var(--pale);
+  }
+
+  .image-grid.count-1 {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+  }
+
+  .image-grid.count-2,
+  .image-grid.count-3,
+  .image-grid.count-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .image-grid.count-3 .image-thumb:first-child {
+    grid-row: span 2;
+  }
+
+  .image-thumb {
+    width: 100%;
+    min-height: 180px;
+    padding: 0;
+    border: 0;
+    background: #fff;
+    cursor: zoom-in;
+  }
+
+  .image-grid.count-1 .image-thumb {
+    min-height: 320px;
+  }
+
+  .image-thumb img {
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+    object-fit: cover;
+  }
+
+  .tweet-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .tweet-actions button {
+    min-height: 34px;
+    padding: 0 14px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    color: var(--muted);
+    background: transparent;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .tweet-actions .js-toggle {
+    display: inline-grid;
+    place-items: center;
+    width: 38px;
+    min-width: 38px;
+    height: 34px;
+    padding: 0;
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  .tweet-actions button:hover {
+    background: var(--pale);
+  }
+
+  .tweet-actions .action-icon {
+    display: block;
+    flex: 0 0 auto;
+    max-width: 22px;
+    max-height: 20px;
+    pointer-events: none;
+  }
+
+  .tweet-actions .like-icon {
+    max-width: 17px;
+    max-height: 17px;
+  }
+
+  .like-button.is-active {
+    color: #f0629b;
+    background: #ffe8f2;
+  }
+
+  .like-button.is-active .like-icon {
+    fill: currentColor;
+  }
+
+  .retweet-button.is-active {
+    color: #75b843;
+    background: #edf9df;
+  }
+
+  .reply-list {
+    display: grid;
+    gap: 0;
+    margin-top: 2px;
+    border-left: 2px solid var(--line);
+  }
+
+  .reply-card {
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr);
+    gap: 10px;
+    margin-left: var(--reply-depth-offset, 0px);
+    padding: 14px 0 14px 14px;
+  }
+
+  .reply-card + .reply-card {
+    border-top: 1px solid var(--line);
+  }
+
+  .reply-avatar {
+    width: 38px;
+    height: 38px;
+  }
+
+  .reply-header {
+    margin-bottom: 8px;
+  }
+
+  .compact {
+    margin-top: 10px;
+  }
+
+  .media-dialog {
+    width: min(920px, calc(100vw - 24px));
+    height: min(720px, calc(100vh - 24px));
+    padding: 0;
+    border: 0;
+    border-radius: 20px;
+    background: rgba(20, 28, 36, 0.96);
+    box-shadow: 0 24px 72px rgba(0, 0, 0, 0.35);
+  }
+
+  .media-dialog::backdrop {
+    background: rgba(15, 27, 36, 0.55);
+  }
+
+  .dialog-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .dialog-close,
+  .dialog-nav {
+    position: absolute;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 999px;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.18);
+    cursor: pointer;
+  }
+
+  .dialog-close {
+    top: 14px;
+    right: 14px;
+    width: 42px;
+    height: 42px;
+    font-size: 28px;
+  }
+
+  .dialog-nav {
+    top: 50%;
+    width: 46px;
+    height: 64px;
+    transform: translateY(-50%);
+    font-size: 40px;
+  }
+
+  .dialog-nav.prev { left: 16px; }
+  .dialog-nav.next { right: 16px; }
+
+  .dialog-count {
+    position: absolute;
+    right: 18px;
+    bottom: 12px;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.86);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  @media (max-width: 620px) {
+    .tweet-card {
+      grid-template-columns: 44px minmax(0, 1fr);
+      gap: 10px;
+      padding: 16px 12px;
+    }
+
+    .avatar-link {
+      width: 44px;
+      height: 44px;
+    }
+
+    .image-grid,
+    .image-grid.count-2,
+    .image-grid.count-3,
+    .image-grid.count-4 {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+
+    .image-grid::-webkit-scrollbar {
+      display: none;
+    }
+
+    .image-grid.count-3 .image-thumb:first-child {
+      grid-row: auto;
+    }
+
+    .image-thumb,
+    .image-grid.count-1 .image-thumb {
+      flex: 0 0 100%;
+      min-height: 260px;
+      scroll-snap-align: center;
+    }
+
+    .tweet-actions {
+      gap: 4px;
+    }
+
+    .tweet-actions button {
+      padding: 0 10px;
+      font-size: 12px;
+    }
+
+    .tweet-actions .js-toggle {
+      width: 34px;
+      min-width: 34px;
+      height: 32px;
+      padding: 0;
+      font-size: 20px;
+    }
+
+    .tweet-actions .action-icon {
+      max-width: 20px;
+      max-height: 18px;
+    }
+
+    .tweet-actions .like-icon {
+      max-width: 16px;
+      max-height: 16px;
+    }
+
+    .dialog-nav {
+      display: none;
+    }
+  }
+</style>
+
+
+
+
+
+
+
+
+
+
+

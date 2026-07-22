@@ -33,7 +33,7 @@ background: "元々は昭和に生きていた。
   誠が出征中に病院のあった町が空襲に遭い病院ごと焼失した。  
 
   死亡後、愛館市立郷土資料館の学芸員として雇用される。"
-other: "動物は魚。"
+other: "体の中で魚を一匹飼っている。"
 group: "愛館市立郷土資料館"
 museumId: "aidate"
 image: "/images/uploads/sion.webp"

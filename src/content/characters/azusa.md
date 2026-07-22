@@ -38,6 +38,8 @@ relationships:
 tags:
   - azusa
   - main
+
+musetterIcon: "/images/uploads/icon_azusa.webp"
 ---
 
 可愛いものが好きで、見た目だけは可愛い軍曹によくちょっかいをかけている。

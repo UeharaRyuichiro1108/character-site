@@ -27,6 +27,7 @@ collections:
       - { label: "所属博物館名", name: "group", widget: "string" }
       - { label: "所属博物館ID", name: "museumId", widget: "string", required: false }
       - { label: "トップ画像", name: "image", widget: "image" }
+      - { label: "Musetter用アイコン", name: "musetterIcon", widget: "image", required: false, hint: "未設定の場合はトップ画像が使われます。" }
       - { label: "デザイン画", name: "designImage", widget: "image", required: false }
       - { label: "キャッチコピー", name: "catchcopy", widget: "string", required: false }
       - { label: "関係キャラクターID", name: "relatedCharacterIds", widget: "list", required: false }
@@ -49,6 +50,7 @@ collections:
       - { label: "ID", name: "id", widget: "string" }
       - { label: "名前", name: "name", widget: "string" }
       - { label: "短い説明", name: "summary", widget: "string" }
+      - { label: "Musetter用アイコン", name: "musetterIcon", widget: "image", required: false, hint: "未設定の場合はロゴが使われます。" }
       - { label: "関係博物館ID", name: "relatedMuseumIds", widget: "list", required: false }
       - label: "相関図の関係文言"
         name: "museumRelationships"
@@ -130,6 +132,19 @@ collections:
       - { label: "掲載年月日", name: "publishedAt", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false }
       - { label: "同じ日付内の表示順", name: "order", widget: "number", required: false, value_type: "int", min: 1, hint: "同じ掲載年月日の中で、1が一番下、2がその上に表示されます。数字が大きいほど上に並びます。未入力の場合は後ろに並びます。" }
       - { label: "本文", name: "body", widget: "markdown", required: false }
+  - name: "musetter"
+    label: "Musetter"
+    folder: "src/content/musetter"
+    create: true
+    slug: "{{fields.id}}"
+    fields:
+      - { label: "ID", name: "id", widget: "string" }
+      - { label: "投稿者種別", name: "authorType", widget: "select", options: ["character", "museum"], hint: "キャラクターなら character、博物館なら museum" }
+      - { label: "投稿者ID", name: "authorId", widget: "string", hint: "例: tasuku / sion / aidate / yubari" }
+      - { label: "投稿日時", name: "publishedAt", widget: "datetime", date_format: "YYYY-MM-DD", time_format: "HH:mm" }
+      - { label: "返信先投稿ID", name: "replyTo", widget: "string", required: false, hint: "返信にしたい場合だけ、元投稿のIDを書く" }
+      - { label: "添付画像", name: "images", widget: "list", required: false, max: 4, field: { label: "画像", name: "image", widget: "image" } }
+      - { label: "本文", name: "body", widget: "markdown", required: false }
   - name: "pages"
     label: "固定ページ"
     files:
@@ -139,6 +154,8 @@ collections:
         fields:
           - { label: "タイトル", name: "title", widget: "string" }
           - { label: "本文", name: "body", widget: "markdown" }
+
+
 
 
 

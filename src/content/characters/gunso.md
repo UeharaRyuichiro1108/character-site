@@ -45,6 +45,8 @@ relationships:
 tags:
   - gunso
   - main
+
+musetterIcon: "/images/uploads/icon_gunso.webp"
 ---
 
 愛館市立郷土資料館のキュートアグレッション担当
