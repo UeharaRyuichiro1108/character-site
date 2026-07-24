@@ -63,6 +63,13 @@ const illustrationItems = [...illustrations]
     image: illustration.image,
     href: `/illustrations/${illustration.id}/`,
   }));
+const ticketIllustrations = illustrations
+  .filter((illustration) => illustration.image)
+  .map((illustration) => ({
+    title: illustration.title,
+    image: illustration.image,
+    href: `/illustrations/${illustration.id}/`,
+  }));
 const latestNews = Object.entries(newsModules)
   .map(([path, module]) => ({
     id: module.frontmatter.id || getIdFromPath(path),
@@ -305,6 +312,93 @@ const museumDiagnosisConfig = {
       </div>
     </section>
 
+    <section class="ticket-section" id="museum-ticket-machine" aria-label="入館証発行機">
+      <div class="section-heading-row ticket-heading">
+        <div>
+          <p class="tag">ADMISSION TICKET</p>
+          <h2 class="section-title">入館証発行機</h2>
+        </div>
+      </div>
+
+      <div class="ticket-machine panel" id="ticket-machine">
+        <div class="ticket-printer">
+          <div class="printer-display">
+            <span class="printer-light" aria-hidden="true"></span>
+            <span class="printer-label">AIDATE MUSEUM</span>
+            <span class="printer-status">READY</span>
+          </div>
+          <button class="ticket-issue-button" type="button" id="ticket-issue-button">入館証発行</button>
+          <span class="printer-slot" aria-hidden="true"></span>
+        </div>
+
+        <div class="ticket-output" aria-live="polite">
+          <article class="museum-ticket" id="museum-ticket">
+            <div class="ticket-main">
+              <a class="ticket-art-link" id="ticket-art-link" href="/illustrations/">
+                <img id="ticket-art-image" src="/images/uploads/logo.webp" alt="入館証に印刷されたイラスト" />
+                <span class="ticket-art-watermark">愛館市立郷土資料館</span>
+              </a>
+            </div>
+            <div class="ticket-stub">
+              <span class="ticket-perforation" aria-hidden="true"></span>
+              <div class="ticket-stub-copy">
+                <strong>常設展示</strong>
+                <time id="ticket-date"></time>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="ticket-result" id="ticket-result" hidden>
+        <p>ごゆっくりご観覧ください</p>
+        <a class="ticket-share-button" href="https://twitter.com/intent/tweet?text=%E6%84%9B%E9%A4%A8%E5%B8%82%E7%AB%8B%E9%83%B7%E5%9C%9F%E8%B3%87%E6%96%99%E9%A4%A8%E3%81%AB%E5%85%A5%E9%A4%A8%E3%81%97%E3%81%BE%E3%81%97%E3%81%9F%E3%80%82%0A%23%E6%84%9B%E9%A4%A8%E5%B8%82%E6%AD%B4%E5%8F%B2%E7%A0%94%E7%A9%B6%E5%AD%A6%E4%BC%9A" target="_blank" rel="noopener noreferrer">Xで共有する</a>
+      </div>
+    </section>
+
+    <script type="application/json" id="ticket-illustrations" set:html={JSON.stringify(ticketIllustrations)}></script>
+    <script>
+      const ticketDataElement = document.querySelector("#ticket-illustrations");
+      const ticketIllustrations = JSON.parse(ticketDataElement?.textContent || "[]");
+      const ticketButton = document.querySelector("#ticket-issue-button");
+      const ticketMachine = document.querySelector("#ticket-machine");
+      const ticket = document.querySelector("#museum-ticket");
+      const ticketResult = document.querySelector("#ticket-result");
+      const ticketImage = document.querySelector("#ticket-art-image");
+      const ticketLink = document.querySelector("#ticket-art-link");
+      const ticketDate = document.querySelector("#ticket-date");
+
+      const formatTicketDate = () => {
+        const date = new Date();
+        return date.toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" });
+      };
+
+      const issueTicket = () => {
+        if (!ticket || !ticketMachine) return;
+        const selected = ticketIllustrations[Math.floor(Math.random() * ticketIllustrations.length)] || {
+          title: "愛館市立郷土資料館",
+          image: "/images/uploads/logo.webp",
+          href: "/illustrations/",
+        };
+
+        ticketImage.src = selected.image;
+        ticketLink.href = selected.href;
+        ticketDate.textContent = formatTicketDate();
+        ticketResult.hidden = true;
+
+        ticketMachine.classList.remove("is-issued");
+        ticket.classList.remove("is-printing");
+        window.setTimeout(() => {
+          ticketMachine.classList.add("is-issued");
+          ticket.classList.add("is-printing");
+        }, 40);
+        window.setTimeout(() => {
+          ticketResult.hidden = false;
+        }, 2600);
+      };
+
+      ticketButton?.addEventListener("click", issueTicket);
+    </script>
     <section class="ad-section" aria-label="幻覚広告欄">
       <div class="section-heading-row">
         <div>
@@ -996,6 +1090,649 @@ const museumDiagnosisConfig = {
     color: var(--blue-deep);
   }
 
+  .ticket-section {
+    padding: 56px 0 24px;
+  }
+
+  .ticket-heading {
+    gap: 18px;
+  }
+
+  .ticket-issue-button,
+  .ticket-share-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 22px;
+    border: 1px solid var(--blue-deep);
+    border-radius: 999px;
+    background: var(--blue-deep);
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 14px 28px rgba(61, 93, 115, 0.18);
+    transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  }
+
+  .ticket-issue-button {
+    justify-self: stretch;
+    min-height: 50px;
+    padding: 0 18px;
+    border-color: rgba(255, 255, 255, 0.72);
+    border-radius: 14px;
+    background: linear-gradient(180deg, #f9fdff, #d9ebf4);
+    color: #2b4b62;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.92),
+      0 8px 0 #8fb2c8,
+      0 16px 26px rgba(44, 73, 94, 0.18);
+  }
+
+  .ticket-issue-button:hover,
+  .ticket-share-button:hover {
+    transform: translateY(-2px);
+    background: #42677f;
+    box-shadow: var(--soft-shadow);
+  }
+
+  .ticket-issue-button:hover {
+    background: linear-gradient(180deg, #ffffff, #cce5f0);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.94),
+      0 7px 0 #7da8c1,
+      0 16px 28px rgba(44, 73, 94, 0.2);
+  }
+
+  .ticket-issue-button:active {
+    transform: translateY(5px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      0 2px 0 #7da8c1,
+      0 8px 18px rgba(44, 73, 94, 0.18);
+  }
+
+  .ticket-machine {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 0;
+    max-width: 600px;
+    margin: 18px auto 0;
+    padding: 34px 18px 36px;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 22% 8%, rgba(255, 255, 255, 0.92), transparent 30%),
+      linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(226, 241, 248, 0.92));
+  }
+
+  .ticket-machine::before {
+    content: "";
+    position: absolute;
+    inset: 14px;
+    border: 1px solid rgba(134, 171, 193, 0.35);
+    border-radius: 16px;
+    pointer-events: none;
+  }
+
+  .ticket-printer {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(132px, 150px);
+    gap: 16px;
+    align-items: center;
+    width: min(420px, 84vw);
+    min-height: 138px;
+    padding: 20px 24px 34px;
+    border: 1px solid rgba(111, 150, 174, 0.68);
+    border-radius: 24px 24px 14px 14px;
+    background:
+      linear-gradient(120deg, rgba(255, 255, 255, 0.62), transparent 42%),
+      linear-gradient(180deg, #eef8fc, #bcd8e8 52%, #779fb7);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.86),
+      inset 0 -12px 22px rgba(51, 86, 109, 0.12),
+      0 24px 46px rgba(62, 91, 112, 0.24);
+  }
+
+  .printer-display {
+    display: grid;
+    grid-template-columns: 12px 1fr;
+    gap: 8px 10px;
+    align-items: center;
+    min-height: 70px;
+    padding: 14px 16px;
+    border: 1px solid rgba(49, 78, 96, 0.32);
+    border-radius: 14px;
+    background:
+      linear-gradient(180deg, rgba(36, 61, 78, 0.92), rgba(22, 39, 52, 0.92));
+    color: #dff3ff;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.28);
+  }
+
+  .printer-light {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: #83e0ad;
+    box-shadow: 0 0 0 4px rgba(131, 224, 173, 0.18), 0 0 14px rgba(131, 224, 173, 0.72);
+  }
+
+  .printer-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+  }
+
+  .printer-status {
+    grid-column: 2;
+    color: #9fd3eb;
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+  }
+
+  .printer-slot {
+    position: absolute;
+    left: 50%;
+    bottom: 16px;
+    width: min(312px, 70vw);
+    height: 12px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #172d3d, #385a70);
+    box-shadow: inset 0 3px 7px rgba(0, 0, 0, 0.42), 0 1px 0 rgba(255, 255, 255, 0.28);
+    transform: translateX(-50%);
+  }
+
+  .ticket-output {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    width: min(360px, 82vw);
+    height: 560px;
+    margin-top: -2px;
+    overflow: hidden;
+  }
+
+  .museum-ticket {
+    display: grid;
+    grid-template-rows: 1fr 118px;
+    width: min(300px, 72vw);
+    min-height: 520px;
+    border: 1px solid #8d5a32;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #f7d8a3;
+    color: #64380f;
+    box-shadow: 0 22px 44px rgba(75, 49, 24, 0.2);
+    transform: translateY(-110%);
+  }
+
+  .museum-ticket.is-printing {
+    animation: printTicket 2.45s cubic-bezier(0.18, 0.78, 0.22, 1) forwards;
+  }
+
+  .ticket-main {
+    display: grid;
+    align-content: start;
+    gap: 10px;
+    padding: 24px 22px 20px;
+    background:
+      linear-gradient(90deg, rgba(106, 58, 21, 0.12) 1px, transparent 1px) 0 0 / 100% 100%,
+      radial-gradient(circle at 18px 18px, rgba(106, 58, 21, 0.1), transparent 18px),
+      #f6d59a;
+  }
+
+  .ticket-small,
+  .ticket-sub,
+  .ticket-art-title {
+    margin: 0;
+    text-align: center;
+    letter-spacing: 0.08em;
+  }
+
+  .ticket-small {
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .ticket-main h3 {
+    margin: 0;
+    font-size: clamp(24px, 7vw, 38px);
+    line-height: 1.15;
+    text-align: center;
+    letter-spacing: 0;
+  }
+
+  .ticket-sub {
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .ticket-art-link {
+    display: block;
+    aspect-ratio: 4 / 3;
+    margin-top: 8px;
+    overflow: hidden;
+    border: 2px solid rgba(100, 56, 15, 0.42);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  .ticket-art-link img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ticket-art-title {
+    min-height: 1.8em;
+    color: #7b4a1c;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+
+  .ticket-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 8px 0 0;
+    padding-top: 12px;
+    border-top: 1px solid rgba(100, 56, 15, 0.34);
+  }
+
+  .ticket-meta div {
+    display: grid;
+    gap: 3px;
+  }
+
+  .ticket-meta dt {
+    color: rgba(100, 56, 15, 0.72);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+  }
+
+  .ticket-meta dd {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  .ticket-stub {
+    position: relative;
+    display: grid;
+    grid-template-columns: 28px 1fr 42px;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: #64380f;
+    color: #f8dca8;
+  }
+
+  .ticket-perforation {
+    align-self: stretch;
+    border-left: 6px dotted #fff8ea;
+  }
+
+  .ticket-barcode {
+    width: 100%;
+    height: 72px;
+    background: repeating-linear-gradient(90deg, #f8dca8 0 3px, transparent 3px 7px, #f8dca8 7px 9px, transparent 9px 14px);
+  }
+
+  .ticket-stub-number {
+    writing-mode: vertical-rl;
+    justify-self: center;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+  }
+
+  .ticket-result {
+    display: grid;
+    justify-items: center;
+    gap: 14px;
+    margin-top: 18px;
+  }
+
+  .ticket-result[hidden] {
+    display: none;
+  }
+
+  .ticket-result p {
+    margin: 0;
+    color: var(--blue-deep);
+    font-size: clamp(18px, 3vw, 26px);
+    font-weight: 700;
+  }
+
+  @media (max-width: 520px) {
+    .ticket-printer {
+      grid-template-columns: 1fr;
+      gap: 14px;
+      width: min(340px, 84vw);
+      padding: 18px 18px 34px;
+    }
+
+    .ticket-issue-button {
+      min-height: 48px;
+    }
+  }
+
+  /* Matte admission ticket refinements */
+  .ticket-machine {
+    background: #eef7fb;
+    border-color: #c6dce8;
+    box-shadow: 0 18px 44px rgba(73, 106, 128, 0.13);
+  }
+
+  .ticket-machine::before {
+    border-color: #c8dde8;
+  }
+
+  .ticket-printer {
+    background: #d7e9f1;
+    border-color: #a9c4d3;
+    box-shadow: 0 16px 32px rgba(77, 108, 129, 0.16);
+  }
+
+  .printer-display {
+    background: #f7fbfd;
+    color: #2d4f65;
+    border-color: #b7d0dc;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.78);
+  }
+
+  .printer-light {
+    background: #8ed4b0;
+    box-shadow: 0 0 0 4px rgba(142, 212, 176, 0.22);
+  }
+
+  .printer-status {
+    color: #6f9fb8;
+  }
+
+  .ticket-issue-button {
+    border-color: #9cbecd;
+    background: #ffffff;
+    color: #31566c;
+    box-shadow: 0 7px 0 #a9c8d6, 0 14px 24px rgba(75, 109, 130, 0.14);
+  }
+
+  .ticket-issue-button:hover {
+    background: #f2f9fc;
+    box-shadow: 0 6px 0 #9dbdcb, 0 12px 22px rgba(75, 109, 130, 0.16);
+  }
+
+  .ticket-issue-button:active {
+    box-shadow: 0 2px 0 #9dbdcb, 0 7px 16px rgba(75, 109, 130, 0.14);
+  }
+
+  .printer-slot {
+    background: #31566c;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.24);
+  }
+
+  .museum-ticket {
+    border-color: #c7d9e1;
+    background: #f5fbfd;
+    color: #355b70;
+    box-shadow: 0 18px 34px rgba(91, 113, 126, 0.16);
+  }
+
+  .ticket-main {
+    background: #f6fbfd;
+  }
+
+  .ticket-main h3,
+  .ticket-small,
+  .ticket-sub,
+  .ticket-art-title,
+  .ticket-meta dt,
+  .ticket-meta dd {
+    color: #355b70;
+  }
+
+  .ticket-main h3 {
+    font-size: clamp(21px, 6vw, 32px);
+  }
+
+  .ticket-sub,
+  .ticket-small {
+    color: #7fa7b8;
+  }
+
+  .ticket-art-link {
+    position: relative;
+    border: 1px solid #c7d9e1;
+    background: #e9f5fa;
+  }
+
+  .ticket-art-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(238, 247, 251, 0.12);
+    pointer-events: none;
+  }
+
+  .ticket-art-watermark {
+    position: absolute;
+    inset: auto 10px 12px;
+    z-index: 1;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: clamp(18px, 5vw, 28px);
+    font-weight: 800;
+    line-height: 1.25;
+    text-align: center;
+    text-shadow: 0 1px 7px rgba(37, 72, 91, 0.28);
+    pointer-events: none;
+  }
+
+  .ticket-meta {
+    border-top-color: #d2e1e8;
+  }
+
+  .ticket-stub {
+    background: #d8edf5;
+    color: #416b80;
+  }
+
+  .ticket-perforation {
+    border-left-color: #f9fdff;
+  }
+
+  .ticket-barcode {
+    background: repeating-linear-gradient(90deg, #5f879a 0 3px, transparent 3px 7px, #5f879a 7px 9px, transparent 9px 14px);
+  }
+
+  /* Museum ticket redesign */
+  .ticket-machine {
+    max-width: 560px;
+    padding: 30px 16px 38px;
+    background: #f8fcfd;
+    border: 1px solid #cfe1e9;
+    border-radius: 16px;
+    box-shadow: 0 18px 38px rgba(84, 116, 135, 0.12);
+  }
+
+  .ticket-machine::before {
+    inset: 14px;
+    border-color: #d8e8ef;
+    border-radius: 12px;
+  }
+
+  .ticket-printer {
+    grid-template-columns: 1fr 144px;
+    width: min(430px, 84vw);
+    min-height: 128px;
+    padding: 20px 22px 32px;
+    border-color: #aac8d6;
+    border-radius: 18px 18px 12px 12px;
+    background: #e7f3f7;
+    box-shadow: 0 12px 26px rgba(75, 107, 127, 0.16);
+  }
+
+  .printer-display {
+    min-height: 66px;
+    background: #ffffff;
+    border-color: #c1d7e0;
+    color: #355b70;
+    box-shadow: none;
+  }
+
+  .printer-label {
+    color: #355b70;
+  }
+
+  .printer-status {
+    color: #7fa7b8;
+  }
+
+  .printer-slot {
+    width: min(300px, 68vw);
+    height: 10px;
+    background: #557d92;
+    box-shadow: inset 0 2px 4px rgba(26, 57, 75, 0.28);
+  }
+
+  .ticket-issue-button {
+    border-color: #9ebdcb;
+    border-radius: 12px;
+    background: #ffffff;
+    color: #355b70;
+    box-shadow: 0 6px 0 #aac8d6, 0 12px 22px rgba(82, 116, 137, 0.14);
+  }
+
+  .ticket-output {
+    width: min(330px, 78vw);
+    height: 620px;
+  }
+
+  .museum-ticket {
+    grid-template-rows: minmax(0, 1fr) 112px;
+    width: min(292px, 70vw);
+    min-height: 568px;
+    border: 1px solid #b9d2dc;
+    border-radius: 4px;
+    background: #edf7fa;
+    color: #111;
+    box-shadow: 0 18px 34px rgba(71, 96, 111, 0.16);
+  }
+
+  .ticket-main {
+    position: relative;
+    display: block;
+    min-height: 0;
+    padding: 0;
+    background: #e9f5fa;
+  }
+
+  .ticket-art-link {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    background: #edf7fa;
+  }
+
+  .ticket-art-link img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ticket-art-link::after {
+    background: rgba(255, 255, 255, 0.16);
+  }
+
+  .ticket-art-watermark {
+    inset: 24px auto auto 24px;
+    z-index: 2;
+    display: block;
+    width: auto;
+    max-height: calc(100% - 48px);
+    color: rgba(0, 0, 0, 0.78);
+    font-size: clamp(28px, 8vw, 42px);
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    line-height: 1.05;
+    text-align: left;
+    text-shadow: 0 1px 8px rgba(255, 255, 255, 0.68);
+    writing-mode: vertical-rl;
+  }
+
+  .ticket-stub {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+    justify-items: center;
+    gap: 6px;
+    padding: 18px 18px 16px;
+    background: #dff2f7;
+    color: #213d4c;
+  }
+
+  .ticket-perforation {
+    position: absolute;
+    top: -3px;
+    left: 0;
+    right: 0;
+    height: 8px;
+    border: 0;
+    border-top: 7px dotted #f8fcfd;
+  }
+
+  .ticket-stub-copy {
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    color: #213d4c;
+    line-height: 1.35;
+  }
+
+  .ticket-stub-copy strong {
+    font-size: 24px;
+    letter-spacing: 0.08em;
+  }
+
+  .ticket-stub-copy time {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+
+  @media (max-width: 520px) {
+    .ticket-printer {
+      grid-template-columns: 1fr;
+      width: min(330px, 84vw);
+    }
+
+    .ticket-output {
+      height: 560px;
+    }
+
+    .museum-ticket {
+      width: min(270px, 72vw);
+      min-height: 510px;
+    }
+  }
+  @keyframes printTicket {
+    from { transform: translateY(-110%); }
+    78% { transform: translateY(4%); }
+    to { transform: translateY(0); }
+  }
   .ad-section {
     padding: 56px 0 24px;
   }
@@ -1513,15 +2250,3 @@ const museumDiagnosisConfig = {
     }
   }
 </style>
-
-
-
-
-
-
-
-
-
-
-
-
