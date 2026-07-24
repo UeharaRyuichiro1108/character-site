@@ -352,7 +352,7 @@ const museumDiagnosisConfig = {
 
       <div class="ticket-result" id="ticket-result" hidden>
         <p>ごゆっくりご観覧ください</p>
-        <a class="ticket-share-button" href="https://twitter.com/intent/tweet?text=%E6%84%9B%E9%A4%A8%E5%B8%82%E7%AB%8B%E9%83%B7%E5%9C%9F%E8%B3%87%E6%96%99%E9%A4%A8%E3%81%AB%E5%85%A5%E9%A4%A8%E3%81%97%E3%81%BE%E3%81%97%E3%81%9F%E3%80%82%0A%23%E6%84%9B%E9%A4%A8%E5%B8%82%E6%AD%B4%E5%8F%B2%E7%A0%94%E7%A9%B6%E5%AD%A6%E4%BC%9A" target="_blank" rel="noopener noreferrer">Xで共有する</a>
+        <button class="ticket-share-button" type="button" id="ticket-image-share-button">チケット画像つきで共有する</button>
       </div>
     </section>
 
@@ -367,11 +367,17 @@ const museumDiagnosisConfig = {
       const ticketImage = document.querySelector("#ticket-art-image");
       const ticketLink = document.querySelector("#ticket-art-link");
       const ticketDate = document.querySelector("#ticket-date");
+      const ticketImageShareButton = document.querySelector("#ticket-image-share-button");
+      const ticketShareText = "愛館市立郷土資料館に入館しました。\n#愛館市歴史研究学会";
+      const ticketStubColors = ["#dff2f7", "#e5f0ff", "#e8f6df", "#fff2cf", "#f7e6ee", "#e9e4fb"];
+      let currentTicketData = null;
 
       const formatTicketDate = () => {
         const date = new Date();
         return date.toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" });
       };
+
+      const pickTicketStubColor = () => ticketStubColors[Math.floor(Math.random() * ticketStubColors.length)];
 
       const issueTicket = () => {
         if (!ticket || !ticketMachine) return;
@@ -380,10 +386,14 @@ const museumDiagnosisConfig = {
           image: "/images/uploads/logo.webp",
           href: "/illustrations/",
         };
+        const issuedDate = formatTicketDate();
+        const stubColor = pickTicketStubColor();
 
         ticketImage.src = selected.image;
         ticketLink.href = selected.href;
-        ticketDate.textContent = formatTicketDate();
+        ticketDate.textContent = issuedDate;
+        ticket.style.setProperty("--ticket-stub-color", stubColor);
+        currentTicketData = { ...selected, date: issuedDate, stubColor };
         ticketResult.hidden = true;
 
         ticketMachine.classList.remove("is-issued");
@@ -394,10 +404,108 @@ const museumDiagnosisConfig = {
         }, 40);
         window.setTimeout(() => {
           ticketResult.hidden = false;
-        }, 2600);
+        }, 3600);
+      };
+
+      const loadTicketImage = (src) => new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = reject;
+        image.src = src;
+      });
+
+      const drawCoverImage = (context, image, x, y, width, height) => {
+        const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
+        const drawWidth = image.naturalWidth * scale;
+        const drawHeight = image.naturalHeight * scale;
+        const drawX = x + (width - drawWidth) / 2;
+        const drawY = y + (height - drawHeight) / 2;
+        context.drawImage(image, drawX, drawY, drawWidth, drawHeight);
+      };
+
+      const createTicketBlob = async () => {
+        const data = currentTicketData || {
+          title: "愛館市立郷土資料館",
+          image: "/images/uploads/logo.webp",
+          href: "/illustrations/",
+          date: formatTicketDate(),
+          stubColor: pickTicketStubColor(),
+        };
+        const canvas = document.createElement("canvas");
+        canvas.width = 900;
+        canvas.height = 1600;
+        const context = canvas.getContext("2d");
+        const stubHeight = 300;
+        const image = await loadTicketImage(data.image);
+
+        context.fillStyle = "#edf7fa";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        drawCoverImage(context, image, 0, 0, canvas.width, canvas.height - stubHeight);
+        context.fillStyle = "rgba(255, 255, 255, 0.16)";
+        context.fillRect(0, 0, canvas.width, canvas.height - stubHeight);
+
+        context.save();
+        context.translate(90, 90);
+        context.fillStyle = "rgba(0, 0, 0, 0.82)";
+        context.font = "800 82px serif";
+        context.textBaseline = "top";
+        Array.from("愛館市立郷土資料館").forEach((char, index) => {
+          context.fillText(char, 0, index * 78);
+        });
+        context.restore();
+
+        const stubY = canvas.height - stubHeight;
+        context.fillStyle = data.stubColor;
+        context.fillRect(0, stubY, canvas.width, stubHeight);
+        context.fillStyle = "#f8fcfd";
+        for (let x = 12; x < canvas.width; x += 38) {
+          context.beginPath();
+          context.arc(x, stubY, 12, 0, Math.PI * 2);
+          context.fill();
+        }
+        context.fillStyle = "#213d4c";
+        context.textAlign = "center";
+        context.font = "800 70px serif";
+        context.fillText("常設展示", canvas.width / 2, stubY + 96);
+        context.font = "700 42px serif";
+        context.fillText(data.date, canvas.width / 2, stubY + 180);
+
+        return new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+      };
+
+      const downloadTicketBlob = (blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "aidate-museum-ticket.png";
+        link.click();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      };
+
+      const shareTicketImage = async () => {
+        if (!currentTicketData) issueTicket();
+        const ticketShareUrl = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(ticketShareText);
+        ticketImageShareButton.disabled = true;
+        ticketImageShareButton.textContent = "画像を作成中...";
+        try {
+          const blob = await createTicketBlob();
+          const file = new File([blob], "aidate-museum-ticket.png", { type: "image/png" });
+          if (navigator.canShare?.({ files: [file] })) {
+            await navigator.share({ text: ticketShareText, files: [file] });
+          } else {
+            downloadTicketBlob(blob);
+            window.open(ticketShareUrl, "_blank", "noopener,noreferrer");
+          }
+        } catch (error) {
+          window.open(ticketShareUrl, "_blank", "noopener,noreferrer");
+        } finally {
+          ticketImageShareButton.disabled = false;
+          ticketImageShareButton.textContent = "チケット画像つきで共有する";
+        }
       };
 
       ticketButton?.addEventListener("click", issueTicket);
+      ticketImageShareButton?.addEventListener("click", shareTicketImage);
     </script>
     <section class="ad-section" aria-label="幻覚広告欄">
       <div class="section-heading-row">
@@ -1273,7 +1381,7 @@ const museumDiagnosisConfig = {
   }
 
   .museum-ticket.is-printing {
-    animation: printTicket 2.45s cubic-bezier(0.18, 0.78, 0.22, 1) forwards;
+    animation: printTicket 3.35s linear forwards;
   }
 
   .ticket-main {
@@ -1399,6 +1507,11 @@ const museumDiagnosisConfig = {
     justify-items: center;
     gap: 14px;
     margin-top: 18px;
+  }
+
+  .ticket-share-button:disabled {
+    cursor: wait;
+    opacity: 0.68;
   }
 
   .ticket-result[hidden] {
@@ -1729,9 +1842,19 @@ const museumDiagnosisConfig = {
     }
   }
   @keyframes printTicket {
-    from { transform: translateY(-110%); }
-    78% { transform: translateY(4%); }
-    to { transform: translateY(0); }
+    0% { transform: translateY(-110%); }
+    10% { transform: translateY(-86%); }
+    19% { transform: translateY(-86%); }
+    27% { transform: translateY(-64%); }
+    36% { transform: translateY(-64%); }
+    45% { transform: translateY(-42%); }
+    54% { transform: translateY(-42%); }
+    63% { transform: translateY(-22%); }
+    72% { transform: translateY(-22%); }
+    82% { transform: translateY(-6%); }
+    90% { transform: translateY(-6%); }
+    96% { transform: translateY(3%); }
+    100% { transform: translateY(0); }
   }
   .ad-section {
     padding: 56px 0 24px;
