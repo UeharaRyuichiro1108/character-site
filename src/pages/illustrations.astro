@@ -2,44 +2,184 @@
 import BaseLayout from "../components/BaseLayout.astro";
 
 const illustrationModules = import.meta.glob("../content/illustrations/*.md", { eager: true });
-const illustrations = Object.values(illustrationModules).map((module) => {
+const characterModules = import.meta.glob("../content/characters/*.md", { eager: true });
+const museumModules = import.meta.glob("../content/museums/*.md", { eager: true });
+
+const getIdFromPath = (path) => path.split("/").pop().replace(".md", "");
+const toDateTime = (value) => {
+  if (!value) return 0;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? 0 : date.getTime();
+};
+
+const characters = Object.entries(characterModules)
+  .map(([path, module]) => ({ id: module.frontmatter.id || getIdFromPath(path), ...module.frontmatter }))
+  .sort((a, b) => a.name.localeCompare(b.name, "ja"));
+const museums = Object.entries(museumModules)
+  .map(([path, module]) => ({ id: module.frontmatter.id || getIdFromPath(path), ...module.frontmatter }))
+  .sort((a, b) => a.name.localeCompare(b.name, "ja"));
+
+const characterMap = new Map(characters.map((character) => [character.id, character]));
+const museumMap = new Map(museums.map((museum) => [museum.id, museum]));
+
+const illustrations = Object.entries(illustrationModules).map(([path, module]) => {
   const data = module.frontmatter;
+  const tags = data.tags || [];
+  const characterIds = data.characterIds?.length ? data.characterIds : tags.filter((tag) => characterMap.has(tag));
+  const museumIds = data.museumIds?.length ? data.museumIds : tags.filter((tag) => museumMap.has(tag));
+  const uploadedAt = data.uploadedAt || data.publishedAt || data.date || "";
+
   return {
     ...data,
+    id: data.id || getIdFromPath(path),
+    uploadedAt,
+    characterIds,
+    museumIds,
     coverImage: data.image,
     Content: module.default,
   };
-}).filter((illustration) => illustration.id);
+}).filter((illustration) => illustration.id)
+  .sort((a, b) => {
+    const dateDiff = toDateTime(b.uploadedAt) - toDateTime(a.uploadedAt);
+    if (dateDiff !== 0) return dateDiff;
+    return (a.title || "").localeCompare(b.title || "", "ja");
+  });
 ---
 
 <BaseLayout title="イラスト一覧">
-  <main class="page-shell">
+  <main class="page-shell illustrations-page">
     <h1 class="gallery-title">GALLERY</h1>
 
-    <div class="illustration-grid" aria-label="イラスト一覧">
+    <form class="filter-panel" id="illustration-filter">
+      <label>
+        <span>キャラクター</span>
+        <select name="character">
+          <option value="">すべて</option>
+          {characters.map((character) => <option value={character.id}>{character.name}</option>)}
+        </select>
+      </label>
+      <label>
+        <span>博物館</span>
+        <select name="museum">
+          <option value="">すべて</option>
+          {museums.map((museum) => <option value={museum.id}>{museum.name}</option>)}
+        </select>
+      </label>
+      <button type="submit">決定</button>
+      <button type="button" class="reset-button" id="illustration-filter-reset">解除</button>
+    </form>
+
+    <div class="illustration-grid" id="illustration-list" aria-label="イラスト一覧" aria-live="polite">
       {illustrations.map((illustration) => (
-        <a class="illustration-tile" href={`/illustrations/${illustration.id}/`} aria-label={illustration.title}>
+        <a
+          class="illustration-tile"
+          href={`/illustrations/${illustration.id}/`}
+          aria-label={illustration.title}
+          data-character-ids={illustration.characterIds.join(",")}
+          data-museum-ids={illustration.museumIds.join(",")}
+        >
           <img src={illustration.coverImage} alt={illustration.title} />
         </a>
       ))}
     </div>
+    <p class="empty-message" id="illustration-empty" hidden>条件に合うイラストがありません。</p>
   </main>
+
+  <script>
+    const form = document.querySelector("#illustration-filter");
+    const resetButton = document.querySelector("#illustration-filter-reset");
+    const cards = Array.from(document.querySelectorAll(".illustration-tile"));
+    const emptyMessage = document.querySelector("#illustration-empty");
+
+    const applyFilter = () => {
+      const data = new FormData(form);
+      const character = data.get("character");
+      const museum = data.get("museum");
+      let visibleCount = 0;
+
+      cards.forEach((card) => {
+        const characterIds = (card.dataset.characterIds || "").split(",").filter(Boolean);
+        const museumIds = (card.dataset.museumIds || "").split(",").filter(Boolean);
+        const matchesCharacter = !character || characterIds.includes(character);
+        const matchesMuseum = !museum || museumIds.includes(museum);
+        const isVisible = matchesCharacter && matchesMuseum;
+        card.hidden = !isVisible;
+        if (isVisible) visibleCount += 1;
+      });
+
+      emptyMessage.hidden = visibleCount !== 0;
+    };
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      applyFilter();
+    });
+
+    resetButton?.addEventListener("click", () => {
+      form.reset();
+      applyFilter();
+    });
+  </script>
 </BaseLayout>
 
 <style>
+  .illustrations-page {
+    display: grid;
+    gap: 24px;
+  }
+
   .gallery-title {
-    margin: 0 0 28px;
+    margin: 0;
     color: var(--blue-deep);
     font-size: clamp(28px, 5vw, 52px);
     text-align: center;
     letter-spacing: 0;
   }
 
+  .filter-panel {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(180px, 1fr)) auto auto;
+    gap: 12px;
+    align-items: end;
+    max-width: 920px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 18px;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--soft-shadow);
+  }
+
+  .filter-panel label {
+    display: grid;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .filter-panel select,
+  .filter-panel button {
+    min-height: 42px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+  }
+
+  .filter-panel select { padding: 0 14px; }
+  .filter-panel button { padding: 0 20px; cursor: pointer; font-weight: 700; }
+  .filter-panel button[type="submit"] { background: var(--blue-deep); color: #fff; border-color: var(--blue-deep); }
+  .reset-button { color: var(--muted); }
+
   .illustration-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: clamp(8px, 1.5vw, 16px);
     max-width: 920px;
+    width: 100%;
     margin: 0 auto;
   }
 
@@ -58,10 +198,30 @@ const illustrations = Object.values(illustrationModules).map((module) => {
     box-shadow: var(--soft-shadow);
   }
 
+  .illustration-tile[hidden] { display: none; }
+
   .illustration-tile img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  .empty-message {
+    max-width: 920px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 22px;
+    color: var(--muted);
+    text-align: center;
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+  }
+
+  @media (max-width: 720px) {
+    .filter-panel {
+      grid-template-columns: 1fr;
+    }
   }
 
   @media (max-width: 520px) {

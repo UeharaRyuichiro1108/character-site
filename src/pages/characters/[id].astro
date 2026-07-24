@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from "../../components/BaseLayout.astro";
 
 export function getStaticPaths() {
@@ -43,7 +43,7 @@ const { character } = Astro.props;
 const CharacterContent = character.Content;
 const museum = museums.find((item) => item.id === character.museumId);
 const relatedCharacters = allCharacters.filter((item) => character.relatedCharacterIds?.includes(item.id));
-const relatedIllustrations = illustrations.filter((illustration) => illustration.tags?.includes(character.id));
+const relatedIllustrations = illustrations.filter((illustration) => (illustration.characterIds?.includes(character.id) || illustration.tags?.includes(character.id)));
 ---
 
 <BaseLayout title={`${character.name} | 愛館市立郷土資料館`} description={character.catchcopy || `${character.name}のキャラクター紹介です。`} image={character.image}>

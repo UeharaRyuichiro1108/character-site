@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from "../../components/BaseLayout.astro";
 
 export function getStaticPaths() {
@@ -27,7 +27,7 @@ const characters = Object.values(characterModules).map((module) => ({
 
 const { illustration } = Astro.props;
 const IllustrationContent = illustration.Content;
-const relatedCharacters = characters.filter((character) => illustration.tags?.includes(character.id));
+const relatedCharacters = characters.filter((character) => illustration.characterIds?.includes(character.id) || illustration.tags?.includes(character.id));
 const isVideo = (src) => /\.(mp4|webm|mov)$/i.test(src);
 const shareImage = illustration.image || illustration.images.find((item) => !isVideo(item)) || "/images/uploads/aidate.webp";
 ---

@@ -69,9 +69,12 @@ collections:
     fields:
       - { label: "ID", name: "id", widget: "string" }
       - { label: "タイトル", name: "title", widget: "string" }
+      - { label: "アップロード日", name: "uploadedAt", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false, required: false }
       - { label: "一覧用静止画", name: "image", widget: "image" }
       - { label: "画像・動画セット", name: "images", widget: "list", required: false, max: 10, field: { label: "画像/GIF/MP4", name: "image", widget: "image" } }
       - { label: "XのポストURL", name: "postUrl", widget: "string", required: false }
+      - { label: "関連キャラクターID", name: "characterIds", widget: "list", required: false, hint: "例: tasuku / sion / gunso。未入力の場合、関連タグから自動判定します。" }
+      - { label: "関連博物館ID", name: "museumIds", widget: "list", required: false, hint: "例: aidate / yubari" }
       - { label: "関連タグ", name: "tags", widget: "list", required: false }
       - { label: "説明", name: "body", widget: "markdown", required: false }
 
@@ -154,6 +157,7 @@ collections:
         fields:
           - { label: "タイトル", name: "title", widget: "string" }
           - { label: "本文", name: "body", widget: "markdown" }
+
 
 
 
