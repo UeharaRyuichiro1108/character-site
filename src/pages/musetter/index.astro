@@ -596,14 +596,15 @@ const allAccounts = [...museums, ...characters].sort((a, b) => a.name.localeComp
     .image-grid.count-2,
     .image-grid.count-3,
     .image-grid.count-4 {
-      display: flex;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      scrollbar-width: none;
+      display: grid;
+      overflow: hidden;
+      scroll-snap-type: none;
     }
 
-    .image-grid::-webkit-scrollbar {
-      display: none;
+    .image-grid.count-2,
+    .image-grid.count-3,
+    .image-grid.count-4 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .image-grid.count-3 .image-thumb:first-child {
@@ -612,9 +613,11 @@ const allAccounts = [...museums, ...characters].sort((a, b) => a.name.localeComp
 
     .image-thumb,
     .image-grid.count-1 .image-thumb {
-      flex: 0 0 100%;
+      min-height: 132px;
+    }
+
+    .image-grid.count-1 .image-thumb {
       min-height: 260px;
-      scroll-snap-align: center;
     }
 
     .tweet-actions {
@@ -649,6 +652,7 @@ const allAccounts = [...museums, ...characters].sort((a, b) => a.name.localeComp
     }
   }
 </style>
+
 
 
 
