@@ -346,12 +346,30 @@ const museumDiagnosisConfig = {
                 <time id="ticket-date"></time>
               </div>
             </div>
+            <div class="rare-ticket-document" aria-hidden="true">
+              <div class="rare-document-stamp">承認</div>
+              <p class="rare-document-classified">極秘資料</p>
+              <h3>学芸員候補発見</h3>
+              <div class="rare-document-rule"></div>
+              <dl class="rare-document-status">
+                <div><dt>適性</dt><dd>██████████ 98%</dd></div>
+                <div><dt>展示物適合</dt><dd>確認</dd></div>
+                <div><dt>魂適合</dt><dd>確認</dd></div>
+                <div><dt>採用</dt><dd>承認</dd></div>
+              </dl>
+              <div class="rare-document-rule"></div>
+              <p>あなたには<br />学芸員としての適性があります。</p>
+              <p>興味がありましたら、<br />この通知をXへ投稿してください。</p>
+              <p>採用担当より<br />後日ご連絡いたします。</p>
+              <div class="rare-document-rule"></div>
+              <p class="rare-document-note">※Xに投稿していただいた際には投稿者さんをイメージした<br />学芸員をデザインさせていただきます。<br />特に料金はかかりませんので<br />お気軽に投稿していただけると嬉しいです！</p>
+            </div>
           </article>
         </div>
       </div>
 
       <div class="ticket-result" id="ticket-result" hidden>
-        <p>ごゆっくりご観覧ください</p>
+        <p id="ticket-result-message">ごゆっくりご観覧ください</p>
         <button class="ticket-share-button" type="button" id="ticket-image-share-button">チケット画像つきで共有する</button>
       </div>
     </section>
@@ -368,8 +386,11 @@ const museumDiagnosisConfig = {
       const ticketLink = document.querySelector("#ticket-art-link");
       const ticketDate = document.querySelector("#ticket-date");
       const ticketImageShareButton = document.querySelector("#ticket-image-share-button");
-      const ticketShareText = "愛館市立郷土資料館に入館しました。\n#愛館市歴史研究学会";
+      const ticketResultMessage = document.querySelector("#ticket-result-message");
+      const normalTicketShareText = "愛館市立郷土資料館に入館しました。\n#愛館市歴史研究学会";
+      const rareTicketShareText = "極秘資料を受け取りました。\n#愛館市歴史研究学会";
       const ticketStubColors = ["#dff2f7", "#e5f0ff", "#e8f6df", "#fff2cf", "#f7e6ee", "#e9e4fb"];
+      const rareTicketOdds = 0.01;
       let currentTicketData = null;
 
       const formatTicketDate = () => {
@@ -381,6 +402,7 @@ const museumDiagnosisConfig = {
 
       const issueTicket = () => {
         if (!ticket || !ticketMachine) return;
+        const isRareTicket = Math.random() < rareTicketOdds;
         const selected = ticketIllustrations[Math.floor(Math.random() * ticketIllustrations.length)] || {
           title: "愛館市立郷土資料館",
           image: "/images/uploads/logo.webp",
@@ -393,7 +415,13 @@ const museumDiagnosisConfig = {
         ticketLink.href = selected.href;
         ticketDate.textContent = issuedDate;
         ticket.style.setProperty("--ticket-stub-color", stubColor);
-        currentTicketData = { ...selected, date: issuedDate, stubColor };
+        ticket.classList.toggle("is-rare", isRareTicket);
+        ticketMachine.classList.toggle("is-rare-issued", isRareTicket);
+        ticketResultMessage.textContent = isRareTicket ? "極秘資料が発行されました" : "ごゆっくりご観覧ください";
+        ticketImageShareButton.textContent = isRareTicket ? "通知書画像つきで共有する" : "チケット画像つきで共有する";
+        currentTicketData = isRareTicket
+          ? { kind: "rare", title: "極秘資料 学芸員候補発見", date: issuedDate }
+          : { kind: "normal", ...selected, date: issuedDate, stubColor };
         ticketResult.hidden = true;
 
         ticketMachine.classList.remove("is-issued");
@@ -423,14 +451,113 @@ const museumDiagnosisConfig = {
         context.drawImage(image, drawX, drawY, drawWidth, drawHeight);
       };
 
+      const drawCenteredText = (context, text, x, y, maxWidth, lineHeight) => {
+        const lines = text.split("\n");
+        lines.forEach((line, index) => context.fillText(line, x, y + index * lineHeight, maxWidth));
+      };
+
+      const createRareTicketBlob = async (data) => {
+        const canvas = document.createElement("canvas");
+        canvas.width = 900;
+        canvas.height = 1600;
+        const context = canvas.getContext("2d");
+
+        context.fillStyle = "#f4efe6";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.strokeStyle = "#1f2a2d";
+        context.lineWidth = 10;
+        context.strokeRect(54, 54, canvas.width - 108, canvas.height - 108);
+        context.strokeStyle = "rgba(31, 42, 45, 0.28)";
+        context.lineWidth = 2;
+        context.strokeRect(82, 82, canvas.width - 164, canvas.height - 164);
+
+        context.fillStyle = "rgba(125, 18, 24, 0.11)";
+        context.beginPath();
+        context.arc(685, 310, 132, 0, Math.PI * 2);
+        context.fill();
+        context.strokeStyle = "rgba(125, 18, 24, 0.38)";
+        context.lineWidth = 7;
+        context.stroke();
+        context.save();
+        context.translate(685, 310);
+        context.rotate(-0.18);
+        context.fillStyle = "rgba(125, 18, 24, 0.56)";
+        context.font = "800 58px serif";
+        context.textAlign = "center";
+        context.fillText("承認", 0, 18);
+        context.restore();
+
+        context.fillStyle = "#1f2a2d";
+        context.textAlign = "center";
+        context.font = "800 52px serif";
+        context.fillText("極秘資料", canvas.width / 2, 160);
+        context.font = "800 64px serif";
+        context.fillText("学芸員候補発見", canvas.width / 2, 250, 680);
+
+        context.strokeStyle = "#1f2a2d";
+        context.lineWidth = 4;
+        context.beginPath();
+        context.moveTo(120, 330);
+        context.lineTo(canvas.width - 120, 330);
+        context.stroke();
+
+        context.textAlign = "left";
+        context.font = "700 42px serif";
+        const rows = [
+          ["適性", "██████████ 98%"],
+          ["展示物適合", "確認"],
+          ["魂適合", "確認"],
+          ["採用", "承認"],
+        ];
+        rows.forEach(([label, value], index) => {
+          const y = 425 + index * 78;
+          context.fillText(label, 150, y);
+          context.fillText(value, 420, y);
+        });
+
+        context.beginPath();
+        context.moveTo(120, 760);
+        context.lineTo(canvas.width - 120, 760);
+        context.stroke();
+
+        context.textAlign = "center";
+        context.font = "500 40px serif";
+        drawCenteredText(context, "あなたには\n学芸員としての適性があります。", canvas.width / 2, 850, 680, 58);
+        drawCenteredText(context, "興味がありましたら、\nこの通知をXへ投稿してください。", canvas.width / 2, 1018, 680, 58);
+        drawCenteredText(context, "採用担当より\n後日ご連絡いたします。", canvas.width / 2, 1186, 680, 58);
+
+        context.beginPath();
+        context.moveTo(120, 1320);
+        context.lineTo(canvas.width - 120, 1320);
+        context.stroke();
+
+        context.textAlign = "left";
+        context.font = "500 24px serif";
+        const noteLines = [
+          "※Xに投稿していただいた際には投稿者さんをイメージした",
+          "　学芸員をデザインさせていただきます。",
+          "特に料金はかかりませんので",
+          "お気軽に投稿していただけると嬉しいです！",
+        ];
+        noteLines.forEach((line, index) => context.fillText(line, 105, 1382 + index * 34, 690));
+
+        context.textAlign = "right";
+        context.font = "600 25px serif";
+        context.fillText(data.date, canvas.width - 95, 95);
+
+        return new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+      };
+
       const createTicketBlob = async () => {
         const data = currentTicketData || {
+          kind: "normal",
           title: "愛館市立郷土資料館",
           image: "/images/uploads/logo.webp",
           href: "/illustrations/",
           date: formatTicketDate(),
           stubColor: pickTicketStubColor(),
         };
+        if (data.kind === "rare") return createRareTicketBlob(data);
         const canvas = document.createElement("canvas");
         canvas.width = 900;
         canvas.height = 1600;
@@ -473,34 +600,37 @@ const museumDiagnosisConfig = {
         return new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
       };
 
-      const downloadTicketBlob = (blob) => {
+      const downloadTicketBlob = (blob, fileName = "aidate-museum-ticket.png") => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = "aidate-museum-ticket.png";
+        link.download = fileName;
         link.click();
         window.setTimeout(() => URL.revokeObjectURL(url), 1000);
       };
 
       const shareTicketImage = async () => {
         if (!currentTicketData) issueTicket();
-        const ticketShareUrl = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(ticketShareText);
+        const shareText = currentTicketData?.kind === "rare" ? rareTicketShareText : normalTicketShareText;
+        const ticketShareUrl = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(shareText);
+        const isRareShare = currentTicketData?.kind === "rare";
         ticketImageShareButton.disabled = true;
         ticketImageShareButton.textContent = "画像を作成中...";
         try {
           const blob = await createTicketBlob();
-          const file = new File([blob], "aidate-museum-ticket.png", { type: "image/png" });
+          const fileName = isRareShare ? "aidate-curator-notice.png" : "aidate-museum-ticket.png";
+          const file = new File([blob], fileName, { type: "image/png" });
           if (navigator.canShare?.({ files: [file] })) {
-            await navigator.share({ text: ticketShareText, files: [file] });
+            await navigator.share({ text: shareText, files: [file] });
           } else {
-            downloadTicketBlob(blob);
+            downloadTicketBlob(blob, fileName);
             window.open(ticketShareUrl, "_blank", "noopener,noreferrer");
           }
         } catch (error) {
           window.open(ticketShareUrl, "_blank", "noopener,noreferrer");
         } finally {
           ticketImageShareButton.disabled = false;
-          ticketImageShareButton.textContent = "チケット画像つきで共有する";
+          ticketImageShareButton.textContent = isRareShare ? "通知書画像つきで共有する" : "チケット画像つきで共有する";
         }
       };
 
@@ -2048,6 +2178,186 @@ const museumDiagnosisConfig = {
       min-height: 108px;
       padding-bottom: 40px;
     }
+  }
+
+  /* Rare curator notice ticket */
+  .rare-ticket-document {
+    display: none;
+  }
+
+  .museum-ticket.is-rare {
+    grid-template-rows: 1fr;
+    overflow: visible;
+    border: 1px solid #2a3437;
+    background:
+      linear-gradient(90deg, rgba(77, 62, 40, 0.04) 1px, transparent 1px),
+      linear-gradient(rgba(77, 62, 40, 0.04) 1px, transparent 1px),
+      #f4efe6;
+    background-size: 18px 18px;
+    box-shadow:
+      0 18px 36px rgba(33, 39, 42, 0.2),
+      0 0 0 1px rgba(255, 255, 255, 0.62) inset;
+  }
+
+  .museum-ticket.is-rare .ticket-main,
+  .museum-ticket.is-rare .ticket-stub {
+    display: none;
+  }
+
+  .museum-ticket.is-rare .rare-ticket-document {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 10px;
+    min-height: 100%;
+    padding: 25px 24px 20px;
+    color: #1f2a2d;
+    font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+    line-height: 1.58;
+  }
+
+  .rare-ticket-document::before,
+  .rare-ticket-document::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .rare-ticket-document::before {
+    inset: 13px;
+    border: 2px solid rgba(31, 42, 45, 0.78);
+  }
+
+  .rare-ticket-document::after {
+    inset: 24px;
+    border: 1px solid rgba(31, 42, 45, 0.18);
+  }
+
+  .rare-document-classified {
+    margin: 4px 0 0;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.24em;
+  }
+
+  .rare-ticket-document h3 {
+    margin: 0;
+    text-align: center;
+    font-size: clamp(21px, 6vw, 28px);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .rare-document-rule {
+    height: 1px;
+    margin: 2px 0;
+    background: #1f2a2d;
+  }
+
+  .rare-document-status {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .rare-document-status div {
+    display: grid;
+    grid-template-columns: 82px 1fr;
+    gap: 10px;
+  }
+
+  .rare-document-status dt,
+  .rare-document-status dd {
+    margin: 0;
+  }
+
+  .rare-ticket-document p {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .rare-document-note {
+    font-size: 10px !important;
+    line-height: 1.7;
+  }
+
+  .rare-document-stamp {
+    position: absolute;
+    right: 28px;
+    top: 86px;
+    display: grid;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    border: 4px double rgba(125, 18, 24, 0.62);
+    border-radius: 50%;
+    color: rgba(125, 18, 24, 0.72);
+    font-size: 22px;
+    font-weight: 800;
+    transform: rotate(-10deg);
+  }
+
+  .ticket-machine.is-rare-issued .ticket-output {
+    position: relative;
+  }
+
+  .ticket-machine.is-rare-issued .ticket-output::before,
+  .ticket-machine.is-rare-issued .ticket-output::after {
+    content: "";
+    position: absolute;
+    z-index: 3;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #fff7ad;
+    box-shadow:
+      42px 28px 0 #cfeeff,
+      -38px 86px 0 #ffe0f0,
+      72px 146px 0 #fff7ad,
+      -62px 206px 0 #cfeeff,
+      26px 282px 0 #ffe0f0;
+    opacity: 0;
+    animation: rareSparkle 1.8s ease-in-out 3.45s 2;
+    pointer-events: none;
+  }
+
+  .ticket-machine.is-rare-issued .ticket-output::before {
+    left: 24px;
+    top: 22px;
+  }
+
+  .ticket-machine.is-rare-issued .ticket-output::after {
+    right: 34px;
+    top: 78px;
+    animation-delay: 3.65s;
+  }
+
+
+  /* Rare notice fit adjustment */
+  .rare-document-rule {
+    margin: 1px 0;
+  }
+
+  .rare-document-status {
+    gap: 4px;
+    font-size: 14px;
+  }
+
+  .rare-ticket-document p {
+    font-size: 12px;
+  }
+
+  .rare-document-note {
+    font-size: 8px !important;
+    line-height: 1.45;
+  }
+  @keyframes rareSparkle {
+    0%, 100% { opacity: 0; transform: scale(0.6) rotate(0deg); }
+    40% { opacity: 1; transform: scale(1.15) rotate(18deg); }
+    70% { opacity: 0.78; transform: scale(0.9) rotate(35deg); }
   }
   @keyframes printTicket {
     0% { transform: translateY(-110%); }
