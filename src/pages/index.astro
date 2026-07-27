@@ -1841,6 +1841,214 @@ const museumDiagnosisConfig = {
       min-height: 510px;
     }
   }
+
+  /* Retro ticket machine finish */
+  .ticket-machine {
+    max-width: 600px;
+    padding: 34px 18px 42px;
+    background: #f6f0e6;
+    border: 1px solid #d7c8b6;
+    border-radius: 26px;
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, 0.78),
+      inset 0 -18px 0 rgba(112, 105, 91, 0.16),
+      0 24px 44px rgba(83, 75, 62, 0.18);
+  }
+
+  .ticket-machine::before {
+    inset: 12px;
+    border: 1px solid rgba(142, 107, 77, 0.26);
+    border-radius: 22px;
+  }
+
+  .ticket-printer {
+    grid-template-columns: minmax(0, 1fr) 158px;
+    width: min(458px, 86vw);
+    min-height: 164px;
+    padding: 20px 24px 40px;
+    border: 2px solid #b98b63;
+    border-radius: 28px 28px 18px 18px;
+    background: #eee7dc;
+    box-shadow:
+      inset 0 3px 0 rgba(255, 255, 255, 0.7),
+      inset 0 -18px 0 rgba(95, 92, 82, 0.18),
+      0 18px 30px rgba(92, 78, 62, 0.22);
+  }
+
+  .ticket-printer::before {
+    content: "";
+    position: absolute;
+    inset: 16px 18px 28px;
+    border-radius: 22px 22px 12px 12px;
+    border: 1px solid rgba(101, 83, 67, 0.18);
+    pointer-events: none;
+  }
+
+  .printer-display {
+    position: relative;
+    grid-template-columns: 12px 1fr;
+    min-height: 96px;
+    padding: 17px 18px 18px;
+    overflow: hidden;
+    background: #302f2c;
+    border: 3px solid #c79a72;
+    border-radius: 18px;
+    color: #efe5d5;
+    box-shadow:
+      inset 0 2px 8px rgba(0, 0, 0, 0.32),
+      0 1px 0 rgba(255, 255, 255, 0.55);
+  }
+
+  .printer-display::after {
+    content: "";
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: min(220px, 100%);
+    height: 24px;
+    margin-top: 6px;
+    border-radius: 999px;
+    background: #d5a16e;
+    box-shadow:
+      0 -38px 0 -7px #4a4944,
+      -76px -38px 0 -7px #4a4944,
+      -38px -38px 0 -7px #4a4944,
+      38px -38px 0 -7px #4a4944,
+      76px -38px 0 -7px #4a4944,
+      -76px -12px 0 -7px #4a4944,
+      -38px -12px 0 -7px #4a4944,
+      0 -12px 0 -7px #4a4944,
+      38px -12px 0 -7px #4a4944,
+      76px -12px 0 -7px #4a4944;
+    pointer-events: none;
+  }
+
+  .printer-light {
+    background: #d5a16e;
+    box-shadow: 0 0 0 4px rgba(213, 161, 110, 0.2);
+  }
+
+  .printer-label {
+    color: #efe5d5;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: none;
+  }
+
+  .printer-status {
+    color: #d5a16e;
+    font-size: 16px;
+    letter-spacing: 0.16em;
+  }
+
+  .ticket-issue-button {
+    min-height: 62px;
+    border: 2px solid #875f43;
+    border-radius: 16px;
+    background: #c98955;
+    color: #fffaf2;
+    font-size: 17px;
+    letter-spacing: 0.06em;
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, 0.38),
+      0 7px 0 #7b563c,
+      0 15px 22px rgba(91, 65, 44, 0.22);
+  }
+
+  .ticket-issue-button:hover {
+    background: #d49a65;
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, 0.44),
+      0 6px 0 #7b563c,
+      0 14px 22px rgba(91, 65, 44, 0.24);
+  }
+
+  .ticket-issue-button:active {
+    transform: translateY(5px);
+    background: #b97848;
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, 0.28),
+      0 2px 0 #7b563c,
+      0 8px 16px rgba(91, 65, 44, 0.2);
+  }
+
+  .printer-slot {
+    bottom: 17px;
+    height: 12px;
+    width: min(318px, 70vw);
+    background: #2d2c29;
+    box-shadow:
+      inset 0 3px 6px rgba(0, 0, 0, 0.58),
+      0 1px 0 rgba(255, 255, 255, 0.42);
+  }
+
+  @media (max-width: 520px) {
+    .ticket-printer {
+      grid-template-columns: 1fr;
+      width: min(340px, 86vw);
+      min-height: 204px;
+      padding: 18px 18px 42px;
+    }
+
+    .printer-display {
+      min-height: 92px;
+    }
+
+    .ticket-issue-button {
+      min-height: 58px;
+    }
+  }
+
+  /* Keep the retro display text readable */
+  .printer-display {
+    align-content: start;
+    min-height: 112px;
+    padding-bottom: 42px;
+  }
+
+  .printer-label,
+  .printer-status,
+  .printer-light {
+    position: relative;
+    z-index: 2;
+  }
+
+  .printer-status {
+    align-self: start;
+    line-height: 1.2;
+    margin-top: 2px;
+  }
+
+  .printer-display::after {
+    position: absolute;
+    left: 50%;
+    bottom: 12px;
+    grid-column: auto;
+    width: min(190px, calc(100% - 32px));
+    height: 22px;
+    margin-top: 0;
+    transform: translateX(-50%);
+    box-shadow:
+      -72px -26px 0 -7px #4a4944,
+      -36px -26px 0 -7px #4a4944,
+      0 -26px 0 -7px #4a4944,
+      36px -26px 0 -7px #4a4944,
+      72px -26px 0 -7px #4a4944,
+      -72px 0 0 -7px #4a4944,
+      -36px 0 0 -7px #4a4944,
+      0 0 0 -7px #4a4944,
+      36px 0 0 -7px #4a4944,
+      72px 0 0 -7px #4a4944;
+  }
+
+  @media (max-width: 520px) {
+    .printer-display {
+      min-height: 108px;
+      padding-bottom: 40px;
+    }
+  }
   @keyframes printTicket {
     0% { transform: translateY(-110%); }
     10% { transform: translateY(-86%); }

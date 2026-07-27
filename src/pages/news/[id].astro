@@ -15,6 +15,7 @@ const formatDate = (value) => {
 };
 
 export async function getStaticPaths() {
+  const getIdFromPath = (path) => path.split("/").pop().replace(".md", "");
   const getFirstMarkdownImage = (module) => {
     const body = typeof module.rawContent === "function" ? module.rawContent() : "";
     const markdownImage = body.match(/!\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/);
