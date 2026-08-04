@@ -1,4 +1,4 @@
-﻿---
+---
 id: "museum"
 title: "博物館一覧（を作ろうとした際の残骸）"
 uploadedAt: "2026-07-10"
@@ -17,8 +17,8 @@ tags:
   - sino
   - nobu
   - haru
-postUrl: "https://x.com/aidate_info/status/2071843009369653339?s=46&t=41ciClRacREARzzk8qEemw"
+postUrl: "https://x.com/Aidate_info/status/2084204525410558283?s=20"
 ---
 
-    まだ名前がないキャラクターが二人入っています
+まだ名前がないキャラクターが二人入っています
 

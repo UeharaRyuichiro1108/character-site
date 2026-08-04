@@ -11,6 +11,7 @@ museumIds:
 tags:
   - sion
   - tasuku
+postUrl: "https://x.com/Aidate_info/status/2083004033820938698?s=20"
 ---
 
 すっとんでくるといい

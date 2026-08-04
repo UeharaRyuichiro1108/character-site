@@ -11,7 +11,7 @@ museumIds:
   - aidate
 tags:
   - gunso
-postUrl: "https://x.com/aidate_info/status/2071841442071539884?s=46&t=41ciClRacREARzzk8qEemw"
+postUrl: "https://x.com/Aidate_info/status/2081902544947917066?s=20"
 ---
 
 

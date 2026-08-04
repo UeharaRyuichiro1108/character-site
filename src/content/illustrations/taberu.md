@@ -1,4 +1,4 @@
-﻿---
+---
 id: "taberu"
 title: "いっぱい食べる"
 uploadedAt: "2026-07-10"
@@ -11,8 +11,8 @@ tags:
   - sino
   - nobu
   - haru
-postUrl: "https://x.com/aidate_info/status/2071843458768392574?s=46&t=41ciClRacREARzzk8qEemw"
+postUrl: "https://x.com/Aidate_info/status/2083434463175000319?s=20"
 ---
 
-    いっぱい作るしいっぱい食べる人たち
+いっぱい作るしいっぱい食べる人たち
 

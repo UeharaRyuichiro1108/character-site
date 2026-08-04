@@ -10,7 +10,7 @@ museumIds:
 tags:
   - sino
   - nobu
-postUrl: "https://x.com/aidate_info/status/2071843340476428795?s=46&t=41ciClRacREARzzk8qEemw"
+postUrl: "https://x.com/Aidate_info/status/2082309036045959555?s=20"
 ---
 
 怖がられなかったことに内心ホッとしていたらいいなと思います。

@@ -9,6 +9,7 @@ museumIds:
   - yubari
 tags:
   - haru
+postUrl: "https://x.com/Aidate_info/status/2083453434259485053?s=20"
 ---
 
 ハルのデザイン画です。

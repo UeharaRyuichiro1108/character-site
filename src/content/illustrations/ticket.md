@@ -1,4 +1,4 @@
-﻿---
+---
 id: "ticket"
 title: "チケット風"
 uploadedAt: "2026-07-10"
@@ -9,8 +9,8 @@ museumIds:
   - aidate
 tags:
   - sion
-postUrl: "https://x.com/aidate_info/status/2071841187913465944?s=46&t=41ciClRacREARzzk8qEemw"
+postUrl: "https://x.com/Aidate_info/status/2080802666180214966?s=20"
 ---
 
-    いずれ全員分描きたいな～と思っています
+いずれ全員分描きたいな～と思っています
 

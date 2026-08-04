@@ -12,7 +12,7 @@ museumIds:
 tags:
   - tasuku
   - sion
-postUrl: "https://x.com/aidate_info/status/2072093155969966333?s=46&t=41ciClRacREARzzk8qEemw"
+postUrl: "https://x.com/Aidate_info/status/2083504634933690703?s=20"
 ---
 
 自家発電の二次創作です

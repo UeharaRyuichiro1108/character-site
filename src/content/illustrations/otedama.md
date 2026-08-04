@@ -11,7 +11,7 @@ museumIds:
 tags:
   - gunso
   - azusa
-postUrl: "https://x.com/Aidate_info/status/2075953487725359176?s=20"
+postUrl: "https://x.com/Aidate_info/status/2083184290968576106?s=20"
 ---
 
 パパな一面が垣間見れるといい

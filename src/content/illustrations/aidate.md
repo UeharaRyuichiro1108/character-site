@@ -12,6 +12,7 @@ tags:
   - tasuku
   - gunso
   - azusa
+postUrl: "https://x.com/Aidate_info/status/2079410069083738344?s=20"
 ---
 
 梓がお気に入り

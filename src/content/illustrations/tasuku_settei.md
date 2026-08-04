@@ -9,7 +9,7 @@ museumIds:
   - aidate
 tags:
   - tasuku
-postUrl: "https://x.com/aidate_info/status/2071840748950237677?s=46&t=41ciClRacREARzzk8qEemw"
+postUrl: "https://x.com/Aidate_info/status/2079410246670532679?s=20"
 ---
 
 顔が気に入ってます

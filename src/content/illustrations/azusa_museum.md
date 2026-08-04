@@ -9,7 +9,7 @@ museumIds:
   - aidate
 tags:
   - azusa
-postUrl: "https://x.com/aidate_info/status/2074548784827379912?s=46&t=41ciClRacREARzzk8qEemw"
+postUrl: "https://x.com/Aidate_info/status/2082116502669627674?s=20"
 ---
 
 空間をうまく表現できるようになりたいです

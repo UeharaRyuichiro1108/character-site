@@ -9,6 +9,7 @@ museumIds:
   - yubari
 tags:
   - nobu
+postUrl: "https://x.com/Aidate_info/status/2083453434259485053?s=20"
 ---
 
 ノブのデザイン画です。

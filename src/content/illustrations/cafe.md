@@ -16,6 +16,7 @@ tags:
   - sion
   - gunso
   - azusa
+postUrl: "https://x.com/Aidate_info/status/2082435397293093136?s=20"
 ---
 
 嘘広告用に書いたものです

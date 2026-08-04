@@ -1,4 +1,4 @@
-﻿---
+---
 id: "yubari_rakugaki"
 title: "夕張組のらくがき"
 uploadedAt: "2026-07-10"
@@ -11,8 +11,8 @@ tags:
   - sino
   - nobu
   - haru
-postUrl: "https://x.com/aidate_info/status/2071842671430377535?s=46&t=41ciClRacREARzzk8qEemw"
+postUrl: "https://x.com/Aidate_info/status/2083453434259485053?s=20"
 ---
 
-    ちょっと詳しめに描いています
+ちょっと詳しめに描いています
 

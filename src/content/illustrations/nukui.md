@@ -1,4 +1,4 @@
-﻿---
+---
 id: "nukui"
 title: "ほかほか軍曹"
 uploadedAt: "2026-07-24"
@@ -11,7 +11,8 @@ museumIds:
 tags:
   - tasuku
   - gunso
+postUrl: "https://x.com/Aidate_info/status/2083059130911310002?s=20"
 ---
 
-    軍曹はほかほかだとうれしい
+軍曹はほかほかだとうれしい
 

@@ -1,4 +1,4 @@
-﻿---
+---
 id: "tasuku_museum"
 title: "剥製展示室"
 uploadedAt: "2026-07-10"
@@ -9,8 +9,8 @@ museumIds:
   - aidate
 tags:
   - tasuku
-postUrl: "https://x.com/aidate_info/status/2073947573296239000?s=46&t=41ciClRacREARzzk8qEemw"
+postUrl: "https://x.com/Aidate_info/status/2082761384576905723?s=20"
 ---
 
-    これはシリーズで描きたいと思っています
+これはシリーズで描きたいと思っています
 

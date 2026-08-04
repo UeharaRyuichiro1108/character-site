@@ -11,7 +11,7 @@ museumIds:
 tags:
   - sion
   - tasuku
-postUrl: "https://x.com/aidate_info/status/2071941501861638266?s=46&t=41ciClRacREARzzk8qEemw"
+postUrl: "https://x.com/Aidate_info/status/2083841860687343745?s=20"
 ---
 
 字幕風フォントはよいです

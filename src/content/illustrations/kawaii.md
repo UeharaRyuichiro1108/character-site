@@ -10,7 +10,7 @@ museumIds:
 tags:
   - gunso
   - azusa
-postUrl: "https://x.com/aidate_info/status/2071841638721470521?s=46&t=41ciClRacREARzzk8qEemw"
+postUrl: "https://x.com/Aidate_info/status/2083367212979720695?s=20"
 ---
 
 嫌々ながらもつきあってあげてるといいなと思います

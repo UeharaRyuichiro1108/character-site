@@ -12,7 +12,7 @@ const stickerOptions = [
   { id: "haru", label: "ハル" },
 ];
 const stickerPositions = ["sticker-margin-top", "sticker-margin-middle", "sticker-margin-bottom", "sticker-margin-upper", "sticker-margin-lower"];
-const handwritingClasses = ["handwriting-4", "handwriting-5", "handwriting-6", "handwriting-7", "handwriting-9"];
+const handwritingClasses = ["handwriting-4", "handwriting-5", "handwriting-7", "handwriting-9"];
 type GuestbookMessage = { date: string; message: string; stickerId: string };
 const guestbookMessages = [
   // ここにGoogleフォームで届いた内容を追加します。
@@ -38,7 +38,25 @@ const guestbookMessages = [
 ありがとうございます！！！メッセージ残していただけてとっても嬉しいです！
 私も軍曹のお父さんぽい一面が大好きなのでこれからも積極的に更新していけたらな、と思っています…！
 バニー服部屋の話もありがとうございます…！とっっってもうれしいです…！
-ぜひこれからも見てやっていただけると嬉しいです！この度はご来館ありがとうございました！`, stickerId: "azusa" }
+ぜひこれからも見てやっていただけると嬉しいです！この度はご来館ありがとうございました！`, stickerId: "azusa" },
+  { date: "2026-08-03", message: `いつも気になっていたのですが、お休みが取れたので来館させていただきました。
+よく手入れされた標本の数々と愛館市の歴史と自然を知ることができる素敵な資料館でした。
+
+軍服を着られたかわいらしい学芸員さんに案内していただきましたが、
+私と歳がかなり離れていらっしゃるのにもかかわらず大変博識で驚きました。
+案内してくださりありがとうございます。楽しく回ることができました。
+
+また新たに展示物を収集されているとのことで、新しい発見や研究の発表を楽しみにしています。
+
+今度は家族も連れて来館しようと思います。
+
+愛館市立郷土資料館の皆様、北海道もまだまだ暑い時期が続きますのでご体調にお気をつけてお過ごしください。
+
+【管理者コメント】
+この度はご来館ありがとうございました！
+楽しく回っていただくことができて何よりです！対応した学芸員にも伝えておきます！
+これからもより楽しんでいただけるよう運営してまいりますのでぜひまたご来館いただければ幸いです！
+体調にはお気をつけてお過ごしください`, stickerId: "gunso" }
 
 ] as GuestbookMessage[];
 const pageCharacterLimit = 420;
@@ -161,11 +179,6 @@ const guestbookPages = guestbookMessages.reduce(
     font-display: swap;
   }
 
-  @font-face {
-    font-family: "GuestbookTegaki6";
-    src: url("/fonts/tegaki-6.ttf") format("truetype");
-    font-display: swap;
-  }
 
   @font-face {
     font-family: "GuestbookTegaki7";
@@ -297,9 +310,6 @@ const guestbookPages = guestbookMessages.reduce(
     font-family: "GuestbookTegaki5", "Yu Mincho", serif;
   }
 
-  .handwriting-6 {
-    font-family: "GuestbookTegaki6", "Yu Mincho", serif;
-  }
 
   .handwriting-7 {
     font-family: "GuestbookTegaki7", "Yu Mincho", serif;

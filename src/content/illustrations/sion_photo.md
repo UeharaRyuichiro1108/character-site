@@ -9,7 +9,7 @@ museumIds:
   - aidate
 tags:
   - sion
-postUrl: "https://x.com/aidate_info/status/2071840577357033979?s=46&t=41ciClRacREARzzk8qEemw"
+postUrl: "https://x.com/Aidate_info/status/2080440913298694179?s=20"
 ---
 
 背景は支笏湖です

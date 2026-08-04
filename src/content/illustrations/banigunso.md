@@ -11,7 +11,7 @@ museumIds:
 tags:
   - gunso
   - azusa
-postUrl: "https://x.com/aidate_info/status/2071841356159557916?s=46&t=41ciClRacREARzzk8qEemw"
+postUrl: "https://x.com/Aidate_info/status/2083039297830330692?s=20"
 ---
 
 時々女の子のパパなのが透けるといいなと思います

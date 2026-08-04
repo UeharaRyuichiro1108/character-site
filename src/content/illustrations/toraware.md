@@ -14,7 +14,7 @@ tags:
   - tasuku
   - sion
   - azusa
-postUrl: "https://x.com/aidate_info/status/2071841548225192416?s=46&t=41ciClRacREARzzk8qEemw"
+postUrl: "https://x.com/Aidate_info/status/2080495095351329079?s=20"
 ---
 
 軍曹にはキュートアグレッションの餌食になってもらいたいが

@@ -9,6 +9,7 @@ museumIds:
   - hokudai
 tags:
   - akira
+postUrl: "https://x.com/Aidate_info/status/2082370595958997058?s=20"
 ---
 
 アキラのデザイン画です。

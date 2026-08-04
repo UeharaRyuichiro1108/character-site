@@ -9,7 +9,7 @@ museumIds:
   - aidate
 tags:
   - gunso
-postUrl: "https://x.com/Aidate_info/status/2071846168431411650?s=20"
+postUrl: "https://x.com/Aidate_info/status/2080591157202219376?s=20"
 ---
 
 ロゴの表示がお気に入り

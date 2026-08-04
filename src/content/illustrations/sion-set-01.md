@@ -10,7 +10,7 @@ museumIds:
 tags:
   - sion
   - tasuku
-postUrl: "https://x.com/aidate_info/status/2071840843015819327?s=46&t=41ciClRacREARzzk8qEemw"
+postUrl: "https://x.com/Aidate_info/status/2079410163656904851?s=20"
 ---
 
 お気に入りです
