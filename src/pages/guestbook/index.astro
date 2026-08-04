@@ -12,7 +12,7 @@ const stickerOptions = [
   { id: "haru", label: "ハル" },
 ];
 const stickerPositions = ["sticker-margin-top", "sticker-margin-middle", "sticker-margin-bottom", "sticker-margin-upper", "sticker-margin-lower"];
-const handwritingClasses = ["handwriting-4", "handwriting-5", "handwriting-7", "handwriting-9"];
+const handwritingClasses = ["handwriting-4", "handwriting-5", "handwriting-7"];
 type GuestbookMessage = { date: string; message: string; stickerId: string };
 const guestbookMessages = [
   // ここにGoogleフォームで届いた内容を追加します。
@@ -59,13 +59,13 @@ const guestbookMessages = [
 体調にはお気をつけてお過ごしください`, stickerId: "gunso" },
   { date: "2026-08-03", message: `こんにちは
 お時間があったので来館してみました。
-ホルマリンな学芸員さんにあんないしてもらいました。（とてもていねいにあんないしてもらいました！）
+ホルマリンな学芸員さんに案内してもらいました。（とても丁寧に案内してもらいました！）
 ほかの学芸員さんたちとも挨拶できてとても嬉しかったです！
 また時間があれば行きたいです。
 
 【管理者コメント】
 ご来館ありがとうございました！
-来館者様とお話しできて学芸員も嬉しそうでした！
+久々に来館者様とお話しできて学芸員も嬉しそうでした！
 またのご来館をお待ちしております！`, stickerId: "sion" }
 
 ] as GuestbookMessage[];
@@ -195,12 +195,6 @@ const guestbookPages = guestbookMessages.reduce(
     src: url("/fonts/tegaki-7.ttf") format("truetype");
     font-display: swap;
   }
-
-  @font-face {
-    font-family: "GuestbookTegaki9";
-    src: url("/fonts/tegaki-9.otf") format("opentype");
-    font-display: swap;
-  }
   .guestbook-page {
     display: grid;
     gap: 28px;
@@ -323,10 +317,6 @@ const guestbookPages = guestbookMessages.reduce(
 
   .handwriting-7 {
     font-family: "GuestbookTegaki7", "Yu Mincho", serif;
-  }
-
-  .handwriting-9 {
-    font-family: "GuestbookTegaki9", "Yu Mincho", serif;
   }
   .empty-message {
     min-height: 220px;
