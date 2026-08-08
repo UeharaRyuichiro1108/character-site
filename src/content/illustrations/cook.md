@@ -7,7 +7,8 @@ images:
   - "/images/uploads/cook1.webp"
   - "/images/uploads/cook2.webp"
   - "/images/uploads/cook3.webp"
-museumIds:ryuhyou
+museumIds:
+  - ryuhyou
 tags:
   - kotaro
   - sirose
