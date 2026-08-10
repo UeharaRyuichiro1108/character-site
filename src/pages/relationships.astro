@@ -1,4 +1,4 @@
-﻿---
+---
 import BaseLayout from "../components/BaseLayout.astro";
 
 const characterModules = import.meta.glob("../content/characters/*.md", { eager: true });
@@ -73,9 +73,91 @@ const readableLabel = (from, to, pairStart, pairEnd, offset) => {
   };
 };
 
-const personNodes = placeNodes(characters, 50, 52, 38, 27);
+const museumClusterCenters = {
+  aidate: { x: 26, y: 40 },
+  yubari: { x: 74, y: 44 },
+  ryuhyou: { x: 28, y: 72 },
+  hokudai: { x: 66, y: 22 },
+  hokkaido: { x: 50, y: 72 },
+  otaru: { x: 18, y: 58 },
+  kusiro: { x: 82, y: 70 },
+  mura: { x: 50, y: 48 },
+};
+
+const fallbackClusterCenters = [
+  { x: 50, y: 28 },
+  { x: 18, y: 50 },
+  { x: 82, y: 50 },
+  { x: 50, y: 78 },
+];
+
+const getMuseumIdForCharacter = (character) => character.museumId || character.museumIds?.[0] || "unknown";
+const getClusterCenter = (museumId, index = 0) => museumClusterCenters[museumId] ?? fallbackClusterCenters[index % fallbackClusterCenters.length];
+
+const placeClusterMembers = (members, center) => {
+  if (members.length === 1) {
+    return [{ ...members[0], x: center.x, y: center.y }];
+  }
+
+  const layouts = {
+    2: [
+      { x: -17, y: -8 },
+      { x: 17, y: 8 },
+    ],
+    3: [
+      { x: 0, y: -15 },
+      { x: -16, y: 12 },
+      { x: 16, y: 12 },
+    ],
+    4: [
+      { x: -16, y: -14 },
+      { x: 16, y: -14 },
+      { x: -16, y: 14 },
+      { x: 16, y: 14 },
+    ],
+  };
+
+  const layout = layouts[members.length];
+  if (layout) {
+    return members.map((member, index) => ({
+      ...member,
+      x: rounded(center.x + layout[index].x),
+      y: rounded(center.y + layout[index].y),
+    }));
+  }
+
+  return members.map((member, index) => {
+    const angle = (-90 + (360 / members.length) * index) * (Math.PI / 180);
+    return {
+      ...member,
+      x: rounded(center.x + Math.cos(angle) * 17),
+      y: rounded(center.y + Math.sin(angle) * 14),
+    };
+  });
+};
+
+const placePersonNodesByMuseum = (items) => {
+  const groups = new Map();
+  items.forEach((character) => {
+    const museumId = getMuseumIdForCharacter(character);
+    if (!groups.has(museumId)) groups.set(museumId, []);
+    groups.get(museumId).push(character);
+  });
+
+  return Array.from(groups.entries()).flatMap(([museumId, members], index) => {
+    const center = getClusterCenter(museumId, index);
+    return placeClusterMembers(members, center);
+  });
+};
+
+const personNodes = placePersonNodesByMuseum(characters);
 const museumNodes = placeNodes(museums, 50, 50, 39, 31);
-const relationshipFontSize = Math.max(0.42, Math.min(0.78, 0.92 - personNodes.length * 0.035));
+const occupiedPersonMuseums = Array.from(new Set(characters.map(getMuseumIdForCharacter))).map((museumId, index) => {
+  const museum = museums.find((item) => item.id === museumId);
+  const center = getClusterCenter(museumId, index);
+  return museum ? { ...museum, x: center.x, y: center.y } : null;
+}).filter(Boolean);
+const relationshipFontSize = Math.max(0.42, Math.min(0.72, 0.86 - personNodes.length * 0.032));
 
 const personById = new Map(personNodes.map((character) => [character.id, character]));
 const museumById = new Map(museumNodes.map((museum) => [museum.id, museum]));
@@ -244,6 +326,11 @@ const { directedLinks: museumTextLinks, plainLinks: museumPlainLinks } = createM
             </g>
           ))}
         </svg>
+        {occupiedPersonMuseums.map((museum) => (
+          <span class="museum-cluster-label" style={`--x: ${museum.x}%; --y: ${museum.y}%;`}>
+            {museum.name}
+          </span>
+        ))}
 
         {personNodes.map((character) => (
           <a
@@ -421,11 +508,30 @@ const { directedLinks: museumTextLinks, plainLinks: museumPlainLinks } = createM
     fill: #d584a9;
   }
 
-  .graph-node {
+  .museum-cluster-label {
     position: absolute;
     left: var(--x);
     top: var(--y);
     z-index: 1;
+    transform: translate(-50%, -50%) translateY(-78px);
+    width: clamp(130px, 16vw, 190px);
+    padding: 0 10px;
+    color: rgba(93, 125, 148, 0.26);
+    font-size: clamp(12px, 1.7vw, 16px);
+    font-weight: 700;
+    line-height: 1.35;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .museum-cluster-label::before {
+    content: none;
+  }
+  .graph-node {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    z-index: 2;
     transform: translate(-50%, -50%);
     display: grid;
     justify-items: center;
@@ -437,12 +543,12 @@ const { directedLinks: museumTextLinks, plainLinks: museumPlainLinks } = createM
   }
 
   .person-node {
-    width: clamp(70px, 9vw, 104px);
-    font-size: clamp(11px, 1.7vw, 14px);
+    width: clamp(76px, 8vw, 96px);
+    font-size: clamp(10px, 1.35vw, 13px);
   }
 
   .person-node img {
-    width: clamp(52px, 7vw, 78px);
+    width: clamp(50px, 6.4vw, 70px);
     aspect-ratio: 1;
     object-fit: cover;
     border: 2px solid white;
@@ -452,8 +558,8 @@ const { directedLinks: museumTextLinks, plainLinks: museumPlainLinks } = createM
 
   .person-node span,
   .museum-node strong {
-    max-width: 120px;
-    line-height: 1.35;
+    max-width: 132px;
+    line-height: 1.38;
     text-shadow: 0 1px 0 white;
   }
 
@@ -500,8 +606,12 @@ const { directedLinks: museumTextLinks, plainLinks: museumPlainLinks } = createM
     }
 
     .person-node {
-      width: 66px;
-      font-size: 10px;
+      width: 62px;
+      font-size: 9px;
+    }
+
+    .museum-cluster-label {
+      display: none;
     }
 
     .person-node img {
