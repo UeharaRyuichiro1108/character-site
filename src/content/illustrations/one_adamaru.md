@@ -1,6 +1,6 @@
 ---
 id: "one_adamaru"
-title: "【ワンドロ】あだまる学芸員"
+title: "【ワンドロ】あだまる学芸員さん"
 uploadedAt: "2026-08-09"
 image: "/images/uploads/one_adamaru.webp"
 images:
