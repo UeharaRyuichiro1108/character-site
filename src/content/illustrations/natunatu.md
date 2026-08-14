@@ -7,7 +7,7 @@ images:
   - "/images/uploads/natunatu.webp"
 museumIds:
 tags:
-postUrl: ""
+postUrl: "https://x.com/Aidate_info/status/2088133149503177165?s=20"
 ---
 
 学芸員化企画でデザインしたものです。

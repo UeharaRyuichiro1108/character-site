@@ -12,7 +12,7 @@ museumIds:
 tags:
   - kotaro
   - sirose
-postUrl: ""
+postUrl: "https://x.com/Aidate_info/status/2088155504006844642?s=20"
 ---
 
 白瀬は目を大きく開いているところを人に見せたことがないといいなと思います
