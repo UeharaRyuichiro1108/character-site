@@ -8,7 +8,7 @@ images:
 museumIds:
   - 
 tags:
-postUrl: "https://x.com/aidate_info/status/2089929004958777389?s=46&t=41ciClRacREARzzk8qEemw"
+postUrl: "https://x.com/Aidate_info/status/2090036110965752070?s=20"
 ---
 
 8/19（水）のワンドロです
