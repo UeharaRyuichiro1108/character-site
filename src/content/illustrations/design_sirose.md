@@ -1,7 +1,7 @@
 ---
 id: "design_sirose"
 title: "デザイン画_白瀬"
-uploadedAt: "2026-08-10"
+uploadedAt: "2026-08-08"
 image: "/images/uploads/sirose_design.webp"
 images:
   - "/images/uploads/sirose_design.webp"
