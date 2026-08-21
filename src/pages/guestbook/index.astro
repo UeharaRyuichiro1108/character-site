@@ -45,7 +45,6 @@ const guestbookMessages = [
 軍服を着られたかわいらしい学芸員さんに案内していただきましたが、
 私と歳がかなり離れていらっしゃるのにもかかわらず大変博識で驚きました。
 案内してくださりありがとうございます。楽しく回ることができました。
-`
 また新たに展示物を収集されているとのことで、新しい発見や研究の発表を楽しみにしています。
 
 今度は家族も連れて来館しようと思います。
@@ -57,7 +56,7 @@ const guestbookMessages = [
 楽しく回っていただくことができて何よりです！対応した学芸員にも伝えておきます！
 これからもより楽しんでいただけるよう運営してまいりますのでぜひまたご来館いただければ幸いです！
 体調にはお気をつけてお過ごしください`, stickerId: "gunso" },
-  { date: "2026-08-03", message: こんにちは
+  { date: "2026-08-03", message: `こんにちは
 お時間があったので来館してみました。
 ホルマリンな学芸員さんに案内してもらいました。（とても丁寧に案内してもらいました！）
 ほかの学芸員さんたちとも挨拶できてとても嬉しかったです！
@@ -73,7 +72,7 @@ const guestbookMessages = [
 
 上原さんが創る世界の優しく包み込んでくれる、どんなときもそばに居てくれるような雰囲気が大好きです。ずっとずっと応援して生きていきます。ゆっくりでも少しずつ進めていってくれたら嬉しいです。
 
-私は白瀬と幸太郎のペアが推しなので、彼らの小説が読みたいなと心の中で思っています。`
+私は白瀬と幸太郎のペアが推しなので、彼らの小説が読みたいなと心の中で思っています。
 
 【管理者コメント】
 ご来館ありがとうございます！とってもうれしいお言葉の数々で浮足立っております…！
@@ -84,7 +83,8 @@ const guestbookMessages = [
 
 ] as GuestbookMessage[];
 const pageCharacterLimit = 420;
-const guestbookPages = guestbookMessages.reduce(
+const guestbookDisplayMessages = [...guestbookMessages].reverse();
+const guestbookPages = guestbookDisplayMessages.reduce(
   (pages, item) => {
     const messageSize = item.message.length + 48;
     const currentPage = pages.at(-1);
@@ -608,6 +608,9 @@ const guestbookPages = guestbookMessages.reduce(
   nextButton?.addEventListener("click", () => showPage(activePage + 1));
   showPage(0);
 </script>
+
+
+
 
 
 
