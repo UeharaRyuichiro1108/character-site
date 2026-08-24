@@ -5,7 +5,7 @@ characterIds:
   - kotaro
   - sirose
 museumIds:
-  - ryuhyo
+  - ryuhyou
 ---
 
 　その日の白瀬は、珍しく昼まで起きてこなかった。
@@ -429,3 +429,4 @@ museumIds:
 　ずっと。
 
 　いつもの朝だった。
+

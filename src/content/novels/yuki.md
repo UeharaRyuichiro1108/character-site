@@ -5,7 +5,7 @@ characterIds:
   - kotaro
   - sirose
 museumIds:
-  - ryuhyo
+  - ryuhyou
 ---
 
 　朝から、雪が降っていた。
@@ -481,3 +481,4 @@ museumIds:
 　樺太犬とシロクマの二人なら。
 
 　案外、退屈する暇はなさそうだった。
+
