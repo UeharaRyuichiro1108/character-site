@@ -19,7 +19,7 @@ other: "ムラージュとして切り離す際に少なからず身体の一部
 group: "北方大学総合博物館"
 museumId: "hokudai"
 image: "/images/uploads/akira.webp"
-designImage: "/images/uploads/akira_design.webp"
+designImage: "/images/uploads/akira_design_color.webp"
 catchcopy: "北方大学総合博物館　医学部展示室担当"
 relatedCharacterIds:
 relationships:
