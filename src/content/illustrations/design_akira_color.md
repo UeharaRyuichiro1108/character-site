@@ -2,9 +2,9 @@
 id: "design_akira_color"
 title: "デザイン画_アキラ（カラー）"
 uploadedAt: "2026-08-25"
-image: "/images/uploads/akira_design_color.webp"
+image: "/images/uploads/akira_designcolor.webp"
 images:
-  - "/images/uploads/akira_design_color.webp"
+  - "/images/uploads/akira_designcolor.webp"
 museumIds:
   - hokudai
 tags:
