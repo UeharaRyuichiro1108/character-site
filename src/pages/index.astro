@@ -2,12 +2,17 @@
 import BaseLayout from "../components/BaseLayout.astro";
 import FlowGallery from "../components/FlowGallery.astro";
 import WorldContent from "../content/pages/world.md";
+import onedrawTopicsText from "../data/onedraw-topics.txt?raw";
 
 const characterModules = import.meta.glob("../content/characters/*.md", { eager: true });
 const illustrationModules = import.meta.glob("../content/illustrations/*.md", { eager: true });
 const museumModules = import.meta.glob("../content/museums/*.md", { eager: true });
 const newsModules = import.meta.glob("../content/news/*.md", { eager: true });
 const adModules = import.meta.glob("../content/ads/*.md", { eager: true });
+const onedrawTopicList = onedrawTopicsText
+  .split(/\r?\n/)
+  .map((topic) => topic.trim())
+  .filter(Boolean);
 
 const getIdFromPath = (path) => path.split("/").pop().replace(".md", "");
 const getSortTime = (value) => {
@@ -1012,6 +1017,48 @@ const museumDiagnosisConfig = {
         memberCardPreview.scrollIntoView({ behavior: "smooth", block: "center" });
       });
     </script>
+    <section class="onedraw-section" id="aidate-onedraw">
+      <p class="tag">ONE DRAW</p>
+      <h2 class="section-title">愛館版ワンドロお題</h2>
+      <p class="lead onedraw-lead">今日のお題は…</p>
+      <div class="onedraw-topics" data-onedraw-topics aria-live="polite">
+        <span>雪</span>
+        <span>雨</span>
+        <span>うさぎ</span>
+      </div>
+      <p class="onedraw-hashtag"><a href="https://twitter.com/intent/tweet?text=%23%E6%84%9B%E9%A4%A8%E3%83%AF%E3%83%B3%E3%83%89%E3%83%AD%E9%83%A8" target="_blank" rel="noopener noreferrer">#愛館ワンドロ部</a>で投稿しよう！</p>
+    </section>
+
+    <script define:vars={{ onedrawTopics: onedrawTopicList }}>
+      const onedrawTopicContainer = document.querySelector("[data-onedraw-topics]");
+
+      const createDateSeed = () => {
+        const now = new Date();
+        return Number(`${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`);
+      };
+
+      const seededRandom = (seed) => {
+        let value = seed % 2147483647;
+        if (value <= 0) value += 2147483646;
+        return () => {
+          value = (value * 16807) % 2147483647;
+          return (value - 1) / 2147483646;
+        };
+      };
+
+      const pickDailyTopics = () => {
+        const random = seededRandom(createDateSeed());
+        const pool = [...onedrawTopics];
+        return Array.from({ length: 3 }, () => {
+          const index = Math.floor(random() * pool.length);
+          return pool.splice(index, 1)[0];
+        });
+      };
+
+      if (onedrawTopicContainer) {
+        onedrawTopicContainer.innerHTML = pickDailyTopics().map((topic) => `<span>${topic}</span>`).join("");
+      }
+    </script>
     <section class="diagnosis-section" id="character-diagnosis">
       <p class="tag">DIAGNOSIS</p>
       <h2 class="section-title">キャラクター診断</h2>
@@ -1462,7 +1509,7 @@ const museumDiagnosisConfig = {
 
   .printer-label {
     font-size: 11px;
-    font-weight: 800;
+    font-weight: 900;
     letter-spacing: 0.18em;
   }
 
@@ -1471,7 +1518,7 @@ const museumDiagnosisConfig = {
     color: #9fd3eb;
     font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
     font-size: 22px;
-    font-weight: 800;
+    font-weight: 900;
     letter-spacing: 0.12em;
   }
 
@@ -1549,7 +1596,7 @@ const museumDiagnosisConfig = {
 
   .ticket-sub {
     font-size: 13px;
-    font-weight: 800;
+    font-weight: 900;
   }
 
   .ticket-art-link {
@@ -1593,14 +1640,14 @@ const museumDiagnosisConfig = {
   .ticket-meta dt {
     color: rgba(100, 56, 15, 0.72);
     font-size: 10px;
-    font-weight: 800;
+    font-weight: 900;
     letter-spacing: 0.14em;
   }
 
   .ticket-meta dd {
     margin: 0;
     font-size: 16px;
-    font-weight: 800;
+    font-weight: 900;
   }
 
   .ticket-stub {
@@ -1629,7 +1676,7 @@ const museumDiagnosisConfig = {
     writing-mode: vertical-rl;
     justify-self: center;
     font-size: 22px;
-    font-weight: 800;
+    font-weight: 900;
     letter-spacing: 0.08em;
   }
 
@@ -1772,7 +1819,7 @@ const museumDiagnosisConfig = {
     z-index: 1;
     color: rgba(255, 255, 255, 0.72);
     font-size: clamp(18px, 5vw, 28px);
-    font-weight: 800;
+    font-weight: 900;
     line-height: 1.25;
     text-align: center;
     text-shadow: 0 1px 7px rgba(37, 72, 91, 0.28);
@@ -1908,7 +1955,7 @@ const museumDiagnosisConfig = {
     max-height: calc(100% - 48px);
     color: rgba(0, 0, 0, 0.78);
     font-size: clamp(28px, 8vw, 42px);
-    font-weight: 800;
+    font-weight: 900;
     letter-spacing: 0.12em;
     line-height: 1.05;
     text-align: left;
@@ -2238,7 +2285,7 @@ const museumDiagnosisConfig = {
     margin: 4px 0 0;
     text-align: center;
     font-size: 18px;
-    font-weight: 800;
+    font-weight: 900;
     letter-spacing: 0.24em;
   }
 
@@ -2297,7 +2344,7 @@ const museumDiagnosisConfig = {
     border-radius: 50%;
     color: rgba(125, 18, 24, 0.72);
     font-size: 22px;
-    font-weight: 800;
+    font-weight: 900;
     transform: rotate(-10deg);
   }
 
@@ -2552,6 +2599,112 @@ const museumDiagnosisConfig = {
 
   .member-card-section {
     padding: 64px 0 36px;
+  }
+
+  .onedraw-section {
+    position: relative;
+    display: grid;
+    gap: 16px;
+    margin: 10px 0 28px;
+    padding: clamp(24px, 5vw, 40px);
+    overflow: hidden;
+    background:
+      linear-gradient(90deg, rgba(140, 180, 207, 0.12) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(140, 180, 207, 0.12) 1px, transparent 1px),
+      rgba(255, 255, 255, 0.86);
+    background-size: 28px 28px, 28px 28px, auto;
+    border: 1px solid rgba(140, 180, 207, 0.45);
+    border-radius: 8px;
+    box-shadow: var(--soft-shadow);
+  }
+
+  .onedraw-section::before,
+  .onedraw-section::after {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    pointer-events: none;
+    border: 1px solid rgba(111, 143, 169, 0.24);
+  }
+
+  .onedraw-section::after {
+    inset: 18px;
+    border-style: dashed;
+    opacity: 0.7;
+  }
+
+  .onedraw-section > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .onedraw-lead {
+    margin-bottom: 0;
+    color: var(--blue-deep);
+    font-weight: 700;
+  }
+
+  .onedraw-topics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(12px, 2vw, 22px);
+  }
+
+  :global(.onedraw-topics span) {
+    position: relative;
+    display: grid;
+    min-height: clamp(68px, 7vw, 92px) !important;
+    place-items: center;
+    padding: 20px 10px 12px;
+    color: #213545;
+    font-family: "Yu Mincho", "Hiragino Mincho ProN", "YuMincho", serif;
+    font-size: clamp(22px, 2.8vw, 34px) !important;
+    font-weight: 900 !important;
+    line-height: 0.92;
+    text-align: center;
+    background: rgba(246, 251, 253, 0.96);
+    border: 1px solid rgba(111, 143, 169, 0.46);
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.62);
+  }
+
+  :global(.onedraw-topics span::before) {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    border: 1px solid rgba(140, 180, 207, 0.42);
+    border-radius: 5px;
+  }
+
+  :global(.onedraw-topics span::after) {
+    content: "TODAY";
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    color: rgba(111, 143, 169, 0.76);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+
+  .onedraw-hashtag {
+    justify-self: start;
+    margin: 0;
+    padding: 8px 14px;
+    color: var(--blue-deep);
+    font-weight: 700;
+    letter-spacing: 0;
+    background: rgba(235, 247, 252, 0.78);
+    border: 1px solid rgba(140, 180, 207, 0.38);
+    border-radius: 999px;
+  }
+
+  .onedraw-hashtag a {
+    color: inherit;
+    font-weight: 900;
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   .member-card-panel {
@@ -2834,6 +2987,23 @@ const museumDiagnosisConfig = {
       grid-template-columns: 1fr;
     }
 
+    .onedraw-topics {
+      gap: 8px;
+    }
+
+    :global(.onedraw-topics span) {
+      min-height: 62px !important;
+      padding: 18px 6px 10px;
+      font-size: clamp(20px, 5.2vw, 26px) !important;
+      font-weight: 900 !important;
+    }
+
+    :global(.onedraw-topics span::after) {
+      top: 7px;
+      left: 8px;
+      font-size: 8px;
+    }
+
 
     .section-heading-row {
       align-items: start;
@@ -2892,3 +3062,9 @@ const museumDiagnosisConfig = {
     }
   }
 </style>
+
+
+
+
+
+
