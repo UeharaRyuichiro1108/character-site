@@ -14,81 +14,31 @@ const stickerOptions = [
 const stickerPositions = ["sticker-margin-top", "sticker-margin-middle", "sticker-margin-bottom", "sticker-margin-upper", "sticker-margin-lower"];
 const handwritingClasses = ["handwriting-4", "handwriting-5", "handwriting-7"];
 type GuestbookMessage = { date: string; message: string; stickerId: string };
-const guestbookMessages = [
-  // ここにGoogleフォームで届いた内容を追加します。
-  // 例: { date: "2026-07-16", message: "また来ます。", stickerId: "sion" },
-  { date: "2026-07-16", message: `こんにちは。
-私は上原さんの創作が可愛くて大好きな人です。可愛いキャラクターに反して設定や抱える想いが深く、楽しませて貰っています!
-軍曹さんと梓ちゃんペアが好きなので、お話読みたいです…他にも新メンバーが続々と誕生しており期待で目が離せません。漫画化アニメ化待ってます。
-最近博物館に行くようになり、いつか北海道の博物館にも足を運びたいです。
-キャラクター診断で汐音さんでしたので汐音さんのステッカーにしました。ラインスタンプで欲しいくらい全員キュートです…!
-長文失礼しました。暑さが厳しいのでお体に気をつけて過ごして下さい。
+const guestbookMessageModules = import.meta.glob("../../content/guestbook/*.md", { eager: true, query: "?raw", import: "default" });
+const parseGuestbookMessage = (path: string, raw: unknown) => {
+  const source = String(raw).replace(/^\uFEFF/, "");
+  const match = source.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+  const frontmatter = match?.[1] ?? "";
+  const message = (match?.[2] ?? source).trimEnd();
+  const data = Object.fromEntries(
+    frontmatter
+      .split(/\r?\n/)
+      .map((line) => line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/))
+      .filter(Boolean)
+      .map((match) => [match![1], match![2].replace(/^["']|["']$/g, "")]),
+  );
 
-【管理者コメント】
-コメントありがとうございます！初めての来館者でウッキウキです…！！
-私も軍曹梓ペア大好きです！！小説の部分だったりが不足気味なので力を入れていきます…！
-ぜひ北海道の博物館にも行ってみてほしいです！土地が広いだけあっていっぱい面白い博物館がありますので！
-創作のモチーフになった場所だったりも紹介していけたらなと思います
-熱中症にはお気をつけてご安全にお過ごしください…！`, stickerId: "sion" },
-  { date: "2026-07-17", message: `こんにちは！いつも龍一郎さんの作品を楽しく見させていただいてます。
-私はとくに軍曹さんのキャラデザや設定がすきで、軍曹さんの父親的な1面が見られるイラスト集がだいすきです！(バニー服部屋のお話だいすきです)
-龍一郎さんのイラストや作り込まれた世界観を見られるのがとても嬉しくてこれからも作品が更新されるのを楽しみにしています。
-
-【管理者コメント】
-ありがとうございます！！！メッセージ残していただけてとっても嬉しいです！
-私も軍曹のお父さんぽい一面が大好きなのでこれからも積極的に更新していけたらな、と思っています…！
-バニー服部屋の話もありがとうございます…！とっっってもうれしいです…！
-ぜひこれからも見てやっていただけると嬉しいです！この度はご来館ありがとうございました！`, stickerId: "azusa" },
-  { date: "2026-08-03", message: `いつも気になっていたのですが、お休みが取れたので来館させていただきました。
-よく手入れされた標本の数々と愛館市の歴史と自然を知ることができる素敵な資料館でした。
-
-軍服を着られたかわいらしい学芸員さんに案内していただきましたが、
-私と歳がかなり離れていらっしゃるのにもかかわらず大変博識で驚きました。
-案内してくださりありがとうございます。楽しく回ることができました。
-また新たに展示物を収集されているとのことで、新しい発見や研究の発表を楽しみにしています。
-
-今度は家族も連れて来館しようと思います。
-
-愛館市立郷土資料館の皆様、北海道もまだまだ暑い時期が続きますのでご体調にお気をつけてお過ごしください。
-
-【管理者コメント】
-この度はご来館ありがとうございました！
-楽しく回っていただくことができて何よりです！対応した学芸員にも伝えておきます！
-これからもより楽しんでいただけるよう運営してまいりますのでぜひまたご来館いただければ幸いです！
-体調にはお気をつけてお過ごしください`, stickerId: "gunso" },
-  { date: "2026-08-03", message: `こんにちは
-お時間があったので来館してみました。
-ホルマリンな学芸員さんに案内してもらいました。（とても丁寧に案内してもらいました！）
-ほかの学芸員さんたちとも挨拶できてとても嬉しかったです！
-また時間があれば行きたいです。
-
-【管理者コメント】
-ご来館ありがとうございました！
-久々に来館者様とお話しできて学芸員も嬉しそうでした！
-またのご来館をお待ちしております！`, stickerId: "sion" },
-  { date: "2026-08-21", message: `資料館という世界観に惹き込まれて来てみました。学芸員さん方の設定が分かりやすく魅力的で、小説は間が心地よくて、思わずうるっとしてしまいました。大好きです。
-
-これから他の博物館とかにも学芸員が配属されて、小説が増えて、設定が決まっていくのを想像するとわくわくで昼も寝てしまいそうです。
-
-上原さんが創る世界の優しく包み込んでくれる、どんなときもそばに居てくれるような雰囲気が大好きです。ずっとずっと応援して生きていきます。ゆっくりでも少しずつ進めていってくれたら嬉しいです。
-
-私は白瀬と幸太郎のペアが推しなので、彼らの小説が読みたいなと心の中で思っています。
-
-【管理者コメント】
-ご来館ありがとうございます！とってもうれしいお言葉の数々で浮足立っております…！
-もっともっと世界を広げていきたいと思っておりますので、ぜひこれからも見ていていただけるととっても嬉しいです！
-推しという言葉を使ってもらえたのが初めてで本当にうれしいです…！！！次の小説は流氷組の話にします…！
-`, stickerId: "sino" },
-  { date: "2026-08-25", message: `創作をサイトにするその行動力、尊敬します！！私も何か自創作のサイトを作ってみたいと思いました✨
-資料館、博物館というテーマがウェブサイトとマッチしていて、ARGみたいで見ていて面白いです！引き込まれます。これからも頑張ってください💪
-
-【管理者コメント】
-ご来館ありがとうございます！少しでも原動力になれていたらとてもうれしいです…！
-これからもより楽しんでいただけるように頑張ってまいりますのでどうぞよろしくお願いいたします！
-`, stickerId: "azusa" }
-
-
-] as GuestbookMessage[];
+  return {
+    date: data.date ?? "",
+    message,
+    stickerId: data.stickerId ?? "tasuku",
+    fileName: path.split("/").pop() ?? path,
+  };
+};
+const guestbookMessages = Object.entries(guestbookMessageModules)
+  .map(([path, raw]) => parseGuestbookMessage(path, raw))
+  .filter((item) => item.message)
+  .sort((a, b) => a.fileName.localeCompare(b.fileName, "ja")) as (GuestbookMessage & { fileName: string })[];
 const pageCharacterLimit = 420;
 const guestbookDisplayMessages = [...guestbookMessages].reverse();
 const guestbookPages = guestbookDisplayMessages.reduce(
