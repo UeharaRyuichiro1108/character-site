@@ -1,7 +1,7 @@
 ---
 id: "azusa_marine"
 title: "海"
-uploadedAt: "2026-07-10"
+uploadedAt: "2026-09-10"
 image: "/images/uploads/azusa_marine.webp"
 images:
   - "/images/uploads/azusa_marine.MP4"
