@@ -74,21 +74,21 @@ const readableLabel = (from, to, pairStart, pairEnd, offset) => {
 };
 
 const museumClusterCenters = {
-  aidate: { x: 26, y: 40 },
-  yubari: { x: 74, y: 44 },
-  ryuhyou: { x: 28, y: 72 },
-  hokudai: { x: 66, y: 22 },
-  hokkaido: { x: 50, y: 72 },
-  otaru: { x: 18, y: 58 },
-  kusiro: { x: 82, y: 70 },
-  mura: { x: 50, y: 48 },
+  aidate: { x: 28, y: 32 },
+  yubari: { x: 72, y: 21 },
+  ryuhyou: { x: 28, y: 76 },
+  hokudai: { x: 72, y: 76 },
+  hokkaido: { x: 50, y: 88 },
+  otaru: { x: 50, y: 48 },
+  kusiro: { x: 86, y: 50 },
+  mura: { x: 14, y: 50 },
 };
 
 const fallbackClusterCenters = [
-  { x: 50, y: 28 },
+  { x: 50, y: 18 },
   { x: 18, y: 50 },
   { x: 82, y: 50 },
-  { x: 50, y: 78 },
+  { x: 50, y: 82 },
 ];
 
 const getMuseumIdForCharacter = (character) => character.museumId || character.museumIds?.[0] || "unknown";
@@ -101,19 +101,19 @@ const placeClusterMembers = (members, center) => {
 
   const layouts = {
     2: [
-      { x: -17, y: -8 },
-      { x: 17, y: 8 },
+      { x: -20, y: -6 },
+      { x: 20, y: 6 },
     ],
     3: [
-      { x: 0, y: -15 },
-      { x: -16, y: 12 },
-      { x: 16, y: 12 },
+      { x: 0, y: -19 },
+      { x: -22, y: 15 },
+      { x: 22, y: 15 },
     ],
     4: [
-      { x: -16, y: -14 },
-      { x: 16, y: -14 },
-      { x: -16, y: 14 },
-      { x: 16, y: 14 },
+      { x: -21, y: -17 },
+      { x: 21, y: -17 },
+      { x: -21, y: 17 },
+      { x: 21, y: 17 },
     ],
   };
 
@@ -130,8 +130,8 @@ const placeClusterMembers = (members, center) => {
     const angle = (-90 + (360 / members.length) * index) * (Math.PI / 180);
     return {
       ...member,
-      x: rounded(center.x + Math.cos(angle) * 17),
-      y: rounded(center.y + Math.sin(angle) * 14),
+      x: rounded(center.x + Math.cos(angle) * 23),
+      y: rounded(center.y + Math.sin(angle) * 20),
     };
   });
 };
@@ -157,7 +157,7 @@ const occupiedPersonMuseums = Array.from(new Set(characters.map(getMuseumIdForCh
   const center = getClusterCenter(museumId, index);
   return museum ? { ...museum, x: center.x, y: center.y } : null;
 }).filter(Boolean);
-const relationshipFontSize = Math.max(0.42, Math.min(0.72, 0.86 - personNodes.length * 0.032));
+const relationshipFontSize = Math.max(0.34, Math.min(0.58, 0.74 - personNodes.length * 0.026));
 
 const personById = new Map(personNodes.map((character) => [character.id, character]));
 const museumById = new Map(museumNodes.map((museum) => [museum.id, museum]));
@@ -283,6 +283,10 @@ const uniqueLinks = (items, map, fieldName) => {
 
 const { directedLinks: personTextLinks, plainLinks: personPlainLinks } = createPersonLinks();
 const { directedLinks: museumTextLinks, plainLinks: museumPlainLinks } = createMuseumLinks();
+const personRelationGroups = occupiedPersonMuseums.map((museum) => ({
+  ...museum,
+  relationships: personTextLinks.filter((link) => getMuseumIdForCharacter(link.from) === museum.id),
+})).filter((group) => group.relationships.length > 0);
 ---
 
 <BaseLayout title="相関図">
@@ -302,46 +306,62 @@ const { directedLinks: museumTextLinks, plainLinks: museumPlainLinks } = createM
       </div>
 
       <div class="network-panel panel">
-        <svg class="network-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-label="人物同士の関係線">
-          <defs>
-            <marker id="arrow-from" markerWidth="7" markerHeight="7" refX="6.3" refY="3.5" orient="auto" markerUnits="strokeWidth">
-              <path d="M 0 0 L 7 3.5 L 0 7 z" fill="rgba(92, 164, 198, 0.98)"></path>
-            </marker>
-            <marker id="arrow-to" markerWidth="7" markerHeight="7" refX="6.3" refY="3.5" orient="auto" markerUnits="strokeWidth">
-              <path d="M 0 0 L 7 3.5 L 0 7 z" fill="rgba(213, 132, 169, 0.98)"></path>
-            </marker>
-          </defs>
+        <div class="network-scroll">
+          <div class="network-canvas">
+            <svg class="network-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-label="人物同士の関係線">
+              <defs>
+                <marker id="arrow-from" markerWidth="7" markerHeight="7" refX="6.3" refY="3.5" orient="auto" markerUnits="strokeWidth">
+                  <path d="M 0 0 L 7 3.5 L 0 7 z" fill="rgba(92, 164, 198, 0.98)"></path>
+                </marker>
+                <marker id="arrow-to" markerWidth="7" markerHeight="7" refX="6.3" refY="3.5" orient="auto" markerUnits="strokeWidth">
+                  <path d="M 0 0 L 7 3.5 L 0 7 z" fill="rgba(213, 132, 169, 0.98)"></path>
+                </marker>
+              </defs>
 
-          {personPlainLinks.map((link) => (
-            <path class="relation-path relation-path-plain" d={link.basePath}></path>
-          ))}
+              {personPlainLinks.map((link) => (
+                <path class="relation-path relation-path-plain" d={link.basePath}></path>
+              ))}
 
-          {personTextLinks.map((link) => (
-            <g>
-              <path id={`${link.id}-label`} class="label-guide" d={link.labelPath}></path>
-              <path class={`relation-path ${link.tone === "from" ? "relation-path-from" : "relation-path-to"}`} d={link.path}></path>
-              <text class={`relation-text ${link.tone === "from" ? "relation-text-from" : "relation-text-to"}`} text-anchor="middle" font-size={relationshipFontSize}>
-                <textPath href={`#${link.id}-label`} startOffset={link.labelStartOffset}>{link.text}</textPath>
-              </text>
-            </g>
-          ))}
-        </svg>
-        {occupiedPersonMuseums.map((museum) => (
-          <span class="museum-cluster-label" style={`--x: ${museum.x}%; --y: ${museum.y}%;`}>
-            {museum.name}
-          </span>
-        ))}
+              {personTextLinks.map((link) => (
+                <path class={`relation-path ${link.tone === "from" ? "relation-path-from" : "relation-path-to"}`} d={link.path}>
+                  <title>{link.text}</title>
+                </path>
+              ))}
+            </svg>
+            {occupiedPersonMuseums.map((museum) => (
+              <span class="museum-cluster-label" style={`--x: ${museum.x}%; --y: ${museum.y}%;`}>
+                {museum.name}
+              </span>
+            ))}
 
-        {personNodes.map((character) => (
-          <a
-            class="graph-node person-node"
-            href={`/characters/${character.id}/`}
-            style={`--x: ${character.x}%; --y: ${character.y}%;`}
-          >
-            <img src={character.image} alt={character.name} />
-            <span>{character.name}</span>
-          </a>
-        ))}
+            {personNodes.map((character) => (
+              <a
+                class="graph-node person-node"
+                href={`/characters/${character.id}/`}
+                style={`--x: ${character.x}%; --y: ${character.y}%;`}
+              >
+                <img src={character.image} alt={character.name} />
+                <span>{character.name}</span>
+              </a>
+            ))}
+          </div>
+
+          <div class="relationship-note-board" aria-label="人物関係の説明">
+            {personRelationGroups.map((group) => (
+              <section class="relationship-note-card">
+                <h3>{group.name}</h3>
+                <ul>
+                  {group.relationships.map((relationship) => (
+                    <li class={`relationship-note ${relationship.tone === "from" ? "relationship-note-from" : "relationship-note-to"}`}>
+                      <span>{relationship.from.name}→{relationship.to.name}</span>
+                      <strong>{relationship.text.split(": ").slice(1).join(": ")}</strong>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
 
@@ -352,48 +372,52 @@ const { directedLinks: museumTextLinks, plainLinks: museumPlainLinks } = createM
       </div>
 
       <div class="network-panel museum-network panel">
-        <svg class="network-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-label="博物館同士の関係線">
-          <defs>
-            <marker id="museum-arrow-from" markerWidth="7" markerHeight="7" refX="6.3" refY="3.5" orient="auto" markerUnits="strokeWidth">
-              <path d="M 0 0 L 7 3.5 L 0 7 z" fill="rgba(92, 164, 198, 0.98)"></path>
-            </marker>
-            <marker id="museum-arrow-to" markerWidth="7" markerHeight="7" refX="6.3" refY="3.5" orient="auto" markerUnits="strokeWidth">
-              <path d="M 0 0 L 7 3.5 L 0 7 z" fill="rgba(213, 132, 169, 0.98)"></path>
-            </marker>
-          </defs>
+        <div class="network-scroll">
+        <div class="network-canvas">
+          <svg class="network-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-label="博物館同士の関係線">
+            <defs>
+              <marker id="museum-arrow-from" markerWidth="7" markerHeight="7" refX="6.3" refY="3.5" orient="auto" markerUnits="strokeWidth">
+                <path d="M 0 0 L 7 3.5 L 0 7 z" fill="rgba(92, 164, 198, 0.98)"></path>
+              </marker>
+              <marker id="museum-arrow-to" markerWidth="7" markerHeight="7" refX="6.3" refY="3.5" orient="auto" markerUnits="strokeWidth">
+                <path d="M 0 0 L 7 3.5 L 0 7 z" fill="rgba(213, 132, 169, 0.98)"></path>
+              </marker>
+            </defs>
 
-          {museumPlainLinks.map((link) => (
-            <path class="relation-path relation-path-plain" d={link.basePath}></path>
-          ))}
+            {museumPlainLinks.map((link) => (
+              <path class="relation-path relation-path-plain" d={link.basePath}></path>
+            ))}
 
-          {museumTextLinks.map((link) => (
-            <g>
-              <path id={`${link.id}-label`} class="label-guide" d={link.labelPath}></path>
-              <path class={`relation-path museum-relation-path ${link.tone === "from" ? "museum-relation-path-from" : "museum-relation-path-to"}`} d={link.path}></path>
-              <text class={`relation-text ${link.tone === "from" ? "relation-text-from" : "relation-text-to"}`} text-anchor="middle" font-size={relationshipFontSize}>
-                <textPath href={`#${link.id}-label`} startOffset={link.labelStartOffset}>{link.text}</textPath>
-              </text>
-            </g>
-          ))}
-        </svg>
+            {museumTextLinks.map((link) => (
+              <g>
+                <path id={`${link.id}-label`} class="label-guide" d={link.labelPath}></path>
+                <path class={`relation-path museum-relation-path ${link.tone === "from" ? "museum-relation-path-from" : "museum-relation-path-to"}`} d={link.path}></path>
+                <text class={`relation-text ${link.tone === "from" ? "relation-text-from" : "relation-text-to"}`} text-anchor="middle" font-size={relationshipFontSize}>
+                  <textPath href={`#${link.id}-label`} startOffset={link.labelStartOffset}>{link.text}</textPath>
+                </text>
+              </g>
+            ))}
+          </svg>
 
-        {museumNodes.map((museum) => {
-          const members = characters.filter((character) => character.museumId === museum.id);
-          return (
-            <a
-              class="graph-node museum-node"
-              href={`/museums/${museum.id}/`}
-              style={`--x: ${museum.x}%; --y: ${museum.y}%;`}
-            >
-              <strong>{museum.name}</strong>
-              <span>{members.length}人</span>
-            </a>
-          );
-        })}
+          {museumNodes.map((museum) => {
+            const members = characters.filter((character) => character.museumId === museum.id);
+            return (
+              <a
+                class="graph-node museum-node"
+                href={`/museums/${museum.id}/`}
+                style={`--x: ${museum.x}%; --y: ${museum.y}%;`}
+              >
+                <strong>{museum.name}</strong>
+                <span>{members.length}人</span>
+              </a>
+            );
+          })}
 
-        {museumPlainLinks.length === 0 && museumTextLinks.length === 0 && (
-          <p class="empty-graph">博物館同士の関係は、博物館データの museumRelationships に相手IDと文言を追加すると表示されます。</p>
-        )}
+          {museumPlainLinks.length === 0 && museumTextLinks.length === 0 && (
+            <p class="empty-graph">博物館同士の関係は、博物館データの museumRelationships に相手IDと文言を追加すると表示されます。</p>
+          )}
+        </div>
+        </div>
       </div>
     </section>
   </main>
@@ -436,12 +460,22 @@ const { directedLinks: museumTextLinks, plainLinks: museumPlainLinks } = createM
 
   .network-panel {
     position: relative;
-    min-height: clamp(420px, 72vw, 760px);
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
     border-radius: 8px;
     background:
       radial-gradient(circle at 20% 20%, rgba(198, 224, 238, 0.4), transparent 26%),
       linear-gradient(180deg, #ffffff 0%, #f7fbfd 100%);
+  }
+
+  .network-scroll {
+    position: relative;
+    min-width: 1180px;
+  }
+
+  .network-canvas {
+    position: relative;
+    height: clamp(620px, 74vw, 860px);
   }
 
   .network-lines {
@@ -508,6 +542,60 @@ const { directedLinks: museumTextLinks, plainLinks: museumPlainLinks } = createM
     fill: #d584a9;
   }
 
+  .relationship-note-board {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    padding: 0 24px 24px;
+  }
+
+  .relationship-note-card {
+    border: 1px solid rgba(155, 177, 191, 0.62);
+    border-radius: 8px;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.88);
+    box-shadow: 0 10px 24px rgba(72, 96, 110, 0.1);
+  }
+
+  .relationship-note-card h3 {
+    margin: 0 0 10px;
+    color: rgba(61, 88, 106, 0.86);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .relationship-note-card ul {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .relationship-note {
+    display: grid;
+    gap: 3px;
+    border-left: 3px solid currentColor;
+    padding: 7px 9px;
+    background: rgba(246, 250, 252, 0.9);
+    color: #5ca4c6;
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  .relationship-note-to {
+    color: #d584a9;
+  }
+
+  .relationship-note span {
+    font-weight: 700;
+  }
+
+  .relationship-note strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
   .museum-cluster-label {
     position: absolute;
     left: var(--x);
@@ -564,7 +652,15 @@ const { directedLinks: museumTextLinks, plainLinks: museumPlainLinks } = createM
   }
 
   .museum-network {
-    min-height: clamp(460px, 70vw, 720px);
+    min-height: 0;
+  }
+
+  .museum-network .network-scroll {
+    min-width: 1040px;
+  }
+
+  .museum-network .network-canvas {
+    height: clamp(520px, 66vw, 740px);
   }
 
   .museum-node {
@@ -602,12 +698,33 @@ const { directedLinks: museumTextLinks, plainLinks: museumPlainLinks } = createM
 
   @media (max-width: 560px) {
     .network-panel {
-      min-height: 520px;
+      margin-inline: -12px;
+    }
+
+    .network-scroll {
+      min-width: 980px;
+    }
+
+    .network-canvas {
+      height: 640px;
+    }
+
+    .museum-network .network-scroll {
+      min-width: 900px;
+    }
+
+    .museum-network .network-canvas {
+      height: 560px;
+    }
+
+    .relationship-note-board {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding-inline: 16px;
     }
 
     .person-node {
-      width: 62px;
-      font-size: 9px;
+      width: 70px;
+      font-size: 10px;
     }
 
     .museum-cluster-label {
