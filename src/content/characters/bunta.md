@@ -23,6 +23,8 @@ relatedCharacterIds:
 relationships:
   - targetId: "rukiti"
     text: "変わった子"
+  - targetId: "siro"
+    text: "やさしい"
 
 tags:
   - bunta

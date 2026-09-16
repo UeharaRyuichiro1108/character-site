@@ -25,6 +25,8 @@ relatedCharacterIds:
 relationships:
   - targetId: "bunta"
     text: "面白いやつ"
+  - targetId: "siro"
+    text: "からかい甲斐がある"
 
 tags:
   - rukiti
