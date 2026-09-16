@@ -24,7 +24,7 @@ other: "剥製の修復が上手い"
 group: "愛館市立郷土資料館"
 museumId: "aidate"
 image: "/images/uploads/tasuku.webp"
-designImage: "/images/uploads/tasuku_design.webp"
+designImage: "/images/uploads/design_tasuku.webp"
 catchcopy: "愛館市立郷土資料館　自然棟　剥製標本担当"
 relatedCharacterIds:
   - sion
