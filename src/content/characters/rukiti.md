@@ -22,6 +22,7 @@ designImage: "/images/uploads/design_rukiti.webp"
 catchcopy: "小樽市歴史資料館　ニシン漁担当"
 relatedCharacterIds:
   - bunta
+  - siro
 relationships:
   - targetId: "bunta"
     text: "面白いやつ"

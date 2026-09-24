@@ -20,6 +20,7 @@ designImage: "/images/uploads/design_bunta.webp"
 catchcopy: "小樽市歴史資料館　昔の暮らし担当"
 relatedCharacterIds:
   - rukiti
+  - siro
 relationships:
   - targetId: "rukiti"
     text: "変わった子"
