@@ -9,7 +9,7 @@ museumIds:
   - otaru
 tags:
   - siro
-postUrl: "https://x.com/Aidate_info/status/2099858613515038977?s=20"
+postUrl: "https://x.com/Aidate_info/status/2100583568099656078?s=20"
 ---
 
 クリスタとの和解の日は遠い
