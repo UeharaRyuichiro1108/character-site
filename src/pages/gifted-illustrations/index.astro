@@ -25,8 +25,8 @@ const items = Object.entries(itemModules)
       <section class="gifted-grid" aria-label="描いていただいたイラスト一覧">
         {items.map((item) => (
           <a class="gifted-card" href={item.url} target="_blank" rel="noopener noreferrer">
-            <div class="thumb" aria-hidden="true">
-              {item.thumbnailUrl ? <img src={item.thumbnailUrl} alt="" loading="lazy" /> : <span>URL</span>}
+            <div class="thumb" aria-hidden="true" data-protected-thumb>
+              {item.thumbnailUrl ? <img src={item.thumbnailUrl} alt="" loading="lazy" draggable="false" /> : <span>URL</span>}
             </div>
             <div class="card-body">
               <p>{item.creatorName} 様</p>
@@ -39,6 +39,17 @@ const items = Object.entries(itemModules)
       <p class="empty-message">まだ登録されていません。</p>
     )}
   </main>
+
+  <script>
+    document.querySelectorAll("[data-protected-thumb]").forEach((thumb) => {
+      thumb.addEventListener("contextmenu", (event) => {
+        event.preventDefault();
+      });
+      thumb.addEventListener("dragstart", (event) => {
+        event.preventDefault();
+      });
+    });
+  </script>
 </BaseLayout>
 
 <style>
@@ -75,6 +86,7 @@ const items = Object.entries(itemModules)
   }
 
   .thumb {
+    position: relative;
     display: grid;
     place-items: center;
     aspect-ratio: 1.91 / 1;
@@ -82,12 +94,26 @@ const items = Object.entries(itemModules)
     color: var(--blue-deep);
     font-weight: 700;
     overflow: hidden;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
   }
 
   .thumb img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    pointer-events: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .thumb::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
   }
 
   .card-body {
